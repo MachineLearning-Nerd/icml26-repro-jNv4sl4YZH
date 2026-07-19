@@ -1159,3 +1159,68 @@ OK
 {"type": "markdown", "id": "cell_9334fb20342f", "created_at": "2026-07-19T15:01:24+00:00", "title": "Raw metric domain contract"}
 -->
 Both resumable runners and both independent raw-artifact verifiers reject coverage outside [0,1] and negative interval length, in addition to non-finite metrics. The CA-to-CCP transition, post-CCP gate, and final publication gate explicitly require zero out-of-domain rows. Negative fixtures inject coverage 1.01, coverage -0.01, and length -0.01 in both protocols and are rejected.
+
+
+---
+<!-- trackio-cell
+{"type": "code", "id": "cell_a944728eabf0", "created_at": "2026-07-19T15:03:41+00:00", "title": "Live jury contract drift controls", "command": ["python", "-m", "unittest", "discover", "-s", "repro/tests", "-v"], "exit_code": 0, "duration_s": 8.514}
+-->
+````bash
+$ python -m unittest discover -s repro/tests -v
+````
+
+exit 0 · 8.5s
+
+
+````output
+test_ca_dry_run_uses_released_full_protocol_and_portable_provenance (test_author_runner_preflight.AuthorRunnerPreflightTests.test_ca_dry_run_uses_released_full_protocol_and_portable_provenance) ... ok
+test_ccp_input_preflight_loads_author_bundles_at_paper_fold_counts (test_author_runner_preflight.AuthorRunnerPreflightTests.test_ccp_input_preflight_loads_author_bundles_at_paper_fold_counts) ... ok
+test_ccp_rng_replay_matches_real_source_power_intervals (test_author_runner_preflight.AuthorRunnerPreflightTests.test_ccp_rng_replay_matches_real_source_power_intervals) ... ok
+test_ccp_seed_checkpoint_accepts_complete_cells_and_rejects_partial_cells (test_author_runner_preflight.AuthorRunnerPreflightTests.test_ccp_seed_checkpoint_accepts_complete_cells_and_rejects_partial_cells) ... boston: completed seed 45
+ok
+test_ccp_wrapper_reconstructs_the_paper_f3_linear_calibrator (test_author_runner_preflight.AuthorRunnerPreflightTests.test_ccp_wrapper_reconstructs_the_paper_f3_linear_calibrator) ... ok
+test_vectorized_aggregation_matches_scalar_oracle_at_paper_fold_counts (test_author_runner_preflight.AuthorRunnerPreflightTests.test_vectorized_aggregation_matches_scalar_oracle_at_paper_fold_counts) ... ok
+test_vectorized_ccp_adapter_matches_all_literal_source_model_paths (test_author_runner_preflight.AuthorRunnerPreflightTests.test_vectorized_ccp_adapter_matches_all_literal_source_model_paths) ... ok
+test_exact_enumerations_pass_and_invalid_control_fails (test_e_merge_coverage.EMergeCoverageTests.test_exact_enumerations_pass_and_invalid_control_fails) ... ok
+test_lp_rejects_invalid_weight_vectors (test_e_merge_coverage.EMergeCoverageTests.test_lp_rejects_invalid_weight_vectors) ... ok
+test_two_fold_lp_matches_independent_permutation_enumeration (test_e_merge_coverage.EMergeCoverageTests.test_two_fold_lp_matches_independent_permutation_enumeration) ... ok
+test_exact_ca_protocol_contract (test_full_protocol.FullProtocolTests.test_exact_ca_protocol_contract) ... ok
+test_expected_ccp_raw_cell_count (test_full_protocol.FullProtocolTests.test_expected_ccp_raw_cell_count) ... ok
+test_final_logbook_renderer_fails_closed_and_emits_gate_marker (test_full_protocol.FullProtocolTests.test_final_logbook_renderer_fails_closed_and_emits_gate_marker) ... ok
+test_live_jury_contract_rejects_count_and_wording_drift (test_full_protocol.FullProtocolTests.test_live_jury_contract_rejects_count_and_wording_drift) ... ok
+test_official_jury_claim_snapshot_has_three_claims_and_six_points (test_full_protocol.FullProtocolTests.test_official_jury_claim_snapshot_has_three_claims_and_six_points) ... ok
+test_paper_table_fixture_is_bound_to_primary_tex (test_full_protocol.FullProtocolTests.test_paper_table_fixture_is_bound_to_primary_tex) ... ok
+test_protocol_matches_released_paper_scale (test_full_protocol.FullProtocolTests.test_protocol_matches_released_paper_scale) ... ok
+test_publication_metadata_and_local_artifact_hygiene (test_full_protocol.FullProtocolTests.test_publication_metadata_and_local_artifact_hygiene) ... ok
+test_shared_queue_handoff_follows_initial_github_push (test_full_protocol.FullProtocolTests.test_shared_queue_handoff_follows_initial_github_push) ... ok
+test_trackio_evidence_bundle_is_hash_indexed_and_roundtrips_json (test_full_protocol.FullProtocolTests.test_trackio_evidence_bundle_is_hash_indexed_and_roundtrips_json) ... ok
+test_classic_calibrator_controls_expand_the_set (test_p2e_identity.P2EIdentityTests.test_classic_calibrator_controls_expand_the_set) ... ok
+test_full_grid_summary_passes (test_p2e_identity.P2EIdentityTests.test_full_grid_summary_passes) ... ok
+test_p2e_exactly_preserves_each_finite_rank_set (test_p2e_identity.P2EIdentityTests.test_p2e_exactly_preserves_each_finite_rank_set) ... ok
+test_ca_verifier_requires_each_method_seed_cell (test_raw_verifiers.RawVerifierTests.test_ca_verifier_requires_each_method_seed_cell) ... ok
+test_ccp_verifier_requires_each_model_method_seed_cell (test_raw_verifiers.RawVerifierTests.test_ccp_verifier_requires_each_model_method_seed_cell) ... ok
+test_paper_headline_comparison_reports_matching_and_drifted_cells (test_raw_verifiers.RawVerifierTests.test_paper_headline_comparison_reports_matching_and_drifted_cells) ... ok
+
+----------------------------------------------------------------------
+Ran 26 tests in 7.842s
+
+OK
+
+````
+
+
+---
+<!-- trackio-cell
+{"type": "code", "id": "cell_047bca10865a", "created_at": "2026-07-19T15:03:43+00:00", "title": "Live jury claim refresh", "command": ["python", "-c", "from repro.src.prepublish_gate import fetch_live_jury_claims; claims=fetch_live_jury_claims(); print(f\"live_claims={len(claims)} exact_wording=true possible_points=6\")"], "exit_code": 0, "duration_s": 1.056}
+-->
+````bash
+$ python -c 'from repro.src.prepublish_gate import fetch_live_jury_claims; claims=fetch_live_jury_claims(); print(f"live_claims={len(claims)} exact_wording=true possible_points=6")'
+````
+
+exit 0 · 1.1s
+
+
+````output
+live_claims=3 exact_wording=true possible_points=6
+
+````

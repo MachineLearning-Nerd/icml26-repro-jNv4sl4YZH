@@ -9,11 +9,16 @@ import json
 import re
 import subprocess
 import sys
+import urllib.request
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE_COMMIT = "66cb1e1c76d1b1d3d133fe6cb3896c95d48b5974"
+CLAIMS_URL = (
+    "https://huggingface.co/spaces/ICML-2026-agent-repro/challenge/"
+    "resolve/main/claims.json"
+)
 REQUIRED_TAGS = {"icml2026-repro", "paper-jNv4sl4YZH"}
 JURY_CLAIM_TEXTS = (
     "P2E calibrator converts conformal p-values to e-values without altering the induced prediction set",
@@ -112,6 +117,28 @@ def assert_exact_ccp_protocol(protocol: dict[str, object]) -> None:
 def assert_exact_ca_protocol(protocol: dict[str, object]) -> None:
     """Reject self-consistent CA output produced at any non-paper scope."""
     assert protocol == EXPECTED_CA_PROTOCOL, "CA paper protocol drift"
+
+
+def assert_live_jury_claims(claims: object) -> None:
+    """Require the live challenge entry to retain the exact three pinned claims."""
+    assert isinstance(claims, list), "live jury entry is not a claim list"
+    assert len(claims) == 3, "live jury claim count changed"
+    texts = tuple(
+        claim.get("text") if isinstance(claim, dict) else None for claim in claims
+    )
+    assert texts == JURY_CLAIM_TEXTS, "live jury claim wording changed"
+
+
+def fetch_live_jury_claims() -> list[dict[str, object]]:
+    request = urllib.request.Request(
+        CLAIMS_URL, headers={"User-Agent": "icml2026-reproduction-gate/1"}
+    )
+    with urllib.request.urlopen(request, timeout=30) as response:
+        payload = json.load(response)
+    assert isinstance(payload, dict), "live claims payload is not a mapping"
+    claims = payload.get("jNv4sl4YZH")
+    assert_live_jury_claims(claims)
+    return claims
 
 
 def text_files() -> list[Path]:
@@ -266,6 +293,7 @@ def main() -> None:
     assert tuple(claim["text"] for claim in jury["claims"]) == JURY_CLAIM_TEXTS
     assert [claim["claim"] for claim in jury["claims"]] == [1, 2, 3]
     assert [claim["possible_points"] for claim in jury["claims"]] == [2, 2, 2]
+    live_jury_claims = fetch_live_jury_claims()
 
     headline_config = load_json("repro/configs/paper_headlines.json")
     assert headline_config["source"] == "arXiv:2606.03600, Table 2 and Appendix Tables 6-8"
@@ -456,6 +484,8 @@ def main() -> None:
         "paper": "jNv4sl4YZH",
         "source_commit": source_commit,
         "claims": len(jury["claims"]),
+        "claims_source_url": CLAIMS_URL,
+        "live_claims_verified": len(live_jury_claims),
         "maximum_points": jury["maximum_points"],
         "tests_passed": True,
         "command_count": len(command_outputs),

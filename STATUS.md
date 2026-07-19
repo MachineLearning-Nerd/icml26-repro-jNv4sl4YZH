@@ -352,3 +352,9 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   negative range fixtures pass across both runners and both verifiers; the
   complete 25-test suite, bytecode compilation, shell syntax, preflight, and
   diff hygiene remain green without interrupting the live legacy CA process.
+- The final publication gate now refreshes the official challenge
+  `claims.json` over HTTPS and requires exactly the three pinned claim texts
+  before emitting its passing manifest. Count, extra-claim, missing-claim, and
+  wording-drift controls fail; a real live refresh returned all three exact
+  texts. The publisher additionally requires this live verification proof from
+  the fresh gate. All 26 tests pass.

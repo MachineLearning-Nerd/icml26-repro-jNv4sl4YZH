@@ -3,7 +3,9 @@
 This matrix uses the exact three claim texts retrieved from the challenge's
 official `claims.json` for OpenReview `jNv4sl4YZH` on 2026-07-19. The machine-
 readable snapshot is `repro/configs/jury_claims.json`; the publication gate
-requires all three entries and the six-point total exactly.
+requires all three entries and the six-point total exactly, then downloads the
+live official file again and rejects any claim-count or wording drift before
+creating the publication manifest.
 
 | Jury claim | Direct reproduction evidence | Independent evidence and falsifiers | Fail-closed acceptance rule |
 | --- | --- | --- | --- |

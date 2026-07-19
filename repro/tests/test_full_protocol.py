@@ -4,10 +4,13 @@ import unittest
 from pathlib import Path
 
 from repro.src.prepublish_gate import (
+    CLAIMS_URL,
     EXPECTED_CA_PROTOCOL,
     EXPECTED_CCP_PROTOCOL,
+    JURY_CLAIM_TEXTS,
     assert_exact_ca_protocol,
     assert_exact_ccp_protocol,
+    assert_live_jury_claims,
     hygiene_gate,
     sha256,
     validate_artifact_bundle,
@@ -46,6 +49,24 @@ class FullProtocolTests(unittest.TestCase):
                 "Enables exact 1-α coverage in cross-conformal prediction and conformal aggregation",
             ],
         )
+        self.assertEqual(
+            jury["source_url"],
+            CLAIMS_URL,
+        )
+
+    def test_live_jury_contract_rejects_count_and_wording_drift(self):
+        claims = [
+            {"status": "unverified", "text": text} for text in JURY_CLAIM_TEXTS
+        ]
+        assert_live_jury_claims(claims)
+        with self.assertRaises(AssertionError):
+            assert_live_jury_claims(claims[:-1])
+        with self.assertRaises(AssertionError):
+            assert_live_jury_claims([*claims, {"text": "new claim"}])
+        with self.assertRaises(AssertionError):
+            assert_live_jury_claims(
+                [{**claims[0], "text": "changed claim"}, *claims[1:]]
+            )
 
     def test_publication_metadata_and_local_artifact_hygiene(self):
         root = Path(__file__).resolve().parents[2]
@@ -102,6 +123,7 @@ class FullProtocolTests(unittest.TestCase):
         wait_for_space = publisher.index('until hf spaces info "$hf_space"')
         self.assertLess(initial_push, enqueue)
         self.assertLess(enqueue, wait_for_space)
+        self.assertIn('gate["live_claims_verified"] == 3', publisher)
 
     def test_protocol_matches_released_paper_scale(self):
         root = Path(__file__).resolve().parents[2]

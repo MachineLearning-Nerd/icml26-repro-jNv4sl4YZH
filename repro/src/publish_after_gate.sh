@@ -51,6 +51,11 @@ from repro.src.prepublish_gate import (
 gate = json.loads(Path("outputs/prepublish_gate.json").read_text(encoding="utf-8"))
 assert gate["paper"] == "jNv4sl4YZH"
 assert gate["claims"] == 3
+assert gate["claims_source_url"] == (
+    "https://huggingface.co/spaces/ICML-2026-agent-repro/challenge/"
+    "resolve/main/claims.json"
+)
+assert gate["live_claims_verified"] == 3
 assert gate["maximum_points"] == 6
 assert gate["tests_passed"] is True
 assert gate["publication_gate_passed"] is True
