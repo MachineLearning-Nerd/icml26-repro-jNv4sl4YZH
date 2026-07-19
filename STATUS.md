@@ -188,3 +188,11 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   continuation guard and both serialized handoffs remain alive. The required
   Python 3.12 environment was re-entered, the publication shell scripts passed
   syntax/preflight checks, and all `18/18` tests passed again.
+- At `2026-07-19 13:12 IST`, the CA-to-CCP transition was made fail-closed at
+  commit `9bd602d`. The durable handoff now requires the exact 1,920-cell set,
+  zero structural errors, all 24/24 comparisons above the predeclared 10%
+  efficiency threshold, and all 8/8 P2E coverage cells within the predeclared
+  0.02 shortfall tolerance before it can start the 11,700-cell CCP sweep. The
+  full 18-test suite and shell syntax check pass. The legacy CA process was not
+  interrupted; only its idle old handoff was replaced by the stricter durable
+  handoff (PID `3482976`).
