@@ -2,16 +2,20 @@
 
 ## Current step
 
-`in_progress` — Claim 1 is complete locally. Claim 2's full released CA run is
-active under Trackio: tasks `361237`, `361235`, and `361244` are complete, with
-task `361234` still computing. The three completed tasks contain exactly 1,440
-raw rows (20 seeds × 24 methods each), all finite and structurally complete;
-their six P2E headline cells agree with the paper within `0.004` coverage and
-`0.22%` relative length. P2E is shorter in all 18 completed
-task/family/comparator cells versus log, square-root, and linear calibrators;
-the minimum relative reduction is `87.82%`. Claim 3's full CCP runner remains
-queued until CA finishes. The local Trackio logbook is structured and tagged
-but unpublished.
+`in_progress` — the effective live contract is six anchored claims / 12
+possible points. The full released CA run is complete at exactly 1,920 cells
+and has passed its independent structure, efficiency, coverage, input, and
+theorem-domain gates. The sole full released CCP worker is active: Boston and
+Abalone are complete at 3,900 cells each and Parkinson has completed 34/100
+seeds (1,326 cells), for 9,126/11,700 raw CCP cells overall as of
+`2026-07-19 23:26 IST`. A partial diagnostic already has the correct direction
+for all 36 calibrator comparisons, all 27 classical gains exceed the fixed 10%
+materiality threshold, and all 27 P2E coverage cells pass; it is not accepted
+as final evidence because 66 Parkinson seeds remain. Post-CCP watcher PID
+`3623510` will run all independent verifiers, render six verdicts, pass the
+fail-closed gate, push GitHub first, and atomically enqueue the paper for the
+shared Hugging Face drain. The local Trackio logbook remains unpublished until
+that complete handoff.
 
 ## Pinned inputs
 
@@ -91,13 +95,10 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   challenge artifacts confirmed the publisher's Space JSON fields, tag/SHA
   checks, recursive bucket JSON fields, exact-size artifact lookup, and Space
   download options match the live CLI/API shapes.
-- Re-read the live official challenge `claims.json`: it still lists exactly
-  three claims (six possible points). Their exact text, direct evidence,
-  independent evidence, falsifiers, and fail-closed acceptance rules are now
-  pinned in `repro/configs/jury_claims.json` and
-  `docs/jury_claim_evidence_matrix.md`; the publication gate enforces this
-  snapshot. The claim-scope check remains part of the current `18/18` passing
-  test suite.
+- Historical fallback snapshot: `claims.json` listed three broad claims. This
+  entry is superseded by the `2026-07-19 22:31 IST` anchored-claim correction
+  below: the frontend prioritizes `claims_anchored.json`, whose six exact live
+  claims are now pinned and fail-closed by the publication gate.
 - Tightened C2's qualitative word "substantial" into a fail-closed numerical
   rule before the final dataset exists: every one of the 24 matched P2E versus
   log/square-root/linear comparisons must reduce interval length by at least
@@ -484,7 +485,7 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   CPU with three complete 480-row artifacts; both serialized handoffs and the
   shared HF drain remained alive. The shared drain has published all 42 current
   backlog entries, and this paper will join it atomically only after the full
-  three-claim gate and first GitHub push succeed. The audit implementation is
+  six-claim gate and first GitHub push succeed. The audit implementation is
   committed at `9f23d62`; refreshed post-CCP watcher PID `3575557` owns its
   singleton lock and the active CA worker was not interrupted.
 
