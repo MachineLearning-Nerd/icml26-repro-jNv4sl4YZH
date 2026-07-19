@@ -13,6 +13,7 @@ from pathlib import Path
 
 COMPARATORS = ("log", "sqrt", "linear")
 MIN_SUBSTANTIAL_RELATIVE_REDUCTION = 0.10
+EMPIRICAL_COVERAGE_SHORTFALL_TOLERANCE = 0.02
 CALIBRATORS = ("log", "linear", "sqrt", "AoN", "P2E")
 EXPECTED_METHODS = (
     "CM",
@@ -157,6 +158,16 @@ def main() -> None:
         for row in comparisons
         if row["relative_reduction"] is not None
     ]
+    p2e_coverage_means = [
+        float(methods[method]["coverage_mean"])
+        for methods in summaries.values()
+        for method in ("WECA(P2E)", "UR-WECA(P2E)")
+        if method in methods and methods[method]["coverage_mean"] is not None
+    ]
+    p2e_coverage_pass_count = sum(
+        coverage >= target - EMPIRICAL_COVERAGE_SHORTFALL_TOLERANCE
+        for coverage in p2e_coverage_means
+    )
     result = {
         "protocol": protocol,
         "rows_seen": rows_seen,
@@ -182,6 +193,16 @@ def main() -> None:
             "minimum_substantial_relative_reduction": MIN_SUBSTANTIAL_RELATIVE_REDUCTION,
             "minimum_observed_relative_reduction": (
                 min(finite_relative_reductions) if finite_relative_reductions else None
+            ),
+            "p2e_empirical_coverage_cell_count": len(p2e_coverage_means),
+            "p2e_empirical_coverage_pass_count": p2e_coverage_pass_count,
+            "all_p2e_empirical_coverage_within_tolerance": (
+                bool(p2e_coverage_means)
+                and p2e_coverage_pass_count == len(p2e_coverage_means)
+            ),
+            "empirical_coverage_shortfall_tolerance": EMPIRICAL_COVERAGE_SHORTFALL_TOLERANCE,
+            "minimum_p2e_empirical_coverage": (
+                min(p2e_coverage_means) if p2e_coverage_means else None
             ),
             "nominal_coverage": target,
         },

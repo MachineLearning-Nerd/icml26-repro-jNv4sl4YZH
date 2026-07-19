@@ -11,6 +11,9 @@ from collections import defaultdict
 from pathlib import Path
 
 
+EMPIRICAL_COVERAGE_SHORTFALL_TOLERANCE = 0.02
+
+
 def mean_and_sd(values: list[float]) -> tuple[float | None, float | None]:
     if not values or not all(math.isfinite(value) for value in values):
         return None, None
@@ -101,6 +104,17 @@ def main() -> None:
                     "length_sd": length_sd,
                 }
 
+    nominal_coverage = 1.0 - protocol["alpha"]
+    eccp_coverage_means = [
+        float(methods["ECCP"]["coverage_mean"])
+        for models in summaries.values()
+        for methods in models.values()
+        if "ECCP" in methods and methods["ECCP"]["coverage_mean"] is not None
+    ]
+    eccp_coverage_pass_count = sum(
+        coverage >= nominal_coverage - EMPIRICAL_COVERAGE_SHORTFALL_TOLERANCE
+        for coverage in eccp_coverage_means
+    )
     result = {
         "protocol": protocol,
         "rows_seen": total_rows,
@@ -115,7 +129,17 @@ def main() -> None:
             "unexpected_row_count": unexpected_rows,
             "nonfinite_row_count": nonfinite_rows,
             "exact_cell_set": observed_cells == expected_cells,
-            "nominal_coverage": 1.0 - protocol["alpha"],
+            "eccp_empirical_coverage_cell_count": len(eccp_coverage_means),
+            "eccp_empirical_coverage_pass_count": eccp_coverage_pass_count,
+            "all_eccp_empirical_coverage_within_tolerance": (
+                bool(eccp_coverage_means)
+                and eccp_coverage_pass_count == len(eccp_coverage_means)
+            ),
+            "empirical_coverage_shortfall_tolerance": EMPIRICAL_COVERAGE_SHORTFALL_TOLERANCE,
+            "minimum_eccp_empirical_coverage": (
+                min(eccp_coverage_means) if eccp_coverage_means else None
+            ),
+            "nominal_coverage": nominal_coverage,
         },
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)

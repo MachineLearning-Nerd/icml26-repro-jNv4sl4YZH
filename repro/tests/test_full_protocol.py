@@ -116,6 +116,10 @@ class FullProtocolTests(unittest.TestCase):
                 "p2e_shorter_count": 24,
                 "substantial_efficiency_gain_count": 24,
                 "all_substantial_efficiency_gains": True,
+                "all_p2e_empirical_coverage_within_tolerance": True,
+                "p2e_empirical_coverage_cell_count": 8,
+                "p2e_empirical_coverage_pass_count": 8,
+                "empirical_coverage_shortfall_tolerance": 0.02,
                 "minimum_substantial_relative_reduction": 0.10,
                 "minimum_observed_relative_reduction": 0.90,
             },
@@ -157,6 +161,10 @@ class FullProtocolTests(unittest.TestCase):
             "summary": {
                 "all_full_seed_cells_present": True,
                 "exact_cell_set": True,
+                "all_eccp_empirical_coverage_within_tolerance": True,
+                "eccp_empirical_coverage_cell_count": 9,
+                "eccp_empirical_coverage_pass_count": 9,
+                "empirical_coverage_shortfall_tolerance": 0.02,
                 "expected_rows": 11_700,
             },
             "summaries": {

@@ -235,6 +235,7 @@ def main() -> None:
             "all_full_seed_method_cells_present",
             "exact_cell_set",
             "all_substantial_efficiency_gains",
+            "all_p2e_empirical_coverage_within_tolerance",
         ),
     )
     claim2_summary = claim2["summary"]
@@ -244,18 +245,31 @@ def main() -> None:
     assert claim2_summary["substantial_efficiency_gain_count"] == 24
     assert claim2_summary["minimum_substantial_relative_reduction"] == 0.10
     assert claim2_summary["minimum_observed_relative_reduction"] >= 0.10
+    assert claim2_summary["p2e_empirical_coverage_cell_count"] == 8
+    assert claim2_summary["p2e_empirical_coverage_pass_count"] == 8
+    assert claim2_summary["empirical_coverage_shortfall_tolerance"] == 0.02
     assert claim2_summary["duplicate_cell_count"] == 0
     assert claim2_summary["unexpected_row_count"] == 0
     assert claim2_summary["nonfinite_row_count"] == 0
 
     claim3 = load_json("outputs/claim3_independent.json")
-    assert_summary(claim3, ("all_full_seed_cells_present", "exact_cell_set"))
+    assert_summary(
+        claim3,
+        (
+            "all_full_seed_cells_present",
+            "exact_cell_set",
+            "all_eccp_empirical_coverage_within_tolerance",
+        ),
+    )
     claim3_summary = claim3["summary"]
     assert claim3["rows_seen"] == claim3_summary["expected_rows"] == 11_700
     assert claim3_summary["observed_unique_cells"] == 11_700
     assert claim3_summary["duplicate_cell_count"] == 0
     assert claim3_summary["unexpected_row_count"] == 0
     assert claim3_summary["nonfinite_row_count"] == 0
+    assert claim3_summary["eccp_empirical_coverage_cell_count"] == 9
+    assert claim3_summary["eccp_empirical_coverage_pass_count"] == 9
+    assert claim3_summary["empirical_coverage_shortfall_tolerance"] == 0.02
 
     headlines = load_json("outputs/paper_headline_comparison.json")
     assert_summary(headlines, ("all_within_tolerance",))

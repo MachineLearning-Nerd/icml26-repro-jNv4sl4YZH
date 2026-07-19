@@ -108,6 +108,13 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   two-fold LP optimum, and malformed/negative/non-normalized weights are
   rejected. The refreshed result is captured in Trackio and closes the
   previously implicit ECCP mechanism scope.
+- Added a pre-final-result empirical coverage sanity gate for both applications
+  named by C3. All eight CA P2E and all nine CCP ECCP coverage means must be no
+  more than two percentage points below nominal; the full gate checks exact
+  cell counts before applying it. Dedicated undercoverage fixtures fail for CA
+  and CCP. This is explicitly labeled a gross-undercoverage check rather than
+  evidence of exactness; the exact rank/e-value and arbitrary-dependence LP
+  certificate remains independently required.
 - Ran all eighteen local mechanism/protocol/author-launcher/raw-verifier and
   paper-headline drift-control tests successfully (including positive and
   deliberately incomplete raw fixtures), including local-only Trackio artifact

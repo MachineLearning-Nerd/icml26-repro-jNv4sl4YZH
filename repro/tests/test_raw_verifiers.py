@@ -128,6 +128,11 @@ class RawVerifierTests(unittest.TestCase):
             self.assertAlmostEqual(
                 passed["summary"]["minimum_observed_relative_reduction"], 0.2
             )
+            self.assertEqual(passed["summary"]["p2e_empirical_coverage_cell_count"], 2)
+            self.assertEqual(passed["summary"]["p2e_empirical_coverage_pass_count"], 2)
+            self.assertTrue(
+                passed["summary"]["all_p2e_empirical_coverage_within_tolerance"]
+            )
 
             payload["rows"] = [
                 {
@@ -148,6 +153,26 @@ class RawVerifierTests(unittest.TestCase):
             )
             self.assertFalse(
                 merely_shorter["summary"]["all_substantial_efficiency_gains"]
+            )
+
+            payload["rows"] = [
+                {
+                    **row,
+                    "Coverage": 0.90
+                    if str(row["Method"]).endswith("(P2E)")
+                    else row["Coverage"],
+                }
+                for row in rows
+            ]
+            (raw / "toy.json").write_text(json.dumps(payload), encoding="utf-8")
+            undercoverage = invoke(
+                "verify_ca_results.py", raw, raw / "undercoverage.json"
+            )
+            self.assertEqual(
+                undercoverage["summary"]["p2e_empirical_coverage_pass_count"], 0
+            )
+            self.assertFalse(
+                undercoverage["summary"]["all_p2e_empirical_coverage_within_tolerance"]
             )
 
             payload["rows"] = rows[:-1]
@@ -205,6 +230,23 @@ class RawVerifierTests(unittest.TestCase):
             self.assertEqual(passed["summary"]["duplicate_cell_count"], 0)
             self.assertEqual(passed["summary"]["unexpected_row_count"], 0)
             self.assertEqual(passed["summary"]["nonfinite_row_count"], 0)
+            self.assertEqual(passed["summary"]["eccp_empirical_coverage_cell_count"], 1)
+            self.assertEqual(passed["summary"]["eccp_empirical_coverage_pass_count"], 1)
+            self.assertTrue(
+                passed["summary"]["all_eccp_empirical_coverage_within_tolerance"]
+            )
+
+            payload["rows"] = [{**row, "coverage": 0.85} for row in rows]
+            (raw / "toy.json").write_text(json.dumps(payload), encoding="utf-8")
+            undercoverage = invoke(
+                "verify_ccp_results.py", raw, raw / "undercoverage.json"
+            )
+            self.assertEqual(
+                undercoverage["summary"]["eccp_empirical_coverage_pass_count"], 0
+            )
+            self.assertFalse(
+                undercoverage["summary"]["all_eccp_empirical_coverage_within_tolerance"]
+            )
 
             payload["rows"] = rows[:-1]
             (raw / "toy.json").write_text(json.dumps(payload), encoding="utf-8")

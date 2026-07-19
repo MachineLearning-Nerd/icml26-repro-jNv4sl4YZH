@@ -38,3 +38,10 @@ for OLS, RF, and Lasso on Boston, Abalone, and Parkinson at the reported
 15/15/20 fold counts. In total, the fail-closed comparison checks all four
 reported scalars (coverage mean/SD and length mean/SD) in each of 17 headline
 cells: 68 scalar comparisons.
+
+Separately, the raw CA/CCP verifiers apply a fixed two-percentage-point
+gross-undercoverage sanity threshold to all eight P2E aggregation cells and all
+nine ECCP cells. This empirical tolerance was fixed before the final CA task
+and every CCP result existed. It does not establish the word "exact"; the
+finite-rank enumeration and arbitrary-dependence LP provide that mechanism
+certificate.
