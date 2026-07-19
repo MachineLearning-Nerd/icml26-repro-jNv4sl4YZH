@@ -281,3 +281,11 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   Negative controls independently remove a dataset, seed, model, or method and
   alter alpha, grid size, or adapter; every drift is rejected. All 22 tests and
   the no-write publication preflight pass.
+- At `2026-07-19 19:39 IST`, the current commit's complete 22-test suite passed
+  in `7.75s`. A fresh invocation of the real prepublication gate revalidated
+  the source pin, Claim 1 identity/source parity, and all eight Claim 3
+  arbitrary-dependence cases, then failed closed at the strict CA verifier
+  because `dataset_361234.json` is still absent. It emitted neither a passing
+  manifest nor an evidence bundle. The legacy final-task worker remained
+  compute-active at `97.8%` CPU with `23:09:30` CPU time, `191,984 kB` RSS, and
+  zero swap; the serialized CA-to-CCP and post-CCP handoffs remain alive.
