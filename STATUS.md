@@ -206,3 +206,16 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   non-writing publication preflight also pass. No fourth artifact has been
   promoted yet; this is a long but demonstrably active finite source
   computation, not a stalled process.
+- At `2026-07-19 18:31 IST`, the final CA task remained compute-active at
+  `97.7%` CPU with `22:02:38` accumulated CPU time, `193,636 kB` RSS, and zero
+  process swap. The three completed dataset artifacts remain unchanged and no
+  incomplete fourth artifact has been promoted. The strict CA-to-CCP and
+  post-CCP watchers remain alive.
+- The gate-complete publication handoff is now durable. After the existing
+  fail-closed gate and `FULL_GATE_READY: jNv4sl4YZH` marker pass, the publisher
+  revalidates both proofs and atomically/idempotently appends this paper to the
+  canonical shared Hugging Face backlog. It no longer races the single shared
+  drain worker for a Space-creation slot; it waits for that worker and then
+  performs the existing public Space/tag/SHA/artifact readback. An attempted
+  enqueue against the current incomplete state is rejected without modifying
+  the backlog. Paper commit: `0ff983a`; control-plane helper commit: `e63646c`.
