@@ -1526,4 +1526,4 @@ OK
 -->
 **📦 Artifact** `outputs/jNv4sl4YZH_full_evidence_bundle.jsonl` · dataset · 2.8 MB
 
-trackio-local-path://outputs/jNv4sl4YZH_full_evidence_bundle.jsonl
+https://huggingface.co/buckets/DineshAI/jNv4sl4YZH-artifacts#logbook-files/outputs/jNv4sl4YZH_full_evidence_bundle.jsonl
