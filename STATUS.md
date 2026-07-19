@@ -464,7 +464,7 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   included in the future 18-record evidence bundle. All 32 tests, compilation,
   shell syntax, publication preflight, and hygiene pass. A real premature gate
   accepts the new OpenML certificate before rejecting the absent fourth CA
-  output and emits neither manifest nor bundle. At `2026-07-19 21:43 IST`, the
+  output and emits neither manifest nor bundle. At `2026-07-19 21:42 IST`, the
   untouched CA worker remained compute-active at `97.9%` CPU and about `193 MB`
   RSS; the handoffs and shared HF drain remained alive. The audit is committed
   at `95f579b`; refreshed post-CCP watcher PID `3571647` owns the singleton lock.
