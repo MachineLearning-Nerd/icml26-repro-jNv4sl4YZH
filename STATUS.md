@@ -345,3 +345,10 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   initial git stage/commit, while retaining idempotent, gate-checked queueing.
   The ordering is regression-tested; all 25 tests, shell syntax, publication
   preflight, and diff hygiene pass.
+- Raw CA and CCP checkpoints and independent verifiers now reject semantically
+  impossible metrics as well as non-finite values: every coverage must be in
+  `[0,1]` and every interval length must be nonnegative. Both transition gates
+  and the final publication gate require zero out-of-domain rows. Positive and
+  negative range fixtures pass across both runners and both verifiers; the
+  complete 25-test suite, bytecode compilation, shell syntax, preflight, and
+  diff hygiene remain green without interrupting the live legacy CA process.

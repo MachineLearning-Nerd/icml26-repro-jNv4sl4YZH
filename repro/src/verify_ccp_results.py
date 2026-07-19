@@ -50,6 +50,7 @@ def main() -> None:
     duplicate_cells: set[tuple[str, str, str, int]] = set()
     unexpected_rows = 0
     nonfinite_rows = 0
+    invalid_metric_rows = 0
     structural_integrity = {dataset_key: True for dataset_key in protocol["datasets"]}
     total_rows = 0
     for dataset_key, folds in protocol["datasets"].items():
@@ -67,7 +68,12 @@ def main() -> None:
             method = str(row["method"])
             seed = int(row["seed"])
             cell = (row_dataset, model, method, seed)
-            finite = math.isfinite(float(row["coverage"])) and math.isfinite(float(row["length"]))
+            coverage = float(row["coverage"])
+            length = float(row["length"])
+            finite = math.isfinite(coverage) and math.isfinite(length)
+            metric_range_valid = (
+                finite and 0.0 <= coverage <= 1.0 and length >= 0.0
+            )
             valid_scope = (
                 row_dataset == dataset_key
                 and model in expected_models
@@ -80,6 +86,9 @@ def main() -> None:
                 structural_integrity[dataset_key] = False
             if not finite:
                 nonfinite_rows += 1
+                structural_integrity[dataset_key] = False
+            elif not metric_range_valid:
+                invalid_metric_rows += 1
                 structural_integrity[dataset_key] = False
             if cell in observed_cells:
                 duplicate_cells.add(cell)
@@ -203,6 +212,7 @@ def main() -> None:
             "duplicate_cell_count": len(duplicate_cells),
             "unexpected_row_count": unexpected_rows,
             "nonfinite_row_count": nonfinite_rows,
+            "invalid_metric_row_count": invalid_metric_rows,
             "exact_cell_set": observed_cells == expected_cells,
             "eccp_empirical_coverage_cell_count": len(eccp_coverage_means),
             "eccp_empirical_coverage_pass_count": eccp_coverage_pass_count,

@@ -129,6 +129,7 @@ class RawVerifierTests(unittest.TestCase):
             self.assertEqual(passed["summary"]["duplicate_cell_count"], 0)
             self.assertEqual(passed["summary"]["unexpected_row_count"], 0)
             self.assertEqual(passed["summary"]["nonfinite_row_count"], 0)
+            self.assertEqual(passed["summary"]["invalid_metric_row_count"], 0)
             self.assertEqual(passed["summary"]["comparison_count"], 6)
             self.assertEqual(passed["summary"]["p2e_shorter_count"], 6)
             self.assertEqual(
@@ -184,6 +185,24 @@ class RawVerifierTests(unittest.TestCase):
             self.assertFalse(
                 undercoverage["summary"]["all_p2e_empirical_coverage_within_tolerance"]
             )
+
+            invalid_range_rows = [
+                {
+                    **row,
+                    "Coverage": 1.01 if index == 0 else row["Coverage"],
+                    "Avg Length": -0.01 if index == 1 else row["Avg Length"],
+                }
+                for index, row in enumerate(rows)
+            ]
+            payload["rows"] = invalid_range_rows
+            (raw / "toy.json").write_text(json.dumps(payload), encoding="utf-8")
+            rejected_range = invoke(
+                "verify_ca_results.py", raw, raw / "rejected_range.json"
+            )
+            self.assertFalse(
+                rejected_range["summary"]["all_full_seed_method_cells_present"]
+            )
+            self.assertEqual(rejected_range["summary"]["invalid_metric_row_count"], 2)
 
             payload["rows"] = rows[:-1]
             (raw / "toy.json").write_text(json.dumps(payload), encoding="utf-8")
@@ -254,6 +273,7 @@ class RawVerifierTests(unittest.TestCase):
             self.assertEqual(passed["summary"]["duplicate_cell_count"], 0)
             self.assertEqual(passed["summary"]["unexpected_row_count"], 0)
             self.assertEqual(passed["summary"]["nonfinite_row_count"], 0)
+            self.assertEqual(passed["summary"]["invalid_metric_row_count"], 0)
             self.assertEqual(passed["summary"]["eccp_empirical_coverage_cell_count"], 1)
             self.assertEqual(passed["summary"]["eccp_empirical_coverage_pass_count"], 1)
             self.assertTrue(
@@ -349,6 +369,22 @@ class RawVerifierTests(unittest.TestCase):
             self.assertFalse(
                 undercoverage["summary"]["all_eccp_empirical_coverage_within_tolerance"]
             )
+
+            invalid_range_rows = [
+                {
+                    **row,
+                    "coverage": 1.01 if index == 0 else row["coverage"],
+                    "length": -0.01 if index == 1 else row["length"],
+                }
+                for index, row in enumerate(rows)
+            ]
+            payload["rows"] = invalid_range_rows
+            (raw / "toy.json").write_text(json.dumps(payload), encoding="utf-8")
+            rejected_range = invoke(
+                "verify_ccp_results.py", raw, raw / "rejected_range.json"
+            )
+            self.assertFalse(rejected_range["summary"]["all_full_seed_cells_present"])
+            self.assertEqual(rejected_range["summary"]["invalid_metric_row_count"], 2)
 
             payload["rows"] = rows[:-1]
             (raw / "toy.json").write_text(json.dumps(payload), encoding="utf-8")

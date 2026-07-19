@@ -326,12 +326,16 @@ def validated_completed_seeds(rows, dataset_key, k):
         cell = (str(row["model"]), str(row["method"]))
         if cell in cells_by_seed[seed]:
             raise RuntimeError(f"duplicate checkpoint cell for {dataset_key}, seed {seed}: {cell}")
-        if not (
-            math.isfinite(float(row["coverage"]))
-            and math.isfinite(float(row["length"]))
-        ):
+        coverage = float(row["coverage"])
+        length = float(row["length"])
+        if not (math.isfinite(coverage) and math.isfinite(length)):
             raise RuntimeError(
                 f"non-finite checkpoint metric for {dataset_key}, seed {seed}: {cell}"
+            )
+        if not (0.0 <= coverage <= 1.0 and length >= 0.0):
+            raise RuntimeError(
+                f"out-of-range checkpoint metric for {dataset_key}, seed {seed}: "
+                f"{cell} coverage={coverage}, length={length}"
             )
         cells_by_seed[seed].add(cell)
     for seed, cells in cells_by_seed.items():

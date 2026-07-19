@@ -74,12 +74,16 @@ def validated_completed_seeds(rows, dataset_name, expected_seeds):
             raise RuntimeError(
                 f"unexpected checkpoint method for {dataset_name}, seed {seed}: {method}"
             )
-        if not (
-            math.isfinite(float(row["Coverage"]))
-            and math.isfinite(float(row["Avg Length"]))
-        ):
+        coverage = float(row["Coverage"])
+        length = float(row["Avg Length"])
+        if not (math.isfinite(coverage) and math.isfinite(length)):
             raise RuntimeError(
                 f"non-finite checkpoint metric for {dataset_name}, seed {seed}: {method}"
+            )
+        if not (0.0 <= coverage <= 1.0 and length >= 0.0):
+            raise RuntimeError(
+                f"out-of-range checkpoint metric for {dataset_name}, seed {seed}: "
+                f"{method} coverage={coverage}, length={length}"
             )
         methods_by_seed[seed].add(method)
     for seed, methods in methods_by_seed.items():

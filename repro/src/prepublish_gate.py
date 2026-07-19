@@ -359,6 +359,7 @@ def main() -> None:
     assert claim2_summary["duplicate_cell_count"] == 0
     assert claim2_summary["unexpected_row_count"] == 0
     assert claim2_summary["nonfinite_row_count"] == 0
+    assert claim2_summary["invalid_metric_row_count"] == 0
 
     claim3 = load_json("outputs/claim3_independent.json")
     assert_summary(
@@ -379,6 +380,7 @@ def main() -> None:
     assert claim3_summary["duplicate_cell_count"] == 0
     assert claim3_summary["unexpected_row_count"] == 0
     assert claim3_summary["nonfinite_row_count"] == 0
+    assert claim3_summary["invalid_metric_row_count"] == 0
     assert claim3_summary["eccp_empirical_coverage_cell_count"] == 9
     assert claim3_summary["eccp_empirical_coverage_pass_count"] == 9
     assert claim3_summary["empirical_coverage_shortfall_tolerance"] == 0.02

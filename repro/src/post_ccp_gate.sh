@@ -52,6 +52,7 @@ assert summary["observed_unique_cells"] == 11_700
 assert summary["duplicate_cell_count"] == 0
 assert summary["unexpected_row_count"] == 0
 assert summary["nonfinite_row_count"] == 0
+assert summary["invalid_metric_row_count"] == 0
 print("Claim 3 raw-cell completeness gate passed")
 PY
 

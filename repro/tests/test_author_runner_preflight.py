@@ -358,6 +358,17 @@ class AuthorRunnerPreflightTests(unittest.TestCase):
                 "boston",
                 15,
             )
+        for field, value in (
+            ("coverage", 1.01),
+            ("coverage", -0.01),
+            ("length", -0.01),
+        ):
+            with self.subTest(field=field, value=value), self.assertRaises(
+                RuntimeError
+            ):
+                runner.validated_completed_seeds(
+                    [{**rows[0], field: value}, *rows[1:]], "boston", 15
+                )
         with tempfile.TemporaryDirectory() as temp:
             checkpoint = Path(temp) / ".boston.partial.json"
             runner.write_checkpoint(checkpoint, protocol, "boston", 15, rows)
@@ -472,6 +483,19 @@ class AuthorRunnerPreflightTests(unittest.TestCase):
         )
         with self.assertRaises(RuntimeError):
             runner.validated_completed_seeds(rows[:-1], "dataset_361237", [42])
+        for field, value in (
+            ("Coverage", 1.01),
+            ("Coverage", -0.01),
+            ("Avg Length", -0.01),
+        ):
+            with self.subTest(field=field, value=value), self.assertRaises(
+                RuntimeError
+            ):
+                runner.validated_completed_seeds(
+                    [{**rows[0], field: value}, *rows[1:]],
+                    "dataset_361237",
+                    [42],
+                )
         mini_protocol = {
             **protocol,
             "tasks": ["dataset_361237"],

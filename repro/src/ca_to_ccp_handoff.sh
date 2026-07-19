@@ -81,6 +81,7 @@ assert summary["observed_unique_cells"] == 1_920
 assert summary["duplicate_cell_count"] == 0
 assert summary["unexpected_row_count"] == 0
 assert summary["nonfinite_row_count"] == 0
+assert summary["invalid_metric_row_count"] == 0
 
 assert summary["comparison_count"] == 24
 assert summary["p2e_shorter_count"] == 24

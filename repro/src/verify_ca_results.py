@@ -54,6 +54,7 @@ def main() -> None:
     duplicate_cells: set[tuple[str, str, int]] = set()
     unexpected_rows = 0
     nonfinite_rows = 0
+    invalid_metric_rows = 0
     structural_integrity = {dataset: True for dataset in task_names}
     rows_seen = 0
     for task_name in task_names:
@@ -66,7 +67,12 @@ def main() -> None:
             method = str(row["Method"])
             seed = int(row["Seed"])
             cell = (dataset, method, seed)
-            finite = math.isfinite(float(row["Coverage"])) and math.isfinite(float(row["Avg Length"]))
+            coverage = float(row["Coverage"])
+            length = float(row["Avg Length"])
+            finite = math.isfinite(coverage) and math.isfinite(length)
+            metric_range_valid = (
+                finite and 0.0 <= coverage <= 1.0 and length >= 0.0
+            )
             valid_scope = (
                 dataset == task_name
                 and method in EXPECTED_METHODS
@@ -77,6 +83,9 @@ def main() -> None:
                 structural_integrity[task_name] = False
             if not finite:
                 nonfinite_rows += 1
+                structural_integrity[task_name] = False
+            elif not metric_range_valid:
+                invalid_metric_rows += 1
                 structural_integrity[task_name] = False
             if cell in observed_cells:
                 duplicate_cells.add(cell)
@@ -183,6 +192,7 @@ def main() -> None:
             "duplicate_cell_count": len(duplicate_cells),
             "unexpected_row_count": unexpected_rows,
             "nonfinite_row_count": nonfinite_rows,
+            "invalid_metric_row_count": invalid_metric_rows,
             "exact_cell_set": observed_cells == expected_cells,
             "comparison_count": len(comparisons),
             "p2e_shorter_count": sum(row["p2e_is_shorter"] for row in comparisons),
