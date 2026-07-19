@@ -2,22 +2,23 @@
 
 ## Current step
 
-`in_progress` — the effective live contract is six anchored claims / 12
-possible points. The full released CA run is complete at exactly 1,920 cells
-and has passed its independent structure, efficiency, coverage, input, and
-theorem-domain gates. The sole full released CCP worker is active: Boston and
-Abalone are complete at 3,900 cells each and Parkinson has completed 70/100
-seeds (2,730 cells), for 10,530/11,700 raw CCP cells overall as of
-`2026-07-19 23:57 IST`. A 69-seed independent checkpoint audit has the correct
-direction for all 36 calibrator comparisons, all 27 classical gains exceed the
-fixed 10% materiality threshold, and all 27 P2E coverage cells pass. All 94
-unaffected table cells and all 72 reversible source-column replay scalars also
-pass their fixed tolerances at this checkpoint; this is not accepted as final
-evidence because 30 Parkinson seeds remain. Post-CCP watcher PID
-`3690266` will run all independent verifiers, render six verdicts, pass the
-fail-closed gate, push GitHub first, and atomically enqueue the paper for the
-shared Hugging Face drain. The local Trackio logbook remains unpublished until
-that complete handoff.
+`under_verdict` — all six anchored claims / 12 possible points passed the
+fail-closed publication gate. The complete released CA and CCP protocols
+contain exactly 1,920 and 11,700 raw cells, respectively; all independent
+structure, efficiency, coverage, source, input, and theorem-domain checks pass,
+as do all 35 tests. All 376 unaffected table scalars reproduce within fixed
+tolerances; the one exact CA finite-seed dispersion discrepancy and the
+paper/released-code CCP formula mismatch are source-bound and disclosed, while
+all 72 reversible source-column replay scalars pass. GitHub was pushed first,
+the paper was atomically added as canonical backlog entry 43, and the singleton
+drain published and verified the Hugging Face Space on `2026-07-20 00:38 IST`.
+
+- GitHub: `MachineLearning-Nerd/icml26-repro-jNv4sl4YZH` at
+  `6f27af6b4a2d2be3c1667cf61ee1179c918ff2e5`.
+- Hugging Face: `DineshAI/jNv4sl4YZH` at
+  `577180d0acf73a39d414588dcdc26d67677d0190`.
+- Trackio evidence bundle: 2,781,144 bytes, publicly read back from
+  `DineshAI/jNv4sl4YZH-artifacts`.
 
 ## Pinned inputs
 

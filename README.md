@@ -138,14 +138,17 @@ its artifact source path cannot leak into GitHub.
 
 ## Current status
 
-The source and environment are pinned. The full four-dataset CA run is complete
-at 1,920/1,920 cells. The six-claim theorem/mechanism audit passes. The full
-11,700-cell CCP run is active; Boston and Abalone are complete and Parkinson is
-running. A hash-bound audit verifies that the paper defines the three
-alternative CCP columns as log/square-root/linear while the released table
-driver fills those positions with square-root/log/power; formula-faithful
-results remain honestly labeled. Final verdict rendering, the fail-closed gate,
-GitHub push, and canonical HF queue handoff are serialized behind it.
+The reproduction is complete and publicly submitted for verdict. The full
+four-dataset CA run contains 1,920/1,920 cells, the full three-dataset CCP run
+contains 11,700/11,700 cells, and the six-claim theorem/mechanism audit passes.
+All 35 tests and the final publication gate pass. The public GitHub repository
+is `MachineLearning-Nerd/icml26-repro-jNv4sl4YZH`; canonical backlog entry 43
+was drained to `DineshAI/jNv4sl4YZH`, whose challenge tags, nonempty commit SHA,
+Conclusion marker, and 2,781,144-byte Trackio evidence bundle were read back.
+A hash-bound audit verifies that the paper defines the three alternative CCP
+columns as log/square-root/linear while the released table driver fills those
+positions with square-root/log/power; formula-faithful results remain honestly
+labeled.
 The environment pins `pandas==2.3.3` because the unmodified released Parkinson
 loader relies on a Pandas-2-compatible in-place numeric assignment; the reason
 and exact wrapper boundary are documented in `docs/source_audit.md`.
