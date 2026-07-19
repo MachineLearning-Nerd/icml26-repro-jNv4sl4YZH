@@ -92,6 +92,17 @@ class FullProtocolTests(unittest.TestCase):
             with self.assertRaises(AssertionError):
                 validate_local_path_artifacts(valid, directory)
 
+    def test_shared_queue_handoff_follows_initial_github_push(self):
+        root = Path(__file__).resolve().parents[2]
+        publisher = (root / "repro/src/publish_after_gate.sh").read_text(
+            encoding="utf-8"
+        )
+        initial_push = publisher.index('git push -u origin main')
+        enqueue = publisher.index('scripts/enqueue_backlog.py')
+        wait_for_space = publisher.index('until hf spaces info "$hf_space"')
+        self.assertLess(initial_push, enqueue)
+        self.assertLess(enqueue, wait_for_space)
+
     def test_protocol_matches_released_paper_scale(self):
         root = Path(__file__).resolve().parents[2]
         protocol = json.loads((root / "repro/configs/full_protocol.json").read_text())

@@ -334,3 +334,14 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   512 grid points, or 500 weight samples. Negative controls alter each field;
   an internally consistent 1,920-cell result at a different scope can no longer
   pass merely by declaring that reduced/changed scope in its own metadata.
+- At `2026-07-19 20:27 IST`, a fresh read of the challenge's authoritative live
+  `claims.json` still returns exactly the three locally pinned jury texts for
+  `jNv4sl4YZH`; the paper remains worth six possible points. The legacy final
+  CA worker remains compute-active at `97.9%` CPU and about `193 MB` RSS, with
+  the three completed task artifacts intact and the fourth not yet promoted.
+- The verified publisher now completes its first public GitHub push before
+  atomically joining the shared Hugging Face backlog. This prevents the shared
+  Trackio publisher from rewriting local artifact links concurrently with the
+  initial git stage/commit, while retaining idempotent, gate-checked queueing.
+  The ordering is regression-tested; all 25 tests, shell syntax, publication
+  preflight, and diff hygiene pass.

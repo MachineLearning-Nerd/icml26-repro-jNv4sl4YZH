@@ -75,16 +75,6 @@ print(
 )
 PY
 
-# Hand the gate-complete paper to the single shared HF publisher.  The enqueue
-# helper revalidates the fail-closed gate and marker, writes atomically, and is
-# idempotent, so a resumed owner session cannot create duplicate queue entries.
-python ../../icml-2026-reproduction-challenge/scripts/enqueue_backlog.py \
-  --orid jNv4sl4YZH \
-  --slug icml26-repro-jNv4sl4YZH-p2e-calibration \
-  --paper-dir . \
-  --gate outputs/prepublish_gate.json \
-  --marker-file .trackio/logbook/pages/conclusion/page.md
-
 if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   git init -b main
 fi
@@ -113,6 +103,18 @@ if gh repo view "$gh_repo" --json url >/dev/null 2>&1; then
 else
   gh repo create "$gh_repo" --public --source=. --remote=origin --push
 fi
+
+# Hand the gate-complete paper to the single shared HF publisher only after the
+# first GitHub push is complete.  Trackio publication rewrites artifact links in
+# local logbook pages, so this ordering prevents the shared drain from racing
+# the initial git staging/commit.  The enqueue helper revalidates the fail-closed
+# gate and marker, writes atomically, and is idempotent.
+python ../../icml-2026-reproduction-challenge/scripts/enqueue_backlog.py \
+  --orid jNv4sl4YZH \
+  --slug icml26-repro-jNv4sl4YZH-p2e-calibration \
+  --paper-dir . \
+  --gate outputs/prepublish_gate.json \
+  --marker-file .trackio/logbook/pages/conclusion/page.md
 
 # The shared drain is the only HF publisher, which preserves queue order and
 # avoids two sessions consuming or racing for the same Space-creation slot.
