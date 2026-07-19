@@ -5,6 +5,15 @@ set -euo pipefail
 
 cd "$(dirname "$0")/../.."
 
+# Only one process may append final Trackio verdicts or own publication. This
+# also makes accidental duplicate watcher launches harmless.
+exec 9>/tmp/jNv4sl4YZH-post-ccp-owner.lock
+if ! flock -n 9; then
+  printf '%s another post-CCP gate owner is already active; exiting\n' \
+    "$(date --iso-8601=seconds)"
+  exit 0
+fi
+
 while true; do
   if [[ -f outputs/raw/author_ccp/boston.json \
      && -f outputs/raw/author_ccp/abalone.json \
@@ -115,4 +124,8 @@ trackio logbook run \
   -- python repro/src/prepublish_gate.py \
   --output outputs/prepublish_gate.json
 
-bash repro/src/publish_after_gate.sh
+until bash repro/src/publish_after_gate.sh; do
+  printf '%s verified publisher exited nonzero; retrying in 60 seconds\n' \
+    "$(date --iso-8601=seconds)" >&2
+  sleep 60
+done

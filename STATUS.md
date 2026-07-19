@@ -313,3 +313,9 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   close the final check/start race if duplicate watcher processes are ever
   launched accidentally, while a whole-transition owner lock prevents duplicate
   Claim-2 verification and Trackio writes.
+- The post-CCP watcher now has the same singleton-owner guarantee, so duplicate
+  launches cannot append competing final verdict cells or race publication.
+  After all evidence and the fail-closed gate pass once, only the idempotent
+  publisher is retried on a nonzero GitHub/HF/readback exit, at 60-second
+  intervals. This preserves the completed evidence and canonical queue entry
+  across transient external failures without rerunning the heavy CCP sweep.
