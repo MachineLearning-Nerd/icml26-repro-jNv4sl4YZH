@@ -85,6 +85,12 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   challenge artifacts confirmed the publisher's Space JSON fields, tag/SHA
   checks, recursive bucket JSON fields, exact-size artifact lookup, and Space
   download options match the live CLI/API shapes.
+- Re-read the live official challenge `claims.json`: it still lists exactly
+  three claims (six possible points). Their exact text, direct evidence,
+  independent evidence, falsifiers, and fail-closed acceptance rules are now
+  pinned in `repro/configs/jury_claims.json` and
+  `docs/jury_claim_evidence_matrix.md`; the publication gate enforces this
+  snapshot. All `16/16` tests pass after adding the claim-scope check.
 - Ran all fifteen local mechanism/protocol/author-launcher/raw-verifier and
   paper-headline drift-control tests successfully (including positive and
   deliberately incomplete raw fixtures), including local-only Trackio artifact

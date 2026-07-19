@@ -15,6 +15,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE_COMMIT = "66cb1e1c76d1b1d3d133fe6cb3896c95d48b5974"
 REQUIRED_TAGS = {"icml2026-repro", "paper-jNv4sl4YZH"}
+JURY_CLAIM_TEXTS = (
+    "P2E calibrator converts conformal p-values to e-values without altering the induced prediction set",
+    "Yields substantial efficiency gains over existing p-to-e methods in conformal inference",
+    "Enables exact 1-α coverage in cross-conformal prediction and conformal aggregation",
+)
 TEXT_SUFFIXES = {
     "", ".cfg", ".csv", ".gitignore", ".ini", ".json", ".md", ".py",
     ".sh", ".toml", ".txt", ".yaml", ".yml",
@@ -165,6 +170,13 @@ def main() -> None:
     }
     assert REQUIRED_TAGS <= set(metadata["tags"])
 
+    jury = load_json("repro/configs/jury_claims.json")
+    assert jury["openreview_id"] == "jNv4sl4YZH"
+    assert jury["maximum_points"] == 6
+    assert tuple(claim["text"] for claim in jury["claims"]) == JURY_CLAIM_TEXTS
+    assert [claim["claim"] for claim in jury["claims"]] == [1, 2, 3]
+    assert [claim["possible_points"] for claim in jury["claims"]] == [2, 2, 2]
+
     commands = (
         [sys.executable, "repro/src/verify_p2e_identity.py", "--output", "outputs/claim1_independent.json"],
         [sys.executable, "repro/src/crosscheck_source_p2e.py", "--source", "upstream", "--output", "outputs/claim1_source_crosscheck.json"],
@@ -269,8 +281,8 @@ def main() -> None:
     result = {
         "paper": "jNv4sl4YZH",
         "source_commit": source_commit,
-        "claims": 3,
-        "maximum_points": 6,
+        "claims": len(jury["claims"]),
+        "maximum_points": jury["maximum_points"],
         "tests_passed": True,
         "command_count": len(command_outputs),
         "hygiene": hygiene,

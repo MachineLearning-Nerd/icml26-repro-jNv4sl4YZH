@@ -14,6 +14,26 @@ from repro.src.run_author_ccp import METHOD_KEYS, PAPER_DATASETS
 
 
 class FullProtocolTests(unittest.TestCase):
+    def test_official_jury_claim_snapshot_has_three_claims_and_six_points(self):
+        root = Path(__file__).resolve().parents[2]
+        jury = json.loads(
+            (root / "repro/configs/jury_claims.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(jury["openreview_id"], "jNv4sl4YZH")
+        self.assertEqual(jury["maximum_points"], 6)
+        self.assertEqual([claim["claim"] for claim in jury["claims"]], [1, 2, 3])
+        self.assertEqual(
+            [claim["possible_points"] for claim in jury["claims"]], [2, 2, 2]
+        )
+        self.assertEqual(
+            [claim["text"] for claim in jury["claims"]],
+            [
+                "P2E calibrator converts conformal p-values to e-values without altering the induced prediction set",
+                "Yields substantial efficiency gains over existing p-to-e methods in conformal inference",
+                "Enables exact 1-α coverage in cross-conformal prediction and conformal aggregation",
+            ],
+        )
+
     def test_publication_metadata_and_local_artifact_hygiene(self):
         root = Path(__file__).resolve().parents[2]
         metadata = json.loads((root / ".trackio/metadata.json").read_text())

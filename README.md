@@ -19,6 +19,8 @@ The mechanism audit includes exact rank-tuple enumeration and a sparse linear
 program over every joint coupling with the prescribed rank marginals, so the
 coverage check is not restricted to independent folds. See
 [`docs/arbitrary_dependence_coverage.md`](docs/arbitrary_dependence_coverage.md).
+The exact current jury wording and the evidence/gate for each claim are mapped
+in [`docs/jury_claim_evidence_matrix.md`](docs/jury_claim_evidence_matrix.md).
 
 The source implementation is checked out locally under `upstream/` at
 `Nabil-Ala/P2E_calibration@66cb1e1c76d1b1d3d133fe6cb3896c95d48b5974`.
