@@ -219,3 +219,11 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   performs the existing public Space/tag/SHA/artifact readback. An attempted
   enqueue against the current incomplete state is rejected without modifying
   the backlog. Paper commit: `0ff983a`; control-plane helper commit: `e63646c`.
+- At `2026-07-19 18:44 IST`, the CA-to-CCP handoff was made self-healing. It
+  continues to leave the healthy legacy CA process untouched, but if that
+  process ever exits without all four final artifacts it now launches the
+  current per-seed-checkpointed CA wrapper, which revalidates and retains the
+  three completed datasets before resuming the missing one. Only after all
+  four files exist does it execute the unchanged strict 1,920-cell Claim 2
+  verifier and start Claim 3. The replacement handoff is live at PID `3527321`;
+  the complete `18/18` test suite and shell syntax check pass.

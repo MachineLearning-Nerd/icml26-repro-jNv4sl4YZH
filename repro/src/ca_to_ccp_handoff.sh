@@ -5,12 +5,40 @@ set -euo pipefail
 
 cd "$(dirname "$0")/../.."
 
-while pgrep -f '[r]un_author_ca.py' >/dev/null \
-   || pgrep -f '[t]rackio logbook run --page Claim 2 --title Full released conformal-aggregation protocol' >/dev/null; do
-  sleep 30
-done
-
 source .venv/bin/activate
+
+ca_is_active() {
+  pgrep -f '[r]un_author_ca.py' >/dev/null \
+    || pgrep -f '[t]rackio logbook run --page Claim 2 --title Full released conformal-aggregation protocol' >/dev/null
+}
+
+all_ca_outputs_exist() {
+  [[ -f outputs/raw/author_ca/dataset_361237.json \
+    && -f outputs/raw/author_ca/dataset_361235.json \
+    && -f outputs/raw/author_ca/dataset_361244.json \
+    && -f outputs/raw/author_ca/dataset_361234.json ]]
+}
+
+# The currently active legacy process cannot checkpoint inside its last
+# dataset, so do not disturb it. If it ever exits without promoting all four
+# final artifacts, relaunch the current per-seed-checkpointed wrapper. Existing
+# complete artifacts are revalidated and retained, making recovery idempotent.
+while true; do
+  while ca_is_active; do
+    sleep 30
+  done
+  if all_ca_outputs_exist; then
+    break
+  fi
+  printf '%s missing CA output after worker exit; starting resumable recovery\n' \
+    "$(date --iso-8601=seconds)"
+  trackio logbook run \
+    --page "Claim 2" \
+    --title "Full released conformal-aggregation protocol" \
+    -- python repro/src/run_author_ca.py \
+    --source upstream \
+    --output-dir outputs/raw/author_ca
+done
 
 trackio logbook run \
   --page "Claim 2" \
