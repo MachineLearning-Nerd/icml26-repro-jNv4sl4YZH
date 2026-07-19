@@ -70,6 +70,11 @@ python repro/src/compare_paper_headlines.py \
   --ca outputs/claim2_independent.json \
   --ccp outputs/claim3_independent.json \
   --output outputs/paper_headline_comparison.json
+
+# Independently re-download the hash-pinned arXiv v1 source and verify that
+# all 98 fixture cells / 392 scalars were transcribed exactly from its TeX.
+python repro/src/verify_paper_table_fixture.py \
+  --output outputs/paper_table_fixture_audit.json
 python -m unittest discover -s repro/tests -v
 ```
 

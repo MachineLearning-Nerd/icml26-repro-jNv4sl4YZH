@@ -121,8 +121,8 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   metadata contains exactly the required bundle path with the correct resolved
   local source, `dataset` type, and byte size. The later Hugging Face bucket
   readback still independently requires the public object at that exact size.
-- The bundle is no longer trusted by size/hash alone. Its ordered 14-record
-  manifest (seven summaries/reports plus seven full raw dataset files) is
+- The bundle is no longer trusted by size/hash alone. Its ordered 15-record
+  manifest (eight summaries/reports plus seven full raw dataset files) is
   persisted in the gate result; every JSONL line is re-parsed and required to
   match its current source path, source SHA-256, and decoded payload immediately
   before publication. Unit controls reject both post-gate source mutation and
@@ -279,8 +279,15 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   Parkinson at 20; seeds 45--144; OLS/RF/Lasso; the ordered 13-method tuple;
   alpha 0.1; 300 grid points; and the parity-checked execution adapter.
   Negative controls independently remove a dataset, seed, model, or method and
-  alter alpha, grid size, or adapter; every drift is rejected. All 22 tests and
+  alter alpha, grid size, or adapter; every drift is rejected. All 23 tests and
   the no-write publication preflight pass.
+- The 98-cell/392-scalar paper-number fixture is now independently executable,
+  not a one-off transcription claim. A verifier downloads arXiv `2606.03600v1`
+  in memory, requires archive SHA-256 `f5124c...` and `main.tex` SHA-256
+  `49058f...`, parses Table 2 and both panels of Appendix Tables 6--8, and
+  compares every field with `paper_headlines.json`. The live primary source
+  yields 98/98 cells and 392/392 exact scalar transcriptions with zero
+  mismatches; the audit JSON is a required fifteenth evidence-bundle record.
 - At `2026-07-19 19:39 IST`, the current commit's complete 22-test suite passed
   in `7.75s`. A fresh invocation of the real prepublication gate revalidated
   the source pin, Claim 1 identity/source parity, and all eight Claim 3

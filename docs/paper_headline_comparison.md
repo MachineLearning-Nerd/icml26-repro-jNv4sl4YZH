@@ -5,6 +5,11 @@ and every tabulated CCP row needed to cross-check the full source runs against t
 transcribed from arXiv `2606.03600`, Table 2 and Appendix Tables 6–8, into
 `repro/configs/paper_headlines.json`.
 
+`repro/src/verify_paper_table_fixture.py` independently downloads the fixed
+arXiv v1 source, checks its archive and `main.tex` hashes, parses all 98 cells,
+and requires exact equality for every one of the 392 configured scalars. The
+paper source itself is never copied into this repository or evidence bundle.
+
 The transcription was rechecked against the primary arXiv v1 HTML on
 2026-07-19. Table 2 reports the four WECA(P2E) and four UR-WECA(P2E) CA cells;
 Appendix Tables 6, 7, and 8 report the Boston, Abalone, and Parkinson

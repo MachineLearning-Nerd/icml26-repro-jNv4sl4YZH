@@ -643,3 +643,365 @@ OK
 {"type": "markdown", "id": "cell_06bb691e7c93", "created_at": "2026-07-19T13:58:38+00:00", "title": "CCP execution and scope contract"}
 -->
 The full CCP runner uses `vectorized-exact-postprocessing-v1` only after reproducing the pinned source fold permutation, OLS/RF/Lasso fits, candidate grids, foldwise p-values, and RNG draws. Literal-source parity requires bit-identical grids/p-values and exact equality for all 13 scored intervals; an independent scalar oracle also checks K=15 and K=20 aggregation. The post-CCP and prepublication gates reject any evidence unless the complete protocol exactly equals the pinned source SHA, Boston/Abalone K=15, Parkinson K=20, seeds 45-144, OLS/RF/Lasso, the ordered 13-method tuple, alpha=0.1, 300 grid points, and this adapter. Negative controls cover source, dataset, seed, model, method, alpha, grid, and adapter drift. This changes runtime only; the required result remains all 11,700 raw cells.
+
+
+---
+<!-- trackio-cell
+{"type": "code", "id": "cell_a313e9d6b3dc", "created_at": "2026-07-19T14:32:42+00:00", "title": "Primary TeX table fixture audit", "command": [".venv/bin/python", "repro/src/verify_paper_table_fixture.py", "--output", "outputs/paper_table_fixture_audit.json"], "exit_code": 0, "duration_s": 0.538}
+-->
+````bash
+$ .venv/bin/python repro/src/verify_paper_table_fixture.py --output outputs/paper_table_fixture_audit.json
+````
+
+exit 0 · 0.5s
+
+
+````python title=verify_paper_table_fixture.py
+#!/usr/bin/env python3
+"""Verify the paper-number fixture directly against pinned primary arXiv TeX."""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import io
+import json
+import re
+import tarfile
+import urllib.request
+from pathlib import Path
+
+
+SOURCE_URL = "https://export.arxiv.org/e-print/2606.03600v1"
+SOURCE_ARCHIVE_SHA256 = "f5124c39036b9107b01439fdbeb5da82331a70b81a3211e3b36887e08109a2db"
+MAIN_TEX_SHA256 = "49058ff8e986f43770936c09cc97360e5cace8802c6304a80d9e153d342ae857"
+DATASETS = ("boston", "abalone", "parkinson")
+MODELS = ("OLS", "RF", "Lasso")
+FIRST_PANEL_METHODS = (
+    "cross",
+    "e-mod-cross",
+    "u-mod-cross",
+    "eu-mod-cross",
+    "ECCP (2α)",
+)
+SECOND_PANEL_METHODS = (
+    "ECCP",
+    "ECCP(ind)",
+    "ECCP(log)",
+    "ECCP(sqrt)",
+    "ECCP(linear)",
+)
+PAIR_PATTERN = re.compile(
+    r"\$?\s*(-?\d+(?:\.\d+)?)\s*\$?\s*\\pm\s*\$?\s*"
+    r"(-?\d+(?:\.\d+)?)\s*\$?"
+)
+
+
+def sha256_bytes(payload: bytes) -> str:
+    return hashlib.sha256(payload).hexdigest()
+
+
+def load_primary_tex(source_url: str = SOURCE_URL) -> tuple[bytes, bytes]:
+    request = urllib.request.Request(
+        source_url,
+        headers={"User-Agent": "icml26-reproduction-audit/1.0"},
+    )
+    with urllib.request.urlopen(request, timeout=60) as response:
+        archive = response.read()
+    if sha256_bytes(archive) != SOURCE_ARCHIVE_SHA256:
+        raise RuntimeError("arXiv source archive hash drift")
+    with tarfile.open(fileobj=io.BytesIO(archive), mode="r:*") as bundle:
+        matches = [member for member in bundle.getmembers() if member.name == "main.tex"]
+        if len(matches) != 1:
+            raise RuntimeError(f"expected one main.tex, found {len(matches)}")
+        extracted = bundle.extractfile(matches[0])
+        if extracted is None:
+            raise RuntimeError("main.tex is not a regular archive member")
+        tex = extracted.read()
+    if sha256_bytes(tex) != MAIN_TEX_SHA256:
+        raise RuntimeError("main.tex hash drift")
+    return archive, tex
+
+
+def parse_pairs(line: str, expected: int) -> list[tuple[float, float]]:
+    pairs = [(float(mean), float(sd)) for mean, sd in PAIR_PATTERN.findall(line)]
+    if len(pairs) != expected:
+        raise RuntimeError(
+            f"expected {expected} mean/SD pairs, found {len(pairs)} in {line!r}"
+        )
+    return pairs
+
+
+def parse_ca_table(tex: str) -> dict[str, dict[str, dict[str, float]]]:
+    label = tex.index(r"\label{table:e-CA_results}")
+    start = tex.rindex(r"\begin{table*}", 0, label)
+    end = tex.index(r"\end{table*}", label)
+    block = tex[start:end]
+    expected_header = (
+        r"Method & \multicolumn{2}{c}{361234} & \multicolumn{2}{c}{361235} & "
+        r"\multicolumn{2}{c}{361237} & \multicolumn{2}{c}{361244}"
+    )
+    if expected_header not in block:
+        raise RuntimeError("CA paper-table dataset order drift")
+    dataset_keys = (
+        "dataset_361234",
+        "dataset_361235",
+        "dataset_361237",
+        "dataset_361244",
+    )
+    output = {dataset: {} for dataset in dataset_keys}
+    for source_method, config_method in (
+        ("WECA", "WECA(P2E)"),
+        ("UR-WECA", "UR-WECA(P2E)"),
+    ):
+        rows = [
+            line.strip()
+            for line in block.splitlines()
+            if line.strip().startswith(source_method + " &")
+        ]
+        if len(rows) != 1:
+            raise RuntimeError(f"expected one active {source_method} paper row")
+        pairs = parse_pairs(rows[0], 8)
+        for index, dataset in enumerate(dataset_keys):
+            coverage, length = pairs[2 * index : 2 * index + 2]
+            output[dataset][config_method] = {
+                "coverage_mean": coverage[0],
+                "coverage_sd": coverage[1],
+                "length_mean": length[0],
+                "length_sd": length[1],
+            }
+    return output
+
+
+def dataset_section(tex: str, dataset: str) -> str:
+    markers = {
+        "boston": ("% boston K=15", "% Abalone K=15"),
+        "abalone": ("% Abalone K=15", "% parkinson K=20"),
+        "parkinson": ("% parkinson K=20", r"\section{Details on the P2E calibrator}"),
+    }
+    start_marker, end_marker = markers[dataset]
+    start = tex.index(start_marker)
+    end = tex.index(end_marker, start + len(start_marker))
+    return tex[start:end]
+
+
+def parse_ccp_panel(
+    block: str, methods: tuple[str, ...]
+) -> dict[str, dict[str, dict[str, float]]]:
+    output = {model: {method: {} for method in methods} for model in MODELS}
+    current_model: str | None = None
+    row_count = 0
+    for raw_line in block.splitlines():
+        line = raw_line.strip()
+        if "& Size &" not in line and "& Cov. &" not in line:
+            continue
+        fields = [field.strip() for field in line.split("&")]
+        if fields[0] in MODELS:
+            current_model = fields[0]
+        if current_model is None:
+            raise RuntimeError("CCP metric row appears before a base model")
+        metric = fields[1]
+        pairs = parse_pairs(line, len(methods))
+        mean_key, sd_key = (
+            ("length_mean", "length_sd")
+            if metric == "Size"
+            else ("coverage_mean", "coverage_sd")
+        )
+        for method, (mean, sd) in zip(methods, pairs):
+            output[current_model][method][mean_key] = mean
+            output[current_model][method][sd_key] = sd
+        row_count += 1
+    if row_count != len(MODELS) * 2:
+        raise RuntimeError(f"expected six model/metric rows, found {row_count}")
+    if not all(
+        set(metrics) == {"coverage_mean", "coverage_sd", "length_mean", "length_sd"}
+        for model in output.values()
+        for metrics in model.values()
+    ):
+        raise RuntimeError("incomplete CCP method metrics")
+    return output
+
+
+def normalized_ccp_header(block: str) -> list[str]:
+    rows = [line.strip() for line in block.splitlines() if line.strip().startswith("Base &")]
+    if len(rows) != 1:
+        raise RuntimeError(f"expected one CCP header, found {len(rows)}")
+    fields = [field.strip() for field in rows[0].removesuffix(r"\\").split("&")]
+    return [re.sub(r"_\{([0-9])\}", r"_\1", field) for field in fields]
+
+
+def parse_ccp_tables(tex: str) -> dict[str, dict[str, dict[str, dict[str, float]]]]:
+    output = {}
+    for dataset in DATASETS:
+        tables = re.findall(
+            r"\\begin\{table\}\[H\](.*?)\\end\{table\}",
+            dataset_section(tex, dataset),
+            flags=re.DOTALL,
+        )
+        if len(tables) != 2:
+            raise RuntimeError(f"expected two CCP panels for {dataset}, found {len(tables)}")
+        expected_first_header = [
+            "Base", "Metric", "CCP", "e-mod-cross", "u-mod-cross",
+            "eu-mod-cross", r"ECCP$(2\alpha)$",
+        ]
+        expected_second_header = [
+            "Base", "Metric", "ECCP", r"ECCP($F_{\text{AoN}}$)",
+            r"ECCP($F_1$)", r"ECCP($F_2$)", r"ECCP($F_3$)",
+        ]
+        if normalized_ccp_header(tables[0]) != expected_first_header:
+            raise RuntimeError(f"first CCP method order drift for {dataset}")
+        if normalized_ccp_header(tables[1]) != expected_second_header:
+            raise RuntimeError(f"second CCP method order drift for {dataset}")
+        first = parse_ccp_panel(tables[0], FIRST_PANEL_METHODS)
+        second = parse_ccp_panel(tables[1], SECOND_PANEL_METHODS)
+        output[dataset] = {
+            model: {**first[model], **second[model]}
+            for model in MODELS
+        }
+    return output
+
+
+def mismatch_paths(expected: object, observed: object, prefix: str = "") -> list[str]:
+    if isinstance(expected, dict) and isinstance(observed, dict):
+        paths = []
+        for key in sorted(set(expected) | set(observed)):
+            path = f"{prefix}.{key}" if prefix else str(key)
+            if key not in expected or key not in observed:
+                paths.append(path)
+            else:
+                paths.extend(mismatch_paths(expected[key], observed[key], path))
+        return paths
+    return [] if expected == observed else [prefix]
+
+
+def audit_fixture(tex: str, config: dict[str, object]) -> dict[str, object]:
+    parsed_ca = parse_ca_table(tex)
+    parsed_ccp = parse_ccp_tables(tex)
+    mismatches = mismatch_paths(config["conformal_aggregation"], parsed_ca)
+    mismatches += mismatch_paths(config["cross_conformal"], parsed_ccp)
+    ca_cells = sum(len(methods) for methods in parsed_ca.values())
+    ccp_cells = sum(
+        len(methods) for models in parsed_ccp.values() for methods in models.values()
+    )
+    return {
+        "all_fields_match": not mismatches,
+        "mismatch_count": len(mismatches),
+        "mismatch_paths": mismatches,
+        "ca_cell_count": ca_cells,
+        "ccp_cell_count": ccp_cells,
+        "total_cell_count": ca_cells + ccp_cells,
+        "scalar_count": 4 * (ca_cells + ccp_cells),
+        "parsed_values_sha256": sha256_bytes(
+            json.dumps(
+                {"conformal_aggregation": parsed_ca, "cross_conformal": parsed_ccp},
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        ),
+    }
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--config", type=Path, default=Path("repro/configs/paper_headlines.json"))
+    parser.add_argument("--output", type=Path, required=True)
+    args = parser.parse_args()
+    archive, tex_bytes = load_primary_tex()
+    config_bytes = args.config.read_bytes()
+    config = json.loads(config_bytes)
+    audit = audit_fixture(tex_bytes.decode("utf-8"), config)
+    result = {
+        "source_url": SOURCE_URL,
+        "source_archive_sha256": sha256_bytes(archive),
+        "main_tex_sha256": sha256_bytes(tex_bytes),
+        "config_sha256": sha256_bytes(config_bytes),
+        "summary": audit,
+    }
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    args.output.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    if not (
+        audit["all_fields_match"]
+        and audit["ca_cell_count"] == 8
+        and audit["ccp_cell_count"] == 90
+        and audit["scalar_count"] == 392
+    ):
+        raise SystemExit("paper table fixture audit failed")
+    print(json.dumps(audit, sort_keys=True))
+
+
+if __name__ == "__main__":
+    main()
+
+````
+
+
+````json title=paper_table_fixture_audit.json
+{
+  "config_sha256": "195b86080d3995559af433c86c1a450aca90dbd710e26155b7d7783cd43458f3",
+  "main_tex_sha256": "49058ff8e986f43770936c09cc97360e5cace8802c6304a80d9e153d342ae857",
+  "source_archive_sha256": "f5124c39036b9107b01439fdbeb5da82331a70b81a3211e3b36887e08109a2db",
+  "source_url": "https://export.arxiv.org/e-print/2606.03600v1",
+  "summary": {
+    "all_fields_match": true,
+    "ca_cell_count": 8,
+    "ccp_cell_count": 90,
+    "mismatch_count": 0,
+    "mismatch_paths": [],
+    "parsed_values_sha256": "4fc44baae9e052b59a4184aa297fe5af2aad8484c881352e3a91a616f7b50b7c",
+    "scalar_count": 392,
+    "total_cell_count": 98
+  }
+}
+
+````
+
+
+````output
+{"all_fields_match": true, "ca_cell_count": 8, "ccp_cell_count": 90, "mismatch_count": 0, "mismatch_paths": [], "parsed_values_sha256": "4fc44baae9e052b59a4184aa297fe5af2aad8484c881352e3a91a616f7b50b7c", "scalar_count": 392, "total_cell_count": 98}
+
+````
+
+
+---
+<!-- trackio-cell
+{"type": "code", "id": "cell_c08399629f79", "created_at": "2026-07-19T14:32:51+00:00", "title": "Primary-source-bound full gate suite", "command": [".venv/bin/python", "-m", "unittest", "discover", "-s", "repro/tests", "-v"], "exit_code": 0, "duration_s": 8.404}
+-->
+````bash
+$ .venv/bin/python -m unittest discover -s repro/tests -v
+````
+
+exit 0 · 8.4s
+
+
+````output
+test_ca_dry_run_uses_released_full_protocol_and_portable_provenance (test_author_runner_preflight.AuthorRunnerPreflightTests.test_ca_dry_run_uses_released_full_protocol_and_portable_provenance) ... ok
+test_ccp_input_preflight_loads_author_bundles_at_paper_fold_counts (test_author_runner_preflight.AuthorRunnerPreflightTests.test_ccp_input_preflight_loads_author_bundles_at_paper_fold_counts) ... ok
+test_ccp_rng_replay_matches_real_source_power_intervals (test_author_runner_preflight.AuthorRunnerPreflightTests.test_ccp_rng_replay_matches_real_source_power_intervals) ... ok
+test_ccp_seed_checkpoint_accepts_complete_cells_and_rejects_partial_cells (test_author_runner_preflight.AuthorRunnerPreflightTests.test_ccp_seed_checkpoint_accepts_complete_cells_and_rejects_partial_cells) ... boston: completed seed 45
+ok
+test_ccp_wrapper_reconstructs_the_paper_f3_linear_calibrator (test_author_runner_preflight.AuthorRunnerPreflightTests.test_ccp_wrapper_reconstructs_the_paper_f3_linear_calibrator) ... ok
+test_vectorized_aggregation_matches_scalar_oracle_at_paper_fold_counts (test_author_runner_preflight.AuthorRunnerPreflightTests.test_vectorized_aggregation_matches_scalar_oracle_at_paper_fold_counts) ... ok
+test_vectorized_ccp_adapter_matches_all_literal_source_model_paths (test_author_runner_preflight.AuthorRunnerPreflightTests.test_vectorized_ccp_adapter_matches_all_literal_source_model_paths) ... ok
+test_exact_enumerations_pass_and_invalid_control_fails (test_e_merge_coverage.EMergeCoverageTests.test_exact_enumerations_pass_and_invalid_control_fails) ... ok
+test_lp_rejects_invalid_weight_vectors (test_e_merge_coverage.EMergeCoverageTests.test_lp_rejects_invalid_weight_vectors) ... ok
+test_two_fold_lp_matches_independent_permutation_enumeration (test_e_merge_coverage.EMergeCoverageTests.test_two_fold_lp_matches_independent_permutation_enumeration) ... ok
+test_expected_ccp_raw_cell_count (test_full_protocol.FullProtocolTests.test_expected_ccp_raw_cell_count) ... ok
+test_final_logbook_renderer_fails_closed_and_emits_gate_marker (test_full_protocol.FullProtocolTests.test_final_logbook_renderer_fails_closed_and_emits_gate_marker) ... ok
+test_official_jury_claim_snapshot_has_three_claims_and_six_points (test_full_protocol.FullProtocolTests.test_official_jury_claim_snapshot_has_three_claims_and_six_points) ... ok
+test_paper_table_fixture_is_bound_to_primary_tex (test_full_protocol.FullProtocolTests.test_paper_table_fixture_is_bound_to_primary_tex) ... ok
+test_protocol_matches_released_paper_scale (test_full_protocol.FullProtocolTests.test_protocol_matches_released_paper_scale) ... ok
+test_publication_metadata_and_local_artifact_hygiene (test_full_protocol.FullProtocolTests.test_publication_metadata_and_local_artifact_hygiene) ... ok
+test_trackio_evidence_bundle_is_hash_indexed_and_roundtrips_json (test_full_protocol.FullProtocolTests.test_trackio_evidence_bundle_is_hash_indexed_and_roundtrips_json) ... ok
+test_classic_calibrator_controls_expand_the_set (test_p2e_identity.P2EIdentityTests.test_classic_calibrator_controls_expand_the_set) ... ok
+test_full_grid_summary_passes (test_p2e_identity.P2EIdentityTests.test_full_grid_summary_passes) ... ok
+test_p2e_exactly_preserves_each_finite_rank_set (test_p2e_identity.P2EIdentityTests.test_p2e_exactly_preserves_each_finite_rank_set) ... ok
+test_ca_verifier_requires_each_method_seed_cell (test_raw_verifiers.RawVerifierTests.test_ca_verifier_requires_each_method_seed_cell) ... ok
+test_ccp_verifier_requires_each_model_method_seed_cell (test_raw_verifiers.RawVerifierTests.test_ccp_verifier_requires_each_model_method_seed_cell) ... ok
+test_paper_headline_comparison_reports_matching_and_drifted_cells (test_raw_verifiers.RawVerifierTests.test_paper_headline_comparison_reports_matching_and_drifted_cells) ... ok
+
+----------------------------------------------------------------------
+Ran 23 tests in 7.773s
+
+OK
+
+````

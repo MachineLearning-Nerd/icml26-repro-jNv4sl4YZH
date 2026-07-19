@@ -267,6 +267,7 @@ def main() -> None:
         [sys.executable, "repro/src/verify_e_merge_coverage.py", "--output", "outputs/claim3_independent_e_merge.json"],
         [sys.executable, "repro/src/verify_ca_results.py", "--raw-dir", "outputs/raw/author_ca", "--output", "outputs/claim2_independent.json"],
         [sys.executable, "repro/src/verify_ccp_results.py", "--raw-dir", "outputs/raw/author_ccp", "--output", "outputs/claim3_independent.json"],
+        [sys.executable, "repro/src/verify_paper_table_fixture.py", "--output", "outputs/paper_table_fixture_audit.json"],
         [sys.executable, "repro/src/compare_paper_headlines.py", "--ca", "outputs/claim2_independent.json", "--ccp", "outputs/claim3_independent.json", "--output", "outputs/paper_headline_comparison.json"],
         [sys.executable, "-m", "unittest", "discover", "-s", "repro/tests", "-v"],
     )
@@ -368,6 +369,26 @@ def main() -> None:
     assert claim3_summary["minimum_substantial_relative_reduction"] == 0.10
     assert claim3_summary["minimum_classical_relative_reduction"] >= 0.10
 
+    fixture_audit = load_json("outputs/paper_table_fixture_audit.json")
+    assert fixture_audit["source_url"] == "https://export.arxiv.org/e-print/2606.03600v1"
+    assert fixture_audit["source_archive_sha256"] == (
+        "f5124c39036b9107b01439fdbeb5da82331a70b81a3211e3b36887e08109a2db"
+    )
+    assert fixture_audit["main_tex_sha256"] == (
+        "49058ff8e986f43770936c09cc97360e5cace8802c6304a80d9e153d342ae857"
+    )
+    assert fixture_audit["config_sha256"] == sha256(
+        "repro/configs/paper_headlines.json"
+    )
+    fixture_summary = fixture_audit["summary"]
+    assert fixture_summary["all_fields_match"] is True
+    assert fixture_summary["mismatch_count"] == 0
+    assert fixture_summary["mismatch_paths"] == []
+    assert fixture_summary["ca_cell_count"] == 8
+    assert fixture_summary["ccp_cell_count"] == 90
+    assert fixture_summary["total_cell_count"] == 98
+    assert fixture_summary["scalar_count"] == 392
+
     headlines = load_json("outputs/paper_headline_comparison.json")
     assert_summary(headlines, ("all_within_tolerance",))
     assert headlines["paper_source"] == headline_config["source"]
@@ -383,7 +404,7 @@ def main() -> None:
     required_trackio_text = {
         ".trackio/logbook/pages/claim-2/page.md": "Independent full CA raw verification",
         ".trackio/logbook/pages/claim-3/page.md": "Independent full CCP raw verification",
-        ".trackio/logbook/pages/methods-source-audit/page.md": "Paper headline comparison",
+        ".trackio/logbook/pages/methods-source-audit/page.md": "Primary TeX table fixture audit",
         ".trackio/logbook/pages/conclusion/page.md": "FULL_GATE_READY: jNv4sl4YZH",
     }
     for relative, marker in required_trackio_text.items():
@@ -397,6 +418,7 @@ def main() -> None:
         "outputs/claim2_independent.json",
         "outputs/claim3_independent_e_merge.json",
         "outputs/claim3_independent.json",
+        "outputs/paper_table_fixture_audit.json",
         "outputs/paper_headline_comparison.json",
         "outputs/final_logbook_cells.json",
         *(f"outputs/raw/author_ca/dataset_{task}.json" for task in (361237, 361235, 361244, 361234)),

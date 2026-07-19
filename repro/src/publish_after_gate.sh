@@ -55,7 +55,7 @@ assert gate["maximum_points"] == 6
 assert gate["tests_passed"] is True
 assert gate["publication_gate_passed"] is True
 assert Path(gate["trackio_artifact_bundle"]).is_file()
-assert len(gate["artifact_paths"]) == 14
+assert len(gate["artifact_paths"]) == 15
 assert set(gate["artifact_paths"]) == set(gate["artifact_sha256"])
 assert validate_artifact_bundle(
     gate["trackio_artifact_bundle"], tuple(gate["artifact_paths"])
@@ -70,7 +70,7 @@ validate_required_local_artifact(
 )
 assert hygiene["local_path_artifact_count"] >= 1
 print(
-    "Verified fresh fail-closed gate, all 14 bundle records, registered bundle, "
+    "Verified fresh fail-closed gate, all 15 bundle records, registered bundle, "
     "conclusion marker, and hygiene"
 )
 PY

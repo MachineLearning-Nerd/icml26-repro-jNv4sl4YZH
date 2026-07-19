@@ -16,6 +16,12 @@ from repro.src.prepublish_gate import (
 from repro.src.render_final_logbook import build_cells
 from repro.src.run_author_ccp import EXECUTION_ADAPTER, METHOD_KEYS, PAPER_DATASETS
 from repro.src.verify_ccp_results import CALIBRATOR_BASELINES
+from repro.src.verify_paper_table_fixture import (
+    MAIN_TEX_SHA256,
+    SOURCE_ARCHIVE_SHA256,
+    SOURCE_URL,
+    mismatch_paths,
+)
 
 
 class FullProtocolTests(unittest.TestCase):
@@ -183,6 +189,34 @@ class FullProtocolTests(unittest.TestCase):
         ):
             with self.subTest(key=key), self.assertRaises(AssertionError):
                 assert_exact_ccp_protocol({**expected, key: drifted_value})
+
+    def test_paper_table_fixture_is_bound_to_primary_tex(self):
+        root = Path(__file__).resolve().parents[2]
+        audit = json.loads(
+            (root / "outputs/paper_table_fixture_audit.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(audit["source_url"], SOURCE_URL)
+        self.assertEqual(audit["source_archive_sha256"], SOURCE_ARCHIVE_SHA256)
+        self.assertEqual(audit["main_tex_sha256"], MAIN_TEX_SHA256)
+        self.assertEqual(
+            audit["config_sha256"],
+            sha256("repro/configs/paper_headlines.json"),
+        )
+        self.assertEqual(
+            audit["summary"],
+            {
+                "all_fields_match": True,
+                "ca_cell_count": 8,
+                "ccp_cell_count": 90,
+                "mismatch_count": 0,
+                "mismatch_paths": [],
+                "parsed_values_sha256": "4fc44baae9e052b59a4184aa297fe5af2aad8484c881352e3a91a616f7b50b7c",
+                "scalar_count": 392,
+                "total_cell_count": 98,
+            },
+        )
+        self.assertEqual(mismatch_paths({"cell": 1.0}, {"cell": 2.0}), ["cell"])
+        self.assertEqual(mismatch_paths({"cell": 1.0}, {"cell": 1.0}), [])
 
     def test_trackio_evidence_bundle_is_hash_indexed_and_roundtrips_json(self):
         root = Path(__file__).resolve().parents[2]

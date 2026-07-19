@@ -48,6 +48,12 @@ PY
 
 trackio logbook run \
   --page "Methods & source audit" \
+  --title "Primary TeX table fixture audit" \
+  -- python repro/src/verify_paper_table_fixture.py \
+  --output outputs/paper_table_fixture_audit.json
+
+trackio logbook run \
+  --page "Methods & source audit" \
   --title "Paper headline comparison" \
   -- python repro/src/compare_paper_headlines.py \
   --ca outputs/claim2_independent.json \
