@@ -20,6 +20,8 @@ worst-case tail probability is no greater than `alpha`.
 
 | Calibration n | alpha | Fixed weights | Coupling variables | Valid tail | Invalid 2x tail | Adaptive-max tail |
 |---:|---:|---|---:|---:|---:|---:|
+| 10 | 0.1 | .50, .50 (ECCP) | 121 | 0.090909 | 0.181818 | 0.181818 |
+| 10 | 0.1 | 1/3, 1/3, 1/3 (ECCP) | 1,331 | 0.090909 | 0.181818 | 0.272727 |
 | 10 | 0.1 | .25, .75 | 121 | 0.090909 | 0.090909 | 0.181818 |
 | 10 | 0.1 | .10, .30, .60 | 1,331 | 0.090909 | 0.090909 | 0.272727 |
 | 10 | 0.1 | .05, .15, .30, .50 | 14,641 | 0.090909 | 0.181818 | 0.363636 |
@@ -27,13 +29,14 @@ worst-case tail probability is no greater than `alpha`.
 | 20 | 0.1 | .10, .20, .70 | 9,261 | 0.095238 | 0.095238 | 0.285714 |
 | 20 | 0.2 | .15, .35, .50 | 9,261 | 0.190476 | 0.380952 | 0.571429 |
 
-All six valid nonuniform-weight coupling optima satisfy the required tail
-bound. Doubling every e-value is an invalid construction, but is still
-accidentally conservative for four weight configurations; it violates the
-bound in 2/6 LP cases and 1/6 independent-product cases. The decisive control
+All eight valid coupling optima—two equal-weight ECCP cases and six
+nonuniform tuning-independent WECA cases—satisfy the required tail bound.
+Doubling every e-value is an invalid construction, but is still accidentally
+conservative for four weight configurations; it violates the bound in 4/8 LP
+cases and 2/8 independent-product cases. The decisive control
 instead chooses a one-hot weight on the largest e-value *after observing the
 inference tuple*. That forbidden outcome-adaptive weighting violates the bound
-in all 6/6 cases, with worst-case tail/alpha ratios from `1.818` to `3.636`.
+in all 8/8 cases, with worst-case tail/alpha ratios from `1.818` to `3.636`.
 This cleanly isolates why WECA's weights must come from its independent tuning
 split. This is a finite mechanism audit; the separate full
 Boston/Abalone/Parkinson source run remains required for the empirical claim.

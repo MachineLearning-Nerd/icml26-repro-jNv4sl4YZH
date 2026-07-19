@@ -137,6 +137,9 @@ class FullProtocolTests(unittest.TestCase):
         }
         mechanism = {
             "summary": {
+                "case_count": 8,
+                "equal_weight_case_count": 2,
+                "nonuniform_weight_case_count": 6,
                 "all_merged_expectations_exact": True,
                 "all_markov_coverage_events_pass": True,
                 "all_arbitrary_dependence_coverage_pass": True,
@@ -144,8 +147,8 @@ class FullProtocolTests(unittest.TestCase):
                 "invalid_arbitrary_dependence_detected": True,
                 "adaptive_weight_control_detected": True,
                 "invalid_scaling_control_rejection_count": 2,
-                "invalid_arbitrary_dependence_rejection_count": 6,
-                "adaptive_weight_rejection_count": 6,
+                "invalid_arbitrary_dependence_rejection_count": 4,
+                "adaptive_weight_rejection_count": 8,
                 "maximum_valid_tail_to_alpha_ratio": 0.95,
             }
         }

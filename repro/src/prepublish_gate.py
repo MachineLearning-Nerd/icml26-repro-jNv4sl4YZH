@@ -220,9 +220,12 @@ def main() -> None:
             "invalid_scaling_control_detected",
         ),
     )
-    assert mechanism["summary"]["invalid_arbitrary_dependence_rejection_count"] == 2
-    assert mechanism["summary"]["invalid_scaling_control_rejection_count"] == 1
-    assert mechanism["summary"]["adaptive_weight_rejection_count"] == 6
+    assert mechanism["summary"]["case_count"] == 8
+    assert mechanism["summary"]["equal_weight_case_count"] == 2
+    assert mechanism["summary"]["nonuniform_weight_case_count"] == 6
+    assert mechanism["summary"]["invalid_arbitrary_dependence_rejection_count"] == 4
+    assert mechanism["summary"]["invalid_scaling_control_rejection_count"] == 2
+    assert mechanism["summary"]["adaptive_weight_rejection_count"] == 8
 
     claim2 = load_json("outputs/claim2_independent.json")
     assert_summary(

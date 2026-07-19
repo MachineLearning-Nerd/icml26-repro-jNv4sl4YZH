@@ -37,17 +37,17 @@ but unpublished.
 3. **C3:** run paper-scale cross-conformal trials on bundled Boston, Abalone,
    and Parkinson datasets with 100 fixed seeds and the paper's reported fold
    counts; independently recompute all interval coverages/lengths and include
-   nominal/invalid-calibrator controls. A separate six-cell finite-rank
+   nominal/invalid-calibrator controls. A separate eight-cell finite-rank
    e-merge enumeration already verifies the exact mean-one mechanism and all
    `1-alpha` Markov events. An exact sparse linear program additionally
    maximizes failure probability over every joint coupling with the required
-   uniform conformal-rank marginals: all 6/6 valid nonuniform fixed-weight
-   worst cases remain at or below `alpha`. A 2x-invalid-e-value control is
-   correctly reported as only 2/6 under the LP (it remains conservative in
-   four cases), while forbidden outcome-adaptive max weighting violates the
-   bound in 6/6. This directly checks the independent-tuning requirement for
-   WECA and supports both CA and CCP, but does not replace the queued empirical
-   run.
+   uniform conformal-rank marginals: all 8/8 fixed-weight worst cases remain at
+   or below `alpha`, including two equal-weight ECCP and six nonuniform
+   tuning-independent WECA cases. A 2x-invalid-e-value control is correctly
+   reported as only 4/8 under the LP (it remains conservative in four cases),
+   while forbidden outcome-adaptive max weighting violates the bound in 8/8.
+   This directly checks both ECCP and WECA's independent-tuning requirement,
+   but does not replace the queued empirical run.
 
 ## Publication gate
 
@@ -90,7 +90,8 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   independent evidence, falsifiers, and fail-closed acceptance rules are now
   pinned in `repro/configs/jury_claims.json` and
   `docs/jury_claim_evidence_matrix.md`; the publication gate enforces this
-  snapshot. All `16/16` tests pass after adding the claim-scope check.
+  snapshot. The claim-scope check remains part of the current `18/18` passing
+  test suite.
 - Tightened C2's qualitative word "substantial" into a fail-closed numerical
   rule before the final dataset exists: every one of the 24 matched P2E versus
   log/square-root/linear comparisons must reduce interval length by at least
@@ -100,7 +101,14 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   correctly fail when the reduction is only 5%. The 18 comparisons from the
   three completed real datasets currently exceed this threshold by a wide
   margin (minimum `87.82%`).
-- Ran all fifteen local mechanism/protocol/author-launcher/raw-verifier and
+- Expanded the exact C3 mechanism suite from six nonuniform WECA cases to
+  eight cases by adding explicit equal-weight two- and three-fold ECCP merges.
+  All 8/8 valid arbitrary-dependence LP optima pass; outcome-adaptive weighting
+  fails 8/8. A separate permutation enumeration independently matches the
+  two-fold LP optimum, and malformed/negative/non-normalized weights are
+  rejected. The refreshed result is captured in Trackio and closes the
+  previously implicit ECCP mechanism scope.
+- Ran all eighteen local mechanism/protocol/author-launcher/raw-verifier and
   paper-headline drift-control tests successfully (including positive and
   deliberately incomplete raw fixtures), including local-only Trackio artifact
   path validation, and completed a scoped secret scan with no findings.
@@ -143,4 +151,4 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   slower than the three completed `1,030`- to `1,503`-row tasks. The exact-PID
   continuation guard and both serialized handoffs remain alive. The required
   Python 3.12 environment was re-entered, the publication shell scripts passed
-  syntax/preflight checks, and all `15/15` tests passed again.
+  syntax/preflight checks, and all `18/18` tests passed again.

@@ -123,6 +123,10 @@ def evaluate_case(
 
 def run_cases() -> dict[str, object]:
     cases = [
+        # Equal-weight merges explicitly exercise ECCP's released construction.
+        evaluate_case(10, 0.1, (0.50, 0.50)),
+        evaluate_case(10, 0.1, (1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0)),
+        # Nonuniform, fixed weights exercise tuning-independent WECA.
         evaluate_case(10, 0.1, (0.25, 0.75)),
         evaluate_case(10, 0.1, (0.10, 0.30, 0.60)),
         evaluate_case(10, 0.1, (0.05, 0.15, 0.30, 0.50)),
@@ -136,6 +140,12 @@ def run_cases() -> dict[str, object]:
         "cases": cases,
         "summary": {
             "case_count": len(cases),
+            "equal_weight_case_count": sum(
+                max(row["weights"]) - min(row["weights"]) < 1e-12 for row in cases
+            ),
+            "nonuniform_weight_case_count": sum(
+                max(row["weights"]) - min(row["weights"]) >= 1e-12 for row in cases
+            ),
             "all_merged_expectations_exact": all(row["mean_merged_e_abs_error"] < 1e-11 for row in cases),
             "all_markov_coverage_events_pass": all(row["coverage_pass"] for row in cases),
             "all_arbitrary_dependence_coverage_pass": all(

@@ -3,12 +3,15 @@
   "title": "Repro - Set-Preserving Calibration from Conformal P-Values to E-Values",
   "emoji": "🎯",
   "space_id": null,
-  "paper": null,
+  "paper": {
+    "arxiv_id": "2606.03600",
+    "openreview_id": "jNv4sl4YZH"
+  },
   "tags": [
     "icml2026-repro",
     "paper-jNv4sl4YZH"
   ],
-  "updated_at": "2026-07-18T12:49:31+00:00",
+  "updated_at": "2026-07-19T07:12:01+00:00",
   "root": {
     "slug": "index",
     "title": "Repro - Set-Preserving Calibration from Conformal P-Values to E-Values",
@@ -58,6 +61,6 @@
       }
     ]
   },
-  "agent_view_tokens": 2593,
-  "revision": "1784378971886306642"
+  "agent_view_tokens": 3097,
+  "revision": "1784445121888171357"
 }
