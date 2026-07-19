@@ -1,18 +1,22 @@
 # Paper headline comparison
 
-This project preserves a machine-readable transcription of every CA P2E row
-and every tabulated CCP row needed to cross-check the full source runs against the paper. The values are
-transcribed from arXiv `2606.03600`, Table 2 and Appendix Tables 6–8, into
+This project preserves a machine-readable transcription of every CA P2E row,
+every CA log/square-root/linear comparator row used by Claim 2, and every
+tabulated CCP row needed to cross-check the full source runs against the paper.
+The values are transcribed from arXiv `2606.03600v1`, Table 2, the CA
+alternative-calibrator table, and Appendix Tables 6–8 into
 `repro/configs/paper_headlines.json`.
 
 `repro/src/verify_paper_table_fixture.py` independently downloads the fixed
-arXiv v1 source, checks its archive and `main.tex` hashes, parses all 98 cells,
-and requires exact equality for every one of the 392 configured scalars. The
+arXiv v1 source, checks its archive and `main.tex` hashes, parses all 122 cells,
+and requires exact equality for every one of the 488 configured scalars. The
 paper source itself is never copied into this repository or evidence bundle.
 
 The transcription was rechecked against the primary arXiv v1 HTML on
 2026-07-19. Table 2 reports the four WECA(P2E) and four UR-WECA(P2E) CA cells;
-Appendix Tables 6, 7, and 8 report the Boston, Abalone, and Parkinson
+the adjacent alternative-calibrator table reports 24 matched F1/log,
+F2/square-root, and F3/linear cells; Appendix Tables 6, 7, and 8 report the
+Boston, Abalone, and Parkinson
 length/coverage cells for OLS, RF, and Lasso. Both panels are transcribed:
 CCP/e-mod/u-mod/eu-mod/ECCP(2alpha), plus P2E ECCP/AoN/F1/F2/F3. The paper also states that ECCP
 is valid under arbitrary dependence among fold-wise p-values, which is the
@@ -38,13 +42,15 @@ result, the audit was strengthened to include the paper's reported standard
 deviations: absolute coverage-SD drift must be at most `0.01`, and relative
 length-SD drift must be at most `10%`.
 
-The CA comparison covers the paper's reported WECA(P2E) and UR-WECA(P2E)
-rows across all four OpenML task IDs. The CCP comparison covers all ten methods
+The CA comparison covers the paper's reported WECA and UR-WECA P2E, log,
+square-root, and linear rows across all four OpenML task IDs. The CCP
+comparison covers all ten methods
 tabulated for OLS, RF, and Lasso on Boston, Abalone, and Parkinson at the
 reported 15/15/20 fold counts. In total, the fail-closed comparison checks all
-four reported scalars (coverage mean/SD and length mean/SD) in 98 cells:
-392 scalar comparisons. The 90 CCP cells were parsed back from the primary
-arXiv TeX and matched field-for-field before any CCP result existed.
+four reported scalars (coverage mean/SD and length mean/SD) in 122 cells:
+488 scalar comparisons. All 32 CA cells and all 90 CCP cells were parsed back
+from the primary arXiv TeX and matched field-for-field before the final CA task
+or any CCP result existed.
 
 Separately, the raw CA/CCP verifiers apply a fixed two-percentage-point
 gross-undercoverage sanity threshold to all eight P2E aggregation cells and all

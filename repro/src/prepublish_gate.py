@@ -296,7 +296,10 @@ def main() -> None:
     live_jury_claims = fetch_live_jury_claims()
 
     headline_config = load_json("repro/configs/paper_headlines.json")
-    assert headline_config["source"] == "arXiv:2606.03600, Table 2 and Appendix Tables 6-8"
+    assert headline_config["source"] == (
+        "arXiv:2606.03600v1, Table 2, CA alternative-calibrator table, "
+        "and Appendix Tables 6-8"
+    )
     assert all(
         headline_config["comparison_policy"].get(key) == value
         for key, value in HEADLINE_TOLERANCES.items()
@@ -304,7 +307,7 @@ def main() -> None:
     assert sum(
         len(methods)
         for methods in headline_config["conformal_aggregation"].values()
-    ) == 8
+    ) == 32
     assert sum(
         len(methods)
         for models in headline_config["cross_conformal"].values()
@@ -457,10 +460,10 @@ def main() -> None:
     assert fixture_summary["all_fields_match"] is True
     assert fixture_summary["mismatch_count"] == 0
     assert fixture_summary["mismatch_paths"] == []
-    assert fixture_summary["ca_cell_count"] == 8
+    assert fixture_summary["ca_cell_count"] == 32
     assert fixture_summary["ccp_cell_count"] == 90
-    assert fixture_summary["total_cell_count"] == 98
-    assert fixture_summary["scalar_count"] == 392
+    assert fixture_summary["total_cell_count"] == 122
+    assert fixture_summary["scalar_count"] == 488
 
     headlines = load_json("outputs/paper_headline_comparison.json")
     assert_summary(headlines, ("all_within_tolerance",))
@@ -469,10 +472,10 @@ def main() -> None:
         headlines["comparison_policy"].get(key) == value
         for key, value in HEADLINE_TOLERANCES.items()
     )
-    assert headlines["summary"]["comparison_count"] == 98
-    assert headlines["summary"]["within_tolerance_count"] == 98
-    assert headlines["summary"]["scalar_comparison_count"] == 392
-    assert headlines["summary"]["within_tolerance_scalar_count"] == 392
+    assert headlines["summary"]["comparison_count"] == 122
+    assert headlines["summary"]["within_tolerance_count"] == 122
+    assert headlines["summary"]["scalar_comparison_count"] == 488
+    assert headlines["summary"]["within_tolerance_scalar_count"] == 488
 
     required_trackio_text = {
         ".trackio/logbook/pages/claim-2/page.md": (

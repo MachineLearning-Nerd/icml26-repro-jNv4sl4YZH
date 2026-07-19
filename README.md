@@ -74,7 +74,7 @@ python repro/src/compare_paper_headlines.py \
   --output outputs/paper_headline_comparison.json
 
 # Independently re-download the hash-pinned arXiv v1 source and verify that
-# all 98 fixture cells / 392 scalars were transcribed exactly from its TeX.
+# all 122 fixture cells / 488 scalars were transcribed exactly from its TeX.
 python repro/src/verify_paper_table_fixture.py \
   --output outputs/paper_table_fixture_audit.json
 python -m unittest discover -s repro/tests -v
@@ -98,8 +98,8 @@ python repro/src/prepublish_gate.py \
 
 After the full source runs finish, `python repro/src/prepublish_gate.py` reruns
 all independent checks and tests, validates every raw cell, verifies the
-Trackio evidence and source pin, checks all 392 reported mean/SD scalars in the
-98 tabulated paper cells, requires all 24 CA material-efficiency comparisons
+Trackio evidence and source pin, checks all 488 reported mean/SD scalars in the
+122 tabulated paper cells, requires all 24 CA material-efficiency comparisons
 and all 36 CCP calibrator comparisons (including nine AoN cells), scans for
 secrets/local paths, and emits a SHA-256 manifest only if the complete
 publication gate passes. It also creates

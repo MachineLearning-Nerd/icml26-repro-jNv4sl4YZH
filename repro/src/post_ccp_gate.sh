@@ -83,12 +83,12 @@ from pathlib import Path
 
 result = json.loads(Path("outputs/paper_headline_comparison.json").read_text())
 summary = result["summary"]
-assert summary["comparison_count"] == 98
+assert summary["comparison_count"] == 122
 assert summary["all_within_tolerance"]
-assert summary["within_tolerance_count"] == 98
-assert summary["scalar_comparison_count"] == 392
-assert summary["within_tolerance_scalar_count"] == 392
-print("All 392 reported scalars in 98 paper-table cells are within tolerance")
+assert summary["within_tolerance_count"] == 122
+assert summary["scalar_comparison_count"] == 488
+assert summary["within_tolerance_scalar_count"] == 488
+print("All 488 reported scalars in 122 paper-table cells are within tolerance")
 PY
 
 trackio logbook run \

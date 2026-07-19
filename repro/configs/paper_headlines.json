@@ -1,5 +1,5 @@
 {
-  "source": "arXiv:2606.03600, Table 2 and Appendix Tables 6-8",
+  "source": "arXiv:2606.03600v1, Table 2, CA alternative-calibrator table, and Appendix Tables 6-8",
   "comparison_policy": {
     "coverage_absolute_tolerance": 0.01,
     "coverage_sd_absolute_tolerance": 0.01,
@@ -10,19 +10,43 @@
   "conformal_aggregation": {
     "dataset_361234": {
       "WECA(P2E)": {"coverage_mean": 0.95, "coverage_sd": 0.01, "length_mean": 2.88, "length_sd": 0.19},
-      "UR-WECA(P2E)": {"coverage_mean": 0.95, "coverage_sd": 0.01, "length_mean": 2.88, "length_sd": 0.18}
+      "UR-WECA(P2E)": {"coverage_mean": 0.95, "coverage_sd": 0.01, "length_mean": 2.88, "length_sd": 0.18},
+      "WECA(log)": {"coverage_mean": 1.00, "coverage_sd": 0.00, "length_mean": 72.14, "length_sd": 15.33},
+      "UR-WECA(log)": {"coverage_mean": 0.95, "coverage_sd": 0.01, "length_mean": 50.36, "length_sd": 10.76},
+      "WECA(sqrt)": {"coverage_mean": 1.00, "coverage_sd": 0.00, "length_mean": 7.75, "length_sd": 1.40},
+      "UR-WECA(sqrt)": {"coverage_mean": 0.95, "coverage_sd": 0.01, "length_mean": 4.88, "length_sd": 0.43},
+      "WECA(linear)": {"coverage_mean": 1.00, "coverage_sd": 0.00, "length_mean": 72.14, "length_sd": 15.33},
+      "UR-WECA(linear)": {"coverage_mean": 0.95, "coverage_sd": 0.01, "length_mean": 65.34, "length_sd": 13.92}
     },
     "dataset_361235": {
       "WECA(P2E)": {"coverage_mean": 0.95, "coverage_sd": 0.01, "length_mean": 1.71, "length_sd": 0.29},
-      "UR-WECA(P2E)": {"coverage_mean": 0.95, "coverage_sd": 0.01, "length_mean": 1.70, "length_sd": 0.30}
+      "UR-WECA(P2E)": {"coverage_mean": 0.95, "coverage_sd": 0.01, "length_mean": 1.70, "length_sd": 0.30},
+      "WECA(log)": {"coverage_mean": 1.00, "coverage_sd": 0.00, "length_mean": 38.43, "length_sd": 2.99},
+      "UR-WECA(log)": {"coverage_mean": 0.95, "coverage_sd": 0.01, "length_mean": 28.73, "length_sd": 2.48},
+      "WECA(sqrt)": {"coverage_mean": 1.00, "coverage_sd": 0.00, "length_mean": 38.43, "length_sd": 2.99},
+      "UR-WECA(sqrt)": {"coverage_mean": 0.96, "coverage_sd": 0.02, "length_mean": 13.98, "length_sd": 1.68},
+      "WECA(linear)": {"coverage_mean": 1.00, "coverage_sd": 0.00, "length_mean": 38.43, "length_sd": 2.99},
+      "UR-WECA(linear)": {"coverage_mean": 0.95, "coverage_sd": 0.01, "length_mean": 34.76, "length_sd": 2.93}
     },
     "dataset_361237": {
       "WECA(P2E)": {"coverage_mean": 0.95, "coverage_sd": 0.03, "length_mean": 1.65, "length_sd": 0.25},
-      "UR-WECA(P2E)": {"coverage_mean": 0.95, "coverage_sd": 0.03, "length_mean": 1.64, "length_sd": 0.25}
+      "UR-WECA(P2E)": {"coverage_mean": 0.95, "coverage_sd": 0.03, "length_mean": 1.64, "length_sd": 0.25},
+      "WECA(log)": {"coverage_mean": 1.00, "coverage_sd": 0.00, "length_mean": 32.05, "length_sd": 3.24},
+      "UR-WECA(log)": {"coverage_mean": 0.95, "coverage_sd": 0.02, "length_mean": 24.65, "length_sd": 2.71},
+      "WECA(sqrt)": {"coverage_mean": 1.00, "coverage_sd": 0.00, "length_mean": 32.05, "length_sd": 3.24},
+      "UR-WECA(sqrt)": {"coverage_mean": 0.96, "coverage_sd": 0.01, "length_mean": 15.64, "length_sd": 2.07},
+      "WECA(linear)": {"coverage_mean": 1.00, "coverage_sd": 0.00, "length_mean": 32.05, "length_sd": 3.24},
+      "UR-WECA(linear)": {"coverage_mean": 0.95, "coverage_sd": 0.02, "length_mean": 28.89, "length_sd": 2.91}
     },
     "dataset_361244": {
       "WECA(P2E)": {"coverage_mean": 0.96, "coverage_sd": 0.02, "length_mean": 5.09, "length_sd": 2.06},
-      "UR-WECA(P2E)": {"coverage_mean": 0.96, "coverage_sd": 0.02, "length_mean": 4.93, "length_sd": 1.86}
+      "UR-WECA(P2E)": {"coverage_mean": 0.96, "coverage_sd": 0.02, "length_mean": 4.93, "length_sd": 1.86},
+      "WECA(log)": {"coverage_mean": 1.00, "coverage_sd": 0.00, "length_mean": 115.49, "length_sd": 34.62},
+      "UR-WECA(log)": {"coverage_mean": 0.97, "coverage_sd": 0.02, "length_mean": 87.96, "length_sd": 25.82},
+      "WECA(sqrt)": {"coverage_mean": 1.00, "coverage_sd": 0.00, "length_mean": 115.49, "length_sd": 34.62},
+      "UR-WECA(sqrt)": {"coverage_mean": 0.97, "coverage_sd": 0.02, "length_mean": 54.66, "length_sd": 17.04},
+      "WECA(linear)": {"coverage_mean": 1.00, "coverage_sd": 0.00, "length_mean": 115.49, "length_sd": 34.62},
+      "UR-WECA(linear)": {"coverage_mean": 0.97, "coverage_sd": 0.02, "length_mean": 103.89, "length_sd": 30.73}
     }
   },
   "cross_conformal": {

@@ -11,7 +11,7 @@
     "icml2026-repro",
     "paper-jNv4sl4YZH"
   ],
-  "updated_at": "2026-07-19T15:13:18+00:00",
+  "updated_at": "2026-07-19T15:24:13+00:00",
   "root": {
     "slug": "index",
     "title": "Repro - Set-Preserving Calibration from Conformal P-Values to E-Values",
@@ -61,6 +61,6 @@
       }
     ]
   },
-  "agent_view_tokens": 5769,
-  "revision": "1784473998809284587"
+  "agent_view_tokens": 5946,
+  "revision": "1784474653164824160"
 }

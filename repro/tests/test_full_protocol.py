@@ -22,10 +22,13 @@ from repro.src.render_final_logbook import build_cells
 from repro.src.run_author_ccp import EXECUTION_ADAPTER, METHOD_KEYS, PAPER_DATASETS
 from repro.src.verify_ccp_results import CALIBRATOR_BASELINES
 from repro.src.verify_paper_table_fixture import (
+    ALTERNATIVE_CA_METHODS,
+    CA_DATASET_KEYS,
     MAIN_TEX_SHA256,
     SOURCE_ARCHIVE_SHA256,
     SOURCE_URL,
     mismatch_paths,
+    parse_ca_alternative_table,
 )
 from repro.src.verify_weca_independence import (
     METHODS_SHA256,
@@ -170,7 +173,7 @@ class FullProtocolTests(unittest.TestCase):
         )
         self.assertEqual(
             headlines["source"],
-            "arXiv:2606.03600, Table 2 and Appendix Tables 6-8",
+            "arXiv:2606.03600v1, Table 2, CA alternative-calibrator table, and Appendix Tables 6-8",
         )
         self.assertEqual(
             {
@@ -191,7 +194,7 @@ class FullProtocolTests(unittest.TestCase):
         )
         self.assertEqual(
             sum(len(methods) for methods in headlines["conformal_aggregation"].values()),
-            8,
+            32,
         )
         self.assertEqual(
             sum(
@@ -278,17 +281,45 @@ class FullProtocolTests(unittest.TestCase):
             audit["summary"],
             {
                 "all_fields_match": True,
-                "ca_cell_count": 8,
+                "ca_cell_count": 32,
                 "ccp_cell_count": 90,
                 "mismatch_count": 0,
                 "mismatch_paths": [],
-                "parsed_values_sha256": "4fc44baae9e052b59a4184aa297fe5af2aad8484c881352e3a91a616f7b50b7c",
-                "scalar_count": 392,
-                "total_cell_count": 98,
+                "parsed_values_sha256": "a412b883aebd9aa128293cf5308db45cd89ae69eb50b868a71551d7a05124b14",
+                "scalar_count": 488,
+                "total_cell_count": 122,
             },
         )
         self.assertEqual(mismatch_paths({"cell": 1.0}, {"cell": 2.0}), ["cell"])
         self.assertEqual(mismatch_paths({"cell": 1.0}, {"cell": 1.0}), [])
+
+    def test_alternative_ca_parser_rejects_dataset_and_method_drift(self):
+        lines = [r"\begin{table}[t]", "& Method & Cov.  & Len."]
+        for dataset in CA_DATASET_KEYS:
+            task_id = dataset.removeprefix("dataset_")
+            for index, (source_method, _) in enumerate(ALTERNATIVE_CA_METHODS):
+                prefix = (
+                    rf"\multirow{{8}}{{*}}{{\rotatebox[origin=c]{{90}}"
+                    rf"{{\textbf{{{task_id}}}}}}}"
+                    if index == 0
+                    else ""
+                )
+                lines.append(
+                    f"{prefix} & {source_method} & "
+                    r"$0.95 \pm 0.01$ & $1.00 \pm 0.10$ \\"
+                )
+        lines.extend([r"\label{tab:weca_rotated}", r"\end{table}"])
+        tex = "\n".join(lines)
+
+        parsed = parse_ca_alternative_table(tex)
+        self.assertEqual(
+            sum(len(methods) for methods in parsed.values()),
+            len(CA_DATASET_KEYS) * len(ALTERNATIVE_CA_METHODS),
+        )
+        with self.assertRaises(RuntimeError):
+            parse_ca_alternative_table(tex.replace("361234", "361999", 1))
+        with self.assertRaises(RuntimeError):
+            parse_ca_alternative_table(tex.replace("WECA($F_1$)", "WECA($F_X$)", 1))
 
     def test_weca_independence_audit_is_bound_to_released_source(self):
         root = Path(__file__).resolve().parents[2]
@@ -458,9 +489,9 @@ class FullProtocolTests(unittest.TestCase):
         headlines = {
             "summary": {
                 "all_within_tolerance": True,
-                "comparison_count": 98,
-                "scalar_comparison_count": 392,
-                "within_tolerance_scalar_count": 392,
+                "comparison_count": 122,
+                "scalar_comparison_count": 488,
+                "within_tolerance_scalar_count": 488,
             }
         }
 
@@ -469,7 +500,7 @@ class FullProtocolTests(unittest.TestCase):
         )
         self.assertIn("FULL_GATE_READY: jNv4sl4YZH", cells["conclusion"])
         self.assertIn("24/24", cells["claim_2"])
-        self.assertEqual(cells["summary"]["headline_scalars"], 392)
+        self.assertEqual(cells["summary"]["headline_scalars"], 488)
 
         claim2["summary"]["p2e_shorter_count"] = 23
         with self.assertRaises(RuntimeError):

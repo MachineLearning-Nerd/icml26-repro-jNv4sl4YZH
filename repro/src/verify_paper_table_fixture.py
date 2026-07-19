@@ -18,6 +18,20 @@ SOURCE_ARCHIVE_SHA256 = "f5124c39036b9107b01439fdbeb5da82331a70b81a3211e3b36887e
 MAIN_TEX_SHA256 = "49058ff8e986f43770936c09cc97360e5cace8802c6304a80d9e153d342ae857"
 DATASETS = ("boston", "abalone", "parkinson")
 MODELS = ("OLS", "RF", "Lasso")
+CA_DATASET_KEYS = (
+    "dataset_361234",
+    "dataset_361235",
+    "dataset_361237",
+    "dataset_361244",
+)
+ALTERNATIVE_CA_METHODS = (
+    (r"WECA($F_1$)", "WECA(log)"),
+    (r"UR-WECA($F_1$)", "UR-WECA(log)"),
+    (r"WECA($F_2$)", "WECA(sqrt)"),
+    (r"UR-WECA($F_2$)", "UR-WECA(sqrt)"),
+    (r"WECA($F_3$)", "WECA(linear)"),
+    (r"UR-WECA($F_3$)", "UR-WECA(linear)"),
+)
 FIRST_PANEL_METHODS = (
     "cross",
     "e-mod-cross",
@@ -84,13 +98,7 @@ def parse_ca_table(tex: str) -> dict[str, dict[str, dict[str, float]]]:
     )
     if expected_header not in block:
         raise RuntimeError("CA paper-table dataset order drift")
-    dataset_keys = (
-        "dataset_361234",
-        "dataset_361235",
-        "dataset_361237",
-        "dataset_361244",
-    )
-    output = {dataset: {} for dataset in dataset_keys}
+    output = {dataset: {} for dataset in CA_DATASET_KEYS}
     for source_method, config_method in (
         ("WECA", "WECA(P2E)"),
         ("UR-WECA", "UR-WECA(P2E)"),
@@ -103,7 +111,7 @@ def parse_ca_table(tex: str) -> dict[str, dict[str, dict[str, float]]]:
         if len(rows) != 1:
             raise RuntimeError(f"expected one active {source_method} paper row")
         pairs = parse_pairs(rows[0], 8)
-        for index, dataset in enumerate(dataset_keys):
+        for index, dataset in enumerate(CA_DATASET_KEYS):
             coverage, length = pairs[2 * index : 2 * index + 2]
             output[dataset][config_method] = {
                 "coverage_mean": coverage[0],
@@ -111,6 +119,66 @@ def parse_ca_table(tex: str) -> dict[str, dict[str, dict[str, float]]]:
                 "length_mean": length[0],
                 "length_sd": length[1],
             }
+    alternatives = parse_ca_alternative_table(tex)
+    for dataset in CA_DATASET_KEYS:
+        output[dataset].update(alternatives[dataset])
+    return output
+
+
+def parse_ca_alternative_table(
+    tex: str,
+) -> dict[str, dict[str, dict[str, float]]]:
+    label = tex.index(r"\label{tab:weca_rotated}")
+    start = tex.rindex(r"\begin{table}[t]", 0, label)
+    end = tex.index(r"\end{table}", label)
+    block = tex[start:end]
+    if "& Method & Cov.  & Len." not in block:
+        raise RuntimeError("alternative CA metric header drift")
+
+    expected_ids = [dataset.removeprefix("dataset_") for dataset in CA_DATASET_KEYS]
+    observed_ids = re.findall(r"\\textbf\{(\d+)\}", block)
+    if observed_ids != expected_ids:
+        raise RuntimeError(
+            f"alternative CA dataset order drift: {observed_ids!r}"
+        )
+
+    method_map = dict(ALTERNATIVE_CA_METHODS)
+    expected_method_order = [source for source, _ in ALTERNATIVE_CA_METHODS]
+    output = {dataset: {} for dataset in CA_DATASET_KEYS}
+    current_dataset: str | None = None
+    observed_method_order: dict[str, list[str]] = {
+        dataset: [] for dataset in CA_DATASET_KEYS
+    }
+    for raw_line in block.splitlines():
+        line = raw_line.strip()
+        if "&" not in line or not any(source in line for source in method_map):
+            continue
+        dataset_match = re.search(r"\\textbf\{(\d+)\}", line)
+        if dataset_match:
+            current_dataset = f"dataset_{dataset_match.group(1)}"
+        if current_dataset not in output:
+            raise RuntimeError("alternative CA row appears before a known dataset")
+        fields = [field.strip() for field in line.split("&")]
+        if len(fields) != 4:
+            raise RuntimeError(f"malformed alternative CA row: {line!r}")
+        source_method = fields[1]
+        if source_method not in method_map:
+            raise RuntimeError(f"unexpected alternative CA method: {source_method!r}")
+        coverage, length = parse_pairs(line, 2)
+        output[current_dataset][method_map[source_method]] = {
+            "coverage_mean": coverage[0],
+            "coverage_sd": coverage[1],
+            "length_mean": length[0],
+            "length_sd": length[1],
+        }
+        observed_method_order[current_dataset].append(source_method)
+
+    for dataset in CA_DATASET_KEYS:
+        if observed_method_order[dataset] != expected_method_order:
+            raise RuntimeError(
+                f"alternative CA method order drift for {dataset}: "
+                f"{observed_method_order[dataset]!r}"
+            )
     return output
 
 
@@ -262,9 +330,9 @@ def main() -> None:
     args.output.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     if not (
         audit["all_fields_match"]
-        and audit["ca_cell_count"] == 8
+        and audit["ca_cell_count"] == 32
         and audit["ccp_cell_count"] == 90
-        and audit["scalar_count"] == 392
+        and audit["scalar_count"] == 488
     ):
         raise SystemExit("paper table fixture audit failed")
     print(json.dumps(audit, sort_keys=True))
