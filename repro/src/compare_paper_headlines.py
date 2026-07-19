@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 from pathlib import Path
 
 
@@ -17,6 +18,20 @@ def comparison(actual: dict[str, object], paper: dict[str, float], policy: dict[
     paper_coverage_sd = float(paper["coverage_sd"])
     paper_length = float(paper["length_mean"])
     paper_length_sd = float(paper["length_sd"])
+    values = (
+        observed_coverage,
+        observed_coverage_sd,
+        observed_length,
+        observed_length_sd,
+        paper_coverage,
+        paper_coverage_sd,
+        paper_length,
+        paper_length_sd,
+    )
+    if not all(math.isfinite(value) for value in values):
+        raise ValueError("headline comparison inputs must all be finite")
+    if paper_length <= 0.0 or paper_length_sd <= 0.0:
+        raise ValueError("paper length mean/SD denominators must be positive")
     coverage_delta = observed_coverage - paper_coverage
     coverage_sd_delta = observed_coverage_sd - paper_coverage_sd
     length_delta = observed_length - paper_length

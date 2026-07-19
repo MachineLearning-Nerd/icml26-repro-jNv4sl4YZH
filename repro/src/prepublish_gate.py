@@ -20,6 +20,12 @@ JURY_CLAIM_TEXTS = (
     "Yields substantial efficiency gains over existing p-to-e methods in conformal inference",
     "Enables exact 1-α coverage in cross-conformal prediction and conformal aggregation",
 )
+HEADLINE_TOLERANCES = {
+    "coverage_absolute_tolerance": 0.01,
+    "coverage_sd_absolute_tolerance": 0.01,
+    "length_relative_tolerance": 0.05,
+    "length_sd_relative_tolerance": 0.10,
+}
 TEXT_SUFFIXES = {
     "", ".cfg", ".csv", ".gitignore", ".ini", ".json", ".md", ".py",
     ".sh", ".toml", ".txt", ".yaml", ".yml",
@@ -210,6 +216,22 @@ def main() -> None:
     assert [claim["claim"] for claim in jury["claims"]] == [1, 2, 3]
     assert [claim["possible_points"] for claim in jury["claims"]] == [2, 2, 2]
 
+    headline_config = load_json("repro/configs/paper_headlines.json")
+    assert headline_config["source"] == "arXiv:2606.03600, Table 2 and Appendix Tables 6-8"
+    assert all(
+        headline_config["comparison_policy"].get(key) == value
+        for key, value in HEADLINE_TOLERANCES.items()
+    )
+    assert sum(
+        len(methods)
+        for methods in headline_config["conformal_aggregation"].values()
+    ) == 8
+    assert sum(
+        len(methods)
+        for models in headline_config["cross_conformal"].values()
+        for methods in models.values()
+    ) == 9
+
     commands = (
         [sys.executable, "repro/src/verify_p2e_identity.py", "--output", "outputs/claim1_independent.json"],
         [sys.executable, "repro/src/crosscheck_source_p2e.py", "--source", "upstream", "--output", "outputs/claim1_source_crosscheck.json"],
@@ -306,6 +328,11 @@ def main() -> None:
 
     headlines = load_json("outputs/paper_headline_comparison.json")
     assert_summary(headlines, ("all_within_tolerance",))
+    assert headlines["paper_source"] == headline_config["source"]
+    assert all(
+        headlines["comparison_policy"].get(key) == value
+        for key, value in HEADLINE_TOLERANCES.items()
+    )
     assert headlines["summary"]["comparison_count"] == 17
     assert headlines["summary"]["within_tolerance_count"] == 17
     assert headlines["summary"]["scalar_comparison_count"] == 68

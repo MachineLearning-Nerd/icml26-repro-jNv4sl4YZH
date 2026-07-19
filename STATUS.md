@@ -132,6 +132,12 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   the strict CA verifier because `dataset_361234.json` is absent. It created
   neither a passing manifest nor an evidence bundle, proving the live gate
   cannot promote the current 1,440/1,920-row partial state.
+- Pinned the headline policy independently inside the final gate: exactly eight
+  CA and nine CCP cells from Table 2 / Appendix Tables 6-8, with coverage
+  mean/SD absolute tolerances `0.01/0.01` and length mean/SD relative tolerances
+  `5%/10%`. Editing the configuration cannot widen those values unnoticed.
+  The comparator now aborts on any non-finite input or nonpositive paper length
+  denominator; a NaN fixture is rejected rather than serialized.
 - Ran all eighteen local mechanism/protocol/author-launcher/raw-verifier and
   paper-headline drift-control tests successfully (including positive and
   deliberately incomplete raw fixtures), including local-only Trackio artifact

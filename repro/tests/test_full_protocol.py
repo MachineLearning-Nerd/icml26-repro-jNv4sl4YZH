@@ -90,6 +90,43 @@ class FullProtocolTests(unittest.TestCase):
         self.assertEqual(PAPER_DATASETS, {"boston": 15, "abalone": 15, "parkinson": 20})
         self.assertEqual(len(METHOD_KEYS), 13)
 
+        headlines = json.loads(
+            (root / "repro/configs/paper_headlines.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(
+            headlines["source"],
+            "arXiv:2606.03600, Table 2 and Appendix Tables 6-8",
+        )
+        self.assertEqual(
+            {
+                key: headlines["comparison_policy"][key]
+                for key in (
+                    "coverage_absolute_tolerance",
+                    "coverage_sd_absolute_tolerance",
+                    "length_relative_tolerance",
+                    "length_sd_relative_tolerance",
+                )
+            },
+            {
+                "coverage_absolute_tolerance": 0.01,
+                "coverage_sd_absolute_tolerance": 0.01,
+                "length_relative_tolerance": 0.05,
+                "length_sd_relative_tolerance": 0.10,
+            },
+        )
+        self.assertEqual(
+            sum(len(methods) for methods in headlines["conformal_aggregation"].values()),
+            8,
+        )
+        self.assertEqual(
+            sum(
+                len(methods)
+                for models in headlines["cross_conformal"].values()
+                for methods in models.values()
+            ),
+            9,
+        )
+
     def test_expected_ccp_raw_cell_count(self):
         self.assertEqual(len(PAPER_DATASETS) * 3 * len(METHOD_KEYS) * 100, 11700)
 

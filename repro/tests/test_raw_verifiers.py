@@ -94,6 +94,16 @@ class RawVerifierTests(unittest.TestCase):
             self.assertEqual(drifted_sd["summary"]["within_tolerance_count"], 16)
             self.assertEqual(drifted_sd["summary"]["within_tolerance_scalar_count"], 67)
 
+            ca["summaries"]["dataset_361234"]["WECA(P2E)"] = dict(
+                headlines["conformal_aggregation"]["dataset_361234"]["WECA(P2E)"]
+            )
+            ca["summaries"]["dataset_361234"]["WECA(P2E)"]["coverage_mean"] = float("nan")
+            ca_path.write_text(json.dumps(ca), encoding="utf-8")
+            with self.assertRaises(subprocess.CalledProcessError):
+                subprocess.run(
+                    command, cwd=ROOT, check=True, capture_output=True, text=True
+                )
+
     def test_ca_verifier_requires_each_method_seed_cell(self):
         with tempfile.TemporaryDirectory() as temp:
             raw = Path(temp)
