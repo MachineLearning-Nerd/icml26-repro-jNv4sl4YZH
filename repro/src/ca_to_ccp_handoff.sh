@@ -7,6 +7,16 @@ cd "$(dirname "$0")/../.."
 
 source .venv/bin/activate
 
+# Serialize the entire CA verification -> CCP transition. Worker-specific locks
+# below close the narrower check/start race; this owner lock also prevents two
+# watcher copies from writing the same independent-verifier/Trackio evidence.
+exec 9>/tmp/jNv4sl4YZH-ca-to-ccp-owner.lock
+if ! flock -n 9; then
+  printf '%s another CA-to-CCP handoff owner is already active; exiting\n' \
+    "$(date --iso-8601=seconds)"
+  exit 0
+fi
+
 ca_is_active() {
   pgrep -f '[r]un_author_ca.py' >/dev/null \
     || pgrep -f '[t]rackio logbook run --page Claim 2 --title Full released conformal-aggregation protocol' >/dev/null

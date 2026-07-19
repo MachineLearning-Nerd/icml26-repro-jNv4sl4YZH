@@ -311,4 +311,5 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   the runner or its Trackio parent is active. The live CA process is not
   interrupted by this watcher hardening. Paper-specific nonblocking file locks
   close the final check/start race if duplicate watcher processes are ever
-  launched accidentally.
+  launched accidentally, while a whole-transition owner lock prevents duplicate
+  Claim-2 verification and Trackio writes.
