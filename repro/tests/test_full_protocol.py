@@ -18,6 +18,7 @@ from repro.src.prepublish_gate import (
     validate_required_local_artifact,
     write_artifact_bundle,
 )
+from repro.src.verify_ca_inputs import verify_inputs
 from repro.src.render_final_logbook import build_cells
 from repro.src.run_author_ccp import EXECUTION_ADAPTER, METHOD_KEYS, PAPER_DATASETS
 from repro.src.verify_ccp_results import CALIBRATOR_BASELINES
@@ -158,6 +159,39 @@ class FullProtocolTests(unittest.TestCase):
         with self.assertRaises(AssertionError):
             validate_manifest(root / "upstream", corrupted)
 
+    def test_openml_ca_inputs_are_content_pinned(self):
+        root = Path(__file__).resolve().parents[2]
+        manifest = json.loads(
+            (root / "repro/configs/ca_input_manifest.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        audit = json.loads(
+            (root / "outputs/ca_input_audit.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(
+            audit["manifest_sha256"], sha256("repro/configs/ca_input_manifest.json")
+        )
+        self.assertEqual(
+            audit["summary"],
+            {
+                "all_processed_array_hashes_verified": True,
+                "all_processed_values_finite": True,
+                "all_task_metadata_verified": True,
+                "source_worktree_clean": True,
+                "task_count": 4,
+                "total_feature_values": 47_126,
+                "total_rows": 7_776,
+            },
+        )
+        self.assertEqual(
+            verify_inputs(root / "upstream", manifest)["summary"], audit["summary"]
+        )
+        corrupted = json.loads(json.dumps(manifest))
+        corrupted["tasks"][0]["X_sha256"] = "0" * 64
+        with self.assertRaises(AssertionError):
+            verify_inputs(root / "upstream", corrupted)
+
     def test_shared_queue_handoff_follows_initial_github_push(self):
         root = Path(__file__).resolve().parents[2]
         publisher = (root / "repro/src/publish_after_gate.sh").read_text(
@@ -169,7 +203,7 @@ class FullProtocolTests(unittest.TestCase):
         self.assertLess(initial_push, enqueue)
         self.assertLess(enqueue, wait_for_space)
         self.assertIn('gate["live_claims_verified"] == 3', publisher)
-        self.assertIn('len(gate["artifact_paths"]) == 17', publisher)
+        self.assertIn('len(gate["artifact_paths"]) == 18', publisher)
 
     def test_protocol_matches_released_paper_scale(self):
         root = Path(__file__).resolve().parents[2]

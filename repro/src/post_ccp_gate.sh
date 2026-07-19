@@ -29,6 +29,13 @@ source .venv/bin/activate
 
 trackio logbook run \
   --page "Methods & source audit" \
+  --title "Released OpenML CA input fingerprint audit" \
+  -- python repro/src/verify_ca_inputs.py \
+  --source upstream \
+  --output outputs/ca_input_audit.json
+
+trackio logbook run \
+  --page "Methods & source audit" \
   --title "Released source and dataset manifest audit" \
   -- python repro/src/verify_source_manifest.py \
   --source upstream \

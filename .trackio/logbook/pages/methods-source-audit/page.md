@@ -2935,3 +2935,266 @@ if __name__ == "__main__":
 {"all_fields_match": true, "ca_cell_count": 32, "ccp_cell_count": 90, "mismatch_count": 0, "mismatch_paths": [], "parsed_values_sha256": "a412b883aebd9aa128293cf5308db45cd89ae69eb50b868a71551d7a05124b14", "scalar_count": 488, "total_cell_count": 122}
 
 ````
+
+
+---
+<!-- trackio-cell
+{"type": "code", "id": "cell_7e01054aac00", "created_at": "2026-07-19T16:10:04+00:00", "title": "Released OpenML CA input fingerprint audit", "command": ["python", "repro/src/verify_ca_inputs.py", "--source", "upstream", "--output", "outputs/ca_input_audit.json"], "exit_code": 0, "duration_s": 1.8}
+-->
+````bash
+$ python repro/src/verify_ca_inputs.py --source upstream --output outputs/ca_input_audit.json
+````
+
+exit 0 · 1.8s
+
+
+````python title=verify_ca_inputs.py
+#!/usr/bin/env python3
+"""Content-pin the live OpenML task inputs used by the released CA loader."""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import importlib.util
+import json
+import subprocess
+from pathlib import Path
+
+import numpy as np
+import openml
+
+
+ROOT = Path(__file__).resolve().parents[2]
+SOURCE_COMMIT = "66cb1e1c76d1b1d3d133fe6cb3896c95d48b5974"
+EXPECTED_TASK_ORDER = [361237, 361235, 361244, 361234]
+TASK_FIELDS = {
+    "task_id", "dataset_id", "dataset_name", "dataset_version", "target_name",
+    "X_shape", "y_shape", "X_sha256", "y_sha256",
+}
+
+
+def file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def array_sha256(array: np.ndarray) -> str:
+    canonical = np.ascontiguousarray(array, dtype="<f8")
+    descriptor = json.dumps(
+        {"dtype": "float64-le", "shape": list(canonical.shape)},
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    digest = hashlib.sha256()
+    digest.update(descriptor)
+    digest.update(b"\0")
+    digest.update(canonical.tobytes(order="C"))
+    return digest.hexdigest()
+
+
+def validate_manifest_contract(manifest: dict) -> None:
+    assert set(manifest) == {
+        "source", "loader_path", "loader_sha256", "array_hash_encoding", "tasks"
+    }
+    assert manifest["source"] == f"Nabil-Ala/P2E_calibration@{SOURCE_COMMIT}"
+    assert manifest["loader_path"] == "e-ca/utils.py"
+    assert manifest["array_hash_encoding"] == (
+        "sha256(canonical-json(shape,dtype=float64-le) + NUL + C-order-bytes)"
+    )
+    tasks = manifest["tasks"]
+    assert [task["task_id"] for task in tasks] == EXPECTED_TASK_ORDER
+    assert len({task["task_id"] for task in tasks}) == len(tasks) == 4
+    for task in tasks:
+        assert set(task) == TASK_FIELDS
+        assert len(task["X_sha256"]) == len(task["y_sha256"]) == 64
+        assert task["X_shape"][0] == task["y_shape"][0]
+
+
+def load_released_utils(source: Path, loader_path: str):
+    path = source / loader_path
+    spec = importlib.util.spec_from_file_location("_p2e_ca_source_utils", path)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def verify_inputs(source: Path, manifest: dict) -> dict:
+    validate_manifest_contract(manifest)
+    source = source.resolve(strict=True)
+    commit = subprocess.run(
+        ["git", "-C", str(source), "rev-parse", "HEAD"],
+        check=True, capture_output=True, text=True,
+    ).stdout.strip()
+    assert commit == SOURCE_COMMIT
+    status = subprocess.run(
+        ["git", "-C", str(source), "status", "--porcelain"],
+        check=True, capture_output=True, text=True,
+    ).stdout.strip()
+    assert status == ""
+    loader_path = source / manifest["loader_path"]
+    assert file_sha256(loader_path) == manifest["loader_sha256"]
+    loader = load_released_utils(source, manifest["loader_path"])
+
+    verified = []
+    for expected in manifest["tasks"]:
+        task_id = expected["task_id"]
+        task = openml.tasks.get_task(task_id)
+        dataset = openml.datasets.get_dataset(task.dataset_id, download_data=False)
+        features, targets = loader.load_dataset(task_id)
+        observed = {
+            "task_id": task_id,
+            "dataset_id": task.dataset_id,
+            "dataset_name": dataset.name,
+            "dataset_version": dataset.version,
+            "target_name": task.target_name,
+            "X_shape": list(features.shape),
+            "y_shape": list(targets.shape),
+            "X_sha256": array_sha256(features),
+            "y_sha256": array_sha256(targets),
+        }
+        assert observed == expected, f"OpenML input drift for task {task_id}"
+        assert np.isfinite(features).all() and np.isfinite(targets).all()
+        verified.append(observed)
+
+    return {
+        "source": manifest["source"],
+        "loader_sha256": manifest["loader_sha256"],
+        "tasks": verified,
+        "summary": {
+            "all_task_metadata_verified": True,
+            "all_processed_array_hashes_verified": True,
+            "all_processed_values_finite": True,
+            "source_worktree_clean": True,
+            "task_count": len(verified),
+            "total_rows": sum(task["X_shape"][0] for task in verified),
+            "total_feature_values": sum(
+                task["X_shape"][0] * task["X_shape"][1] for task in verified
+            ),
+        },
+    }
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--source", type=Path, required=True)
+    parser.add_argument(
+        "--manifest", type=Path,
+        default=Path("repro/configs/ca_input_manifest.json"),
+    )
+    parser.add_argument("--output", type=Path, required=True)
+    args = parser.parse_args()
+
+    manifest_path = args.manifest if args.manifest.is_absolute() else ROOT / args.manifest
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    result = verify_inputs(args.source, manifest)
+    result["manifest_sha256"] = file_sha256(manifest_path)
+    output = args.output if args.output.is_absolute() else ROOT / args.output
+    output.parent.mkdir(parents=True, exist_ok=True)
+    temporary = output.with_name(output.name + ".tmp")
+    temporary.write_text(
+        json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    temporary.replace(output)
+    print(json.dumps(result["summary"], sort_keys=True))
+
+
+if __name__ == "__main__":
+    main()
+
+````
+
+
+````json title=ca_input_audit.json
+{
+  "loader_sha256": "7aa2daf12c176af1679a5553fe903d594bc721f1b8c5e231de5a1fd8fc26a82f",
+  "manifest_sha256": "0948d0059e4e0663a079257374363ef245ff71305b8ac9a7e472b2046706eca9",
+  "source": "Nabil-Ala/P2E_calibration@66cb1e1c76d1b1d3d133fe6cb3896c95d48b5974",
+  "summary": {
+    "all_processed_array_hashes_verified": true,
+    "all_processed_values_finite": true,
+    "all_task_metadata_verified": true,
+    "source_worktree_clean": true,
+    "task_count": 4,
+    "total_feature_values": 47126,
+    "total_rows": 7776
+  },
+  "tasks": [
+    {
+      "X_sha256": "5e1b1a2b2a9de2b2b397d0145476a77c81a884faa5f038c390f652bc02173d82",
+      "X_shape": [
+        1030,
+        8
+      ],
+      "dataset_id": 44959,
+      "dataset_name": "concrete_compressive_strength",
+      "dataset_version": 7,
+      "target_name": "strength",
+      "task_id": 361237,
+      "y_sha256": "e709a1c0fefc715248a41ab1c184d00ec7f024f8ba274f613716414c730280e7",
+      "y_shape": [
+        1030
+      ]
+    },
+    {
+      "X_sha256": "8a1026e8e5c8852dff15f9e35b302f32eed9dbed73ea7c2c2f48fe0d570144b7",
+      "X_shape": [
+        1503,
+        5
+      ],
+      "dataset_id": 44957,
+      "dataset_name": "airfoil_self_noise",
+      "dataset_version": 8,
+      "target_name": "sound_pressure",
+      "task_id": 361235,
+      "y_sha256": "18723b318b20d127390b0c3797d4a670bf14ae56f1f9aed3adfdc1fcd170e13c",
+      "y_shape": [
+        1503
+      ]
+    },
+    {
+      "X_sha256": "197312760018900048c99403c277b56bcc2236a959dcfa1edb76ff1b729b8c57",
+      "X_shape": [
+        1066,
+        2
+      ],
+      "dataset_id": 44966,
+      "dataset_name": "solar_flare",
+      "dataset_version": 7,
+      "target_name": "c_class_flares",
+      "task_id": 361244,
+      "y_sha256": "d49d7c568e5508fe19a10cabe5882ef52fe2b14d1c57eed4f543035a5225efbf",
+      "y_shape": [
+        1066
+      ]
+    },
+    {
+      "X_sha256": "ffff896d7a215e8da58462b9849493c8553b0b1a8edc1ebccffb5580479a47fc",
+      "X_shape": [
+        4177,
+        7
+      ],
+      "dataset_id": 44956,
+      "dataset_name": "abalone",
+      "dataset_version": 15,
+      "target_name": "rings",
+      "task_id": 361234,
+      "y_sha256": "6e8fb2c54afc1b10153c3a12bb53176aef5b351ab11f9c8dee1494c571071ef2",
+      "y_shape": [
+        4177
+      ]
+    }
+  ]
+}
+
+````
+
+
+````output
+{"all_processed_array_hashes_verified": true, "all_processed_values_finite": true, "all_task_metadata_verified": true, "source_worktree_clean": true, "task_count": 4, "total_feature_values": 47126, "total_rows": 7776}
+
+````

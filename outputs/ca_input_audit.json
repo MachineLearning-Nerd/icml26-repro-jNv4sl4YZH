@@ -1,0 +1,80 @@
+{
+  "loader_sha256": "7aa2daf12c176af1679a5553fe903d594bc721f1b8c5e231de5a1fd8fc26a82f",
+  "manifest_sha256": "0948d0059e4e0663a079257374363ef245ff71305b8ac9a7e472b2046706eca9",
+  "source": "Nabil-Ala/P2E_calibration@66cb1e1c76d1b1d3d133fe6cb3896c95d48b5974",
+  "summary": {
+    "all_processed_array_hashes_verified": true,
+    "all_processed_values_finite": true,
+    "all_task_metadata_verified": true,
+    "source_worktree_clean": true,
+    "task_count": 4,
+    "total_feature_values": 47126,
+    "total_rows": 7776
+  },
+  "tasks": [
+    {
+      "X_sha256": "5e1b1a2b2a9de2b2b397d0145476a77c81a884faa5f038c390f652bc02173d82",
+      "X_shape": [
+        1030,
+        8
+      ],
+      "dataset_id": 44959,
+      "dataset_name": "concrete_compressive_strength",
+      "dataset_version": 7,
+      "target_name": "strength",
+      "task_id": 361237,
+      "y_sha256": "e709a1c0fefc715248a41ab1c184d00ec7f024f8ba274f613716414c730280e7",
+      "y_shape": [
+        1030
+      ]
+    },
+    {
+      "X_sha256": "8a1026e8e5c8852dff15f9e35b302f32eed9dbed73ea7c2c2f48fe0d570144b7",
+      "X_shape": [
+        1503,
+        5
+      ],
+      "dataset_id": 44957,
+      "dataset_name": "airfoil_self_noise",
+      "dataset_version": 8,
+      "target_name": "sound_pressure",
+      "task_id": 361235,
+      "y_sha256": "18723b318b20d127390b0c3797d4a670bf14ae56f1f9aed3adfdc1fcd170e13c",
+      "y_shape": [
+        1503
+      ]
+    },
+    {
+      "X_sha256": "197312760018900048c99403c277b56bcc2236a959dcfa1edb76ff1b729b8c57",
+      "X_shape": [
+        1066,
+        2
+      ],
+      "dataset_id": 44966,
+      "dataset_name": "solar_flare",
+      "dataset_version": 7,
+      "target_name": "c_class_flares",
+      "task_id": 361244,
+      "y_sha256": "d49d7c568e5508fe19a10cabe5882ef52fe2b14d1c57eed4f543035a5225efbf",
+      "y_shape": [
+        1066
+      ]
+    },
+    {
+      "X_sha256": "ffff896d7a215e8da58462b9849493c8553b0b1a8edc1ebccffb5580479a47fc",
+      "X_shape": [
+        4177,
+        7
+      ],
+      "dataset_id": 44956,
+      "dataset_name": "abalone",
+      "dataset_version": 15,
+      "target_name": "rings",
+      "task_id": 361234,
+      "y_sha256": "6e8fb2c54afc1b10153c3a12bb53176aef5b351ab11f9c8dee1494c571071ef2",
+      "y_shape": [
+        4177
+      ]
+    }
+  ]
+}

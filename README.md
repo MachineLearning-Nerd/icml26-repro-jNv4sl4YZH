@@ -59,6 +59,8 @@ python repro/src/crosscheck_source_p2e.py \
   --source upstream --output outputs/claim1_source_crosscheck.json
 python repro/src/verify_source_manifest.py \
   --source upstream --output outputs/source_manifest_audit.json
+python repro/src/verify_ca_inputs.py \
+  --source upstream --output outputs/ca_input_audit.json
 
 python repro/src/run_author_ca.py \
   --source upstream --output-dir outputs/raw/author_ca
@@ -109,7 +111,7 @@ Trackio evidence and source pin, checks all 488 reported mean/SD scalars in the
 and all 36 CCP calibrator comparisons (including nine AoN cells), scans for
 secrets/local paths, and emits a SHA-256 manifest only if the complete
 publication gate passes. It also creates
-a hash-indexed JSONL bundle containing ten summary/report artifacts and all
+a hash-indexed JSONL bundle containing eleven summary/report artifacts and all
 seven full raw dataset files; Trackio recognizes this format and promotes
 it to the Hugging Face artifact bucket on publication.
 

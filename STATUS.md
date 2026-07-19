@@ -64,7 +64,7 @@ Face quota does not affect local implementation work. The fail-closed
 tests, validates the 1,920 CA and 11,700 CCP cell sets, requires all 122 tabulated paper
 headline cells within tolerance, verifies the source pin and Trackio evidence,
 scans hygiene, and hashes every final artifact. It cannot pass until the full
-source outputs and final Conclusion marker exist. On success it packages ten
+source outputs and final Conclusion marker exist. On success it packages eleven
 summary/report artifacts plus all seven raw dataset files into one hash-indexed JSONL
 artifact that Trackio will promote to the Hugging Face bucket.
 The headline tolerances were fixed before the remaining results existed at
@@ -455,3 +455,15 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   `2026-07-19 21:36 IST`, the untouched CA worker remained active at `97.9%`
   CPU with about `25:05:24` CPU time and `193 MB` RSS; both handoffs and the
   shared HF drain remained alive.
+- The four live OpenML CA inputs are now content-pinned independently of their
+  task IDs. The audit binds exact task/dataset IDs, names, versions, targets,
+  processed array shapes, and SHA-256 values after the released numeric-column
+  and missing/non-finite-row filtering. All 7,776 rows and 47,126 feature
+  values are finite and hash-identical; a deliberately corrupted feature hash
+  is rejected. The audit is Trackio-captured, required by the final gate, and
+  included in the future 18-record evidence bundle. All 32 tests, compilation,
+  shell syntax, publication preflight, and hygiene pass. A real premature gate
+  accepts the new OpenML certificate before rejecting the absent fourth CA
+  output and emits neither manifest nor bundle. At `2026-07-19 21:43 IST`, the
+  untouched CA worker remained compute-active at `97.9%` CPU and about `193 MB`
+  RSS; the handoffs and shared HF drain remained alive.

@@ -316,6 +316,7 @@ def main() -> None:
 
     commands = (
         [sys.executable, "repro/src/verify_source_manifest.py", "--source", "upstream", "--output", "outputs/source_manifest_audit.json"],
+        [sys.executable, "repro/src/verify_ca_inputs.py", "--source", "upstream", "--output", "outputs/ca_input_audit.json"],
         [sys.executable, "repro/src/verify_p2e_identity.py", "--output", "outputs/claim1_independent.json"],
         [sys.executable, "repro/src/crosscheck_source_p2e.py", "--source", "upstream", "--output", "outputs/claim1_source_crosscheck.json"],
         [sys.executable, "repro/src/verify_e_merge_coverage.py", "--output", "outputs/claim3_independent_e_merge.json"],
@@ -346,6 +347,26 @@ def main() -> None:
         "source_worktree_clean": True,
         "total_dataset_rows": 10_558,
         "total_source_input_bytes": 1_181_454,
+    }
+
+    ca_inputs = load_json("outputs/ca_input_audit.json")
+    assert ca_inputs["source"] == (
+        "Nabil-Ala/P2E_calibration@66cb1e1c76d1b1d3d133fe6cb3896c95d48b5974"
+    )
+    assert ca_inputs["loader_sha256"] == (
+        "7aa2daf12c176af1679a5553fe903d594bc721f1b8c5e231de5a1fd8fc26a82f"
+    )
+    assert ca_inputs["manifest_sha256"] == sha256(
+        "repro/configs/ca_input_manifest.json"
+    )
+    assert ca_inputs["summary"] == {
+        "all_processed_array_hashes_verified": True,
+        "all_processed_values_finite": True,
+        "all_task_metadata_verified": True,
+        "source_worktree_clean": True,
+        "task_count": 4,
+        "total_feature_values": 47_126,
+        "total_rows": 7_776,
     }
 
     claim1 = load_json("outputs/claim1_independent.json")
@@ -538,6 +559,7 @@ def main() -> None:
             "Exchangeable and randomized e-merge coverage certificate",
         ),
         ".trackio/logbook/pages/methods-source-audit/page.md": (
+            "Released OpenML CA input fingerprint audit",
             "Released source and dataset manifest audit",
             "Primary TeX table fixture audit",
             "WECA independent-tuning audit",
@@ -553,6 +575,7 @@ def main() -> None:
 
     hygiene = hygiene_gate()
     artifacts = (
+        "outputs/ca_input_audit.json",
         "outputs/source_manifest_audit.json",
         "outputs/claim1_independent.json",
         "outputs/claim1_source_crosscheck.json",

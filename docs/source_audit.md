@@ -17,6 +17,15 @@ requires the Boston, Abalone, and Parkinson arrays to have shapes `(506, 14)`,
 final publication gate reruns this check and includes its hash-indexed audit in
 the public evidence bundle.
 
+The CA datasets are live OpenML tasks rather than repository files, so they
+have a separate content certificate in `repro/configs/ca_input_manifest.json`.
+It binds task IDs to dataset IDs, names, versions, targets, processed shapes,
+and SHA-256 hashes of the exact float64 arrays returned by the pinned released
+loader after numeric-column selection and missing/non-finite-row removal. The
+four tasks resolve to 7,776 finite rows and 47,126 feature values. Both the
+final gate and a corruption control re-check these fingerprints, preventing a
+stable task ID from hiding OpenML metadata, cache, or data drift.
+
 The paper specifies `K=15` for Boston/Abalone and `K=20` for Parkinson in its
 reported CCP tables. The upstream driver exposes `K` as a local constant, so
 the reproduction runner will pass those values explicitly rather than silently
