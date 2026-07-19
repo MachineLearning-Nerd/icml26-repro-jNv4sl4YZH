@@ -127,6 +127,11 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   match its current source path, source SHA-256, and decoded payload immediately
   before publication. Unit controls reject both post-gate source mutation and
   an altered embedded payload.
+- Exercised the actual end-to-end gate while evidence is intentionally
+  incomplete. It revalidated C1 and the expanded C3 mechanism, then stopped at
+  the strict CA verifier because `dataset_361234.json` is absent. It created
+  neither a passing manifest nor an evidence bundle, proving the live gate
+  cannot promote the current 1,440/1,920-row partial state.
 - Ran all eighteen local mechanism/protocol/author-launcher/raw-verifier and
   paper-headline drift-control tests successfully (including positive and
   deliberately incomplete raw fixtures), including local-only Trackio artifact
