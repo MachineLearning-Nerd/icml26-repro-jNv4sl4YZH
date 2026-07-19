@@ -32,7 +32,7 @@ while true; do
   fi
   printf '%s missing CA output after worker exit; starting resumable recovery\n' \
     "$(date --iso-8601=seconds)"
-  if ! trackio logbook run \
+  if ! flock -n /tmp/jNv4sl4YZH-ca-worker.lock trackio logbook run \
       --page "Claim 2" \
       --title "Full released conformal-aggregation protocol" \
       -- python repro/src/run_author_ca.py \
@@ -84,9 +84,37 @@ assert summary["empirical_coverage_shortfall_tolerance"] == 0.02
 print("Claim 2 strict structural, efficiency, and coverage gates passed")
 PY
 
-trackio logbook run \
-  --page "Claim 3" \
-  --title "Full released cross-conformal protocol" \
-  -- python repro/src/run_author_ccp.py \
-  --source upstream \
-  --output-dir outputs/raw/author_ccp
+ccp_is_active() {
+  pgrep -f '[r]un_author_ccp.py' >/dev/null \
+    || pgrep -f '[t]rackio logbook run --page Claim 3 --title Full released cross-conformal protocol' >/dev/null
+}
+
+all_ccp_outputs_exist() {
+  [[ -f outputs/raw/author_ccp/boston.json \
+    && -f outputs/raw/author_ccp/abalone.json \
+    && -f outputs/raw/author_ccp/parkinson.json ]]
+}
+
+# The CCP runner promotes one complete seed checkpoint at a time and revalidates
+# every retained seed/output on resume. Keep a single worker alive until all
+# three paper-scale artifacts exist; never start a competing sweep.
+while true; do
+  while ccp_is_active; do
+    sleep 30
+  done
+  if all_ccp_outputs_exist; then
+    break
+  fi
+  printf '%s starting/resuming checkpointed full CCP worker\n' \
+    "$(date --iso-8601=seconds)"
+  if ! flock -n /tmp/jNv4sl4YZH-ccp-worker.lock trackio logbook run \
+      --page "Claim 3" \
+      --title "Full released cross-conformal protocol" \
+      -- python repro/src/run_author_ccp.py \
+      --source upstream \
+      --output-dir outputs/raw/author_ccp; then
+    printf '%s checkpointed CCP worker exited nonzero; retrying in 60 seconds\n' \
+      "$(date --iso-8601=seconds)" >&2
+    sleep 60
+  fi
+done

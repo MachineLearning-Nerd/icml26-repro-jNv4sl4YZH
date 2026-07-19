@@ -303,3 +303,12 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   Both durable handoffs and the shared HF drain are alive. Primary-source
   fixture audit commit `e6295ce` leaves the repository clean and raises the
   complete suite to 23 passing tests without reducing any paper-scale work.
+- The CA-to-CCP transition is now self-healing on both sides. After Claim 2's
+  strict gate passes, a single-owner loop starts or resumes the checkpointed
+  full CCP worker until all Boston, Abalone, and Parkinson artifacts exist.
+  A failed/interrupted CCP attempt retains only structurally complete seeds,
+  retries after 60 seconds, and cannot launch a competing worker while either
+  the runner or its Trackio parent is active. The live CA process is not
+  interrupted by this watcher hardening. Paper-specific nonblocking file locks
+  close the final check/start race if duplicate watcher processes are ever
+  launched accidentally.
