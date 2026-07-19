@@ -37,10 +37,19 @@ written atomically and structurally revalidated before reuse. The independent
 CA and CCP aggregators separately reject protocol drift, missing, duplicate,
 unexpected, and non-finite raw cells.
 
-A line-by-line parity audit of the CCP wrapper against `e-ccp/main.py` confirms
-the released split (`default_rng(seed)`, train sample without replacement,
-sorted complement test set), seeds 45–144, three model calls, 300-point grid,
-13 interval keys, and per-test aggregation. The wrapper deliberately uses the
-same `numpy.nanmean` aggregation as the released driver; interval counts are
-checked before aggregation and any non-finite seed summary is rejected before
-checkpoint promotion. A fake-source execution test exercises this behavior.
+A line-by-line audit of the CCP wrapper against `e-ccp/main.py` confirms the
+released split (`default_rng(seed)`, train sample without replacement, sorted
+complement test set), seeds 45–144, three model calls, 300-point grid, 13
+reported methods, and per-test aggregation. It also identifies one material
+source/paper drift: the paper defines its third classical calibrator as
+`F3(p)=2(1-p)`, whereas `e-ccp/eccp_utils.py` names the corresponding output
+`int_cc_eval_pow` and computes `5(1-p)^4`. Treating that output as the paper's
+linear baseline would be incorrect. The wrapper therefore leaves every author
+estimator and returned foldwise p-value untouched, replays the identical local
+randomization stream, and reconstructs only the paper-specified F3 intervals
+as `ECCP(linear)`. A dedicated numerical test verifies the reconstruction and
+proves it differs from the released power expression. The wrapper deliberately
+uses the same `numpy.nanmean` aggregation as the released driver; interval
+counts are checked before aggregation and any non-finite seed summary is
+rejected before checkpoint promotion. A fake-source execution test exercises
+this behavior.

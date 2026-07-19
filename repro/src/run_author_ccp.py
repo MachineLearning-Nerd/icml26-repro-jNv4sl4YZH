@@ -2,10 +2,13 @@
 """Run the author CCP primitives at the paper's full reported protocol.
 
 The upstream ``e-ccp/main.py`` hard-codes one dataset and five folds.  This
-wrapper leaves every author estimator untouched and only supplies the paper's
-three reported dataset/fold configurations (Boston/Abalone K=15, Parkinson
-K=20) and its 100 released seeds.  It writes one resumable raw file per data
-set.
+wrapper leaves every author estimator untouched and supplies the paper's three
+reported dataset/fold configurations (Boston/Abalone K=15, Parkinson K=20)
+and its 100 released seeds. The source calls its fourth classical calibrator
+``ECCP(pow)`` and implements ``5(1-p)^4``, while the paper defines F3 as
+``2(1-p)``. The wrapper reconstructs that paper-specified linear calibrator
+from the returned author p-values and identical randomization stream. It writes
+one resumable raw file per data set.
 """
 
 from __future__ import annotations
@@ -35,7 +38,7 @@ METHOD_KEYS = (
     ("ECCP(ind)", "int_cc_eval_ind"),
     ("ECCP(sqrt)", "int_cc_eval_sqrt"),
     ("ECCP(log)", "int_cc_eval_log"),
-    ("ECCP(pow)", "int_cc_eval_pow"),
+    ("ECCP(linear)", "int_cc_eval_linear"),
     ("ECCP (2α)", "int_cc_eval_2alpha"),
 )
 PAPER_DATASETS = {"boston": 15, "abalone": 15, "parkinson": 20}
@@ -54,23 +57,68 @@ def source_descriptor(source_root: Path) -> str:
     return f"Nabil-Ala/P2E_calibration@{commit}"
 
 
+def attach_paper_linear_calibrator(
+    result, functions, *, n_train: int, k: int, alpha: float, seed: int
+):
+    """Add paper F3=2(1-p) intervals to an unchanged author model result.
+
+    Each released model function returns the foldwise p-values and candidate
+    grid. Replaying its local RNG through the fold permutation recovers the
+    exact U-values used for every other randomized e-value baseline.
+    """
+    if "int_cc_eval_linear" in result:
+        return result
+    p_values = np.asarray(result["p_vals"], dtype=float)
+    y_grid = np.asarray(result["ys"], dtype=float)
+    if p_values.ndim != 3 or p_values.shape[0] != len(y_grid):
+        raise RuntimeError("unexpected author p-value/grid shape")
+    if p_values.shape[1] != k:
+        raise RuntimeError(f"unexpected author fold count: {p_values.shape[1]} != {k}")
+    if not np.isfinite(p_values).all() or np.any((p_values < 0.0) | (p_values > 1.0)):
+        raise RuntimeError("author p-values are non-finite or outside [0,1]")
+
+    rng = np.random.default_rng(seed)
+    rng.permutation(n_train)
+    u_values = rng.random(p_values.shape[2])
+    if np.any(u_values <= 0.0):
+        raise RuntimeError("zero randomization draw prevents finite linear e-values")
+    linear_e_values = 2.0 * (1.0 - p_values)
+    merged = linear_e_values.mean(axis=1) / u_values[None, :]
+    intervals = [
+        functions.set_cc_eval(merged[:, index], y_grid, alpha)
+        for index in range(p_values.shape[2])
+    ]
+    augmented = dict(result)
+    augmented["int_cc_eval_linear"] = intervals
+    return augmented
+
+
 def call_author_model(name, functions, y_train, x_train, x_test, *, k, alpha, config, seed):
     if name == "OLS":
-        return functions.cc_ols(
+        result = functions.cc_ols(
             y=y_train, X=x_train, x_test=x_test, K=k, alpha=alpha,
             n_grid=300, grid_factor=1.0, random_state=seed,
         )
-    if name == "RF":
-        return functions.cc_rf(
+    elif name == "RF":
+        result = functions.cc_rf(
             y=y_train, X=x_train, x_test=x_test, K=k, alpha=alpha,
             ntree=config["ntree"], n_grid=300, grid_factor=1.0, random_state=seed,
         )
-    if name == "Lasso":
-        return functions.cc_lasso(
+    elif name == "Lasso":
+        result = functions.cc_lasso(
             y=y_train, X=x_train, x_test=x_test, K=k, alpha=alpha,
             n_grid=300, grid_factor=1.0, random_state=seed, lambda_=config["lambda_"],
         )
-    raise ValueError(name)
+    else:
+        raise ValueError(name)
+    return attach_paper_linear_calibrator(
+        result,
+        functions,
+        n_train=len(y_train),
+        k=k,
+        alpha=alpha,
+        seed=seed,
+    )
 
 
 def validated_completed_seeds(rows, dataset_key, k):

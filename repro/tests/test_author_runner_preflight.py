@@ -53,6 +53,45 @@ def load_ca_runner():
 
 
 class AuthorRunnerPreflightTests(unittest.TestCase):
+    def test_ccp_wrapper_reconstructs_the_paper_f3_linear_calibrator(self):
+        import numpy as np
+
+        runner = load_ccp_runner()
+        p_values = np.array(
+            [
+                [[0.10, 0.20], [0.30, 0.40]],
+                [[0.50, 0.60], [0.70, 0.80]],
+                [[0.90, 1.00], [0.20, 0.30]],
+            ],
+            dtype=float,
+        )
+        grid = np.array([-1.0, 0.0, 1.0])
+
+        class IntervalFunctions:
+            @staticmethod
+            def set_cc_eval(e_values, y_values, alpha):
+                return tuple(np.asarray(y_values)[np.asarray(e_values) < 1.0 / alpha])
+
+        result = runner.attach_paper_linear_calibrator(
+            {"p_vals": p_values, "ys": grid},
+            IntervalFunctions,
+            n_train=7,
+            k=2,
+            alpha=0.1,
+            seed=45,
+        )
+        rng = np.random.default_rng(45)
+        rng.permutation(7)
+        u_values = rng.random(2)
+        expected_e_values = (2.0 * (1.0 - p_values)).mean(axis=1) / u_values[None, :]
+        expected = [
+            IntervalFunctions.set_cc_eval(expected_e_values[:, index], grid, 0.1)
+            for index in range(2)
+        ]
+        self.assertEqual(result["int_cc_eval_linear"], expected)
+        source_power = 5.0 * (1.0 - p_values) ** 4
+        self.assertGreater(float(np.max(np.abs(source_power - 2.0 * (1.0 - p_values)))), 0.1)
+
     def test_ccp_seed_checkpoint_accepts_complete_cells_and_rejects_partial_cells(self):
         runner = load_ccp_runner()
         protocol = {
