@@ -290,11 +290,10 @@ class FullProtocolTests(unittest.TestCase):
         post_gate = (root / "repro/src/post_ccp_gate.sh").read_text(
             encoding="utf-8"
         )
-        self.assertIn(
-            'sed -i "s|${paper_root}/outputs/|outputs/|g"', post_gate
-        )
+        portable_scrub = 'sed -i "s|${paper_root}/||g"'
+        self.assertIn(portable_scrub, post_gate)
         self.assertLess(
-            post_gate.index('sed -i "s|${paper_root}/outputs/|outputs/|g"'),
+            post_gate.index(portable_scrub),
             post_gate.index("source .venv/bin/activate"),
         )
 

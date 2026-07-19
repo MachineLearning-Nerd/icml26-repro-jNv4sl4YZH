@@ -1948,3 +1948,10 @@ if __name__ == "__main__":
 {"all_cleanroom_membership_pass": true, "all_source_expectations_pass": true, "all_source_membership_pass": true, "all_theorem_domain_verified": true, "rows": 18, "underflow_is_documented": true}
 
 ````
+
+
+---
+<!-- trackio-cell
+{"type": "markdown", "id": "cell_208587e221c0", "created_at": "2026-07-19T18:54:46+00:00", "title": "Claim 1 verdict"}
+-->
+Claim 1 is verified from both the pinned Definition 2.2 source block and an independent finite-rank construction. At every one of 18 theorem-valid `(n, alpha)` cells, membership under `P_n > alpha` is identical to membership under `F(P_n) < 1/alpha`; the threshold identity also passes exactly. The constructed e-variable has maximum expectation error 4.44e-16. This directly reproduces the definition of set preservation rather than inferring it from empirical coverage.

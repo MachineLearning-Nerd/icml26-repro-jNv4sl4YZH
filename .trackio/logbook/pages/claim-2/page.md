@@ -865,3 +865,10 @@ if __name__ == "__main__":
 {"all_four_tasks_present": true, "all_full_seed_method_cells_present": true, "all_p2e_empirical_coverage_within_tolerance": true, "all_substantial_efficiency_gains": true, "comparison_count": 24, "dataset_integrity": {"dataset_361234": true, "dataset_361235": true, "dataset_361237": true, "dataset_361244": true}, "duplicate_cell_count": 0, "empirical_coverage_shortfall_tolerance": 0.02, "exact_cell_set": true, "expected_rows": 1920, "expected_unique_cells": 1920, "invalid_metric_row_count": 0, "minimum_observed_relative_reduction": 0.40302055578705925, "minimum_p2e_empirical_coverage": 0.9490322580645161, "minimum_substantial_relative_reduction": 0.1, "nominal_coverage": 0.95, "nonfinite_row_count": 0, "observed_unique_cells": 1920, "p2e_empirical_coverage_cell_count": 8, "p2e_empirical_coverage_pass_count": 8, "p2e_shorter_count": 24, "substantial_efficiency_gain_count": 24, "unexpected_row_count": 0}
 
 ````
+
+
+---
+<!-- trackio-cell
+{"type": "markdown", "id": "cell_339de38565e9", "created_at": "2026-07-19T18:54:47+00:00", "title": "Claim 2 verdict"}
+-->
+Claim 2 is verified by a source-hash-bound proof contract and an exact rational budget certificate. For 4 distinct alpha levels, set preservation forces `F >= 1/alpha` on `(0, alpha]`, which consumes exactly the entire p-to-e integral budget; nonnegativity and monotonicity then force `F=1/alpha` below alpha and `F=0` above it, while explicit conformal-grid witnesses exercise the left-continuity boundary argument. The pinned Proposition 2.3, Theorem 2.6, and Equation 9 blocks are among 10 independently hashed source anchors, tying the uniqueness result to the sigmoid construction it motivates.

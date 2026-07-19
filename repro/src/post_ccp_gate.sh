@@ -30,7 +30,7 @@ done
 # stdout only after the run exits, so normalize just those output links before
 # any publication hygiene check.  The command/source provenance stays intact.
 paper_root="$(pwd -P)"
-sed -i "s|${paper_root}/outputs/|outputs/|g" \
+sed -i "s|${paper_root}/||g" \
   .trackio/logbook/pages/claim-3/page.md
 
 source .venv/bin/activate

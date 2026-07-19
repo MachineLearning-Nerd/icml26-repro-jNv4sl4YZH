@@ -103,13 +103,17 @@ def run(command: list[str]) -> str:
     result = subprocess.run(
         command,
         cwd=ROOT,
-        check=True,
+        check=False,
         capture_output=True,
         text=True,
     )
     output = result.stdout + result.stderr
-    print(f"$ {' '.join(command)}")
+    display_command = list(command)
+    if display_command and display_command[0] == sys.executable:
+        display_command[0] = "python"
+    print(f"$ {' '.join(display_command)}")
     print(output.rstrip())
+    result.check_returncode()
     return output
 
 

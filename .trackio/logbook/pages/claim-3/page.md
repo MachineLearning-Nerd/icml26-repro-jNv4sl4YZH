@@ -2231,3 +2231,1222 @@ if __name__ == "__main__":
 {"adaptive_randomized_weight_control_detected": true, "adaptive_randomized_weight_rejection_count": 8, "adaptive_weight_control_detected": true, "adaptive_weight_rejection_count": 8, "all_arbitrary_dependence_coverage_pass": true, "all_exchangeable_prefix_coverage_pass": true, "all_exchangeable_randomized_prefix_coverage_pass": true, "all_markov_coverage_events_pass": true, "all_merged_expectations_exact": true, "all_randomized_arbitrary_dependence_coverage_pass": true, "all_randomized_uniform_coverage_events_pass": true, "case_count": 8, "equal_weight_case_count": 2, "exchangeable_prefix_case_count": 5, "invalid_arbitrary_dependence_detected": true, "invalid_arbitrary_dependence_rejection_count": 4, "invalid_exchangeable_prefix_rejection_count": 5, "invalid_exchangeable_randomized_prefix_rejection_count": 5, "invalid_randomized_arbitrary_dependence_detected": true, "invalid_randomized_arbitrary_dependence_rejection_count": 8, "invalid_scaling_control_detected": true, "invalid_scaling_control_rejection_count": 2, "maximum_exchangeable_prefix_tail_to_alpha_ratio": 0.9523809523809523, "maximum_exchangeable_randomized_prefix_tail_to_alpha_ratio": 0.9727207182725058, "maximum_valid_randomized_tail_to_alpha_ratio": 0.9999999999999999, "maximum_valid_randomized_worst_case_failure_probability": 0.19999999999999998, "maximum_valid_tail_to_alpha_ratio": 0.9523809523809523, "maximum_valid_worst_case_tail_probability": 0.19047619047619047, "minimum_adaptive_randomized_tail_to_alpha_ratio": 1.9428630069079045, "minimum_adaptive_tail_to_alpha_ratio": 1.8181818181818181, "nonuniform_weight_case_count": 6}
 
 ````
+
+
+---
+<!-- trackio-cell
+{"type": "code", "id": "cell_c795c04eb742", "created_at": "2026-07-19T18:54:05+00:00", "title": "Full released cross-conformal protocol", "command": ["python", "repro/src/run_author_ccp.py", "--source", "upstream", "--output-dir", "outputs/raw/author_ccp"], "exit_code": 0, "duration_s": 7609.076}
+-->
+````bash
+$ python repro/src/run_author_ccp.py --source upstream --output-dir outputs/raw/author_ccp
+````
+
+exit 0 · 7609.1s
+
+
+````python title=run_author_ccp.py
+#!/usr/bin/env python3
+"""Run the author CCP primitives at the paper's full reported protocol.
+
+The upstream ``e-ccp/main.py`` hard-codes one dataset and five folds.  This
+wrapper leaves every author estimator untouched and supplies the paper's three
+reported dataset/fold configurations (Boston/Abalone K=15, Parkinson K=20)
+and its 100 released seeds. The source calls its fourth classical calibrator
+``ECCP(pow)`` and implements ``5(1-p)^4``, while the paper defines F3 as
+``2(1-p)``. The wrapper reconstructs that paper-specified linear calibrator
+from the returned author p-values and identical randomization stream. It writes
+one resumable raw file per data set.
+"""
+
+from __future__ import annotations
+
+import argparse
+import importlib
+import json
+import math
+import os
+import subprocess
+import sys
+from collections import defaultdict
+from pathlib import Path
+
+import numpy as np
+
+
+METHOD_KEYS = (
+    ("mod-cross", "int_cc"),
+    ("e-mod-cross", "int_cce"),
+    ("u-mod-cross", "int_ccu"),
+    ("eu-mod-cross", "int_cceu"),
+    ("cross", "int_ccs"),
+    ("ECCP", "int_cc_eval"),
+    ("ECCP_exch", "int_cc_ev_exch"),
+    ("UR-ECCP_exch", "int_cc_ev_exch_U"),
+    ("ECCP(ind)", "int_cc_eval_ind"),
+    ("ECCP(sqrt)", "int_cc_eval_sqrt"),
+    ("ECCP(log)", "int_cc_eval_log"),
+    ("ECCP(linear)", "int_cc_eval_linear"),
+    ("ECCP (2α)", "int_cc_eval_2alpha"),
+)
+PAPER_DATASETS = {"boston": 15, "abalone": 15, "parkinson": 20}
+MODELS = ("OLS", "RF", "Lasso")
+SEEDS = tuple(range(45, 145))
+EXECUTION_ADAPTER = "vectorized-exact-postprocessing-v1"
+
+
+def source_descriptor(source_root: Path) -> str:
+    """Return portable source provenance rather than an absolute local path."""
+    commit = subprocess.run(
+        ["git", "-C", str(source_root), "rev-parse", "HEAD"],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+    return f"Nabil-Ala/P2E_calibration@{commit}"
+
+
+def attach_paper_linear_calibrator(
+    result, functions, *, n_train: int, k: int, alpha: float, seed: int
+):
+    """Add paper F3=2(1-p) intervals to an unchanged author model result.
+
+    Each released model function returns the foldwise p-values and candidate
+    grid. Replaying its local RNG through the fold permutation recovers the
+    exact U-values used for every other randomized e-value baseline.
+    """
+    if "int_cc_eval_linear" in result:
+        return result
+    p_values = np.asarray(result["p_vals"], dtype=float)
+    y_grid = np.asarray(result["ys"], dtype=float)
+    if p_values.ndim != 3 or p_values.shape[0] != len(y_grid):
+        raise RuntimeError("unexpected author p-value/grid shape")
+    if p_values.shape[1] != k:
+        raise RuntimeError(f"unexpected author fold count: {p_values.shape[1]} != {k}")
+    if not np.isfinite(p_values).all() or np.any((p_values < 0.0) | (p_values > 1.0)):
+        raise RuntimeError("author p-values are non-finite or outside [0,1]")
+
+    rng = np.random.default_rng(seed)
+    rng.permutation(n_train)
+    u_values = rng.random(p_values.shape[2])
+    if np.any(u_values <= 0.0):
+        raise RuntimeError("zero randomization draw prevents finite linear e-values")
+    linear_e_values = 2.0 * (1.0 - p_values)
+    merged = linear_e_values.mean(axis=1) / u_values[None, :]
+    intervals = [
+        functions.set_cc_eval(merged[:, index], y_grid, alpha)
+        for index in range(p_values.shape[2])
+    ]
+    augmented = dict(result)
+    augmented["int_cc_eval_linear"] = intervals
+    return augmented
+
+
+def call_literal_author_model(
+    name, functions, y_train, x_train, x_test, *, k, alpha, config, seed,
+    n_grid=300,
+):
+    """Run the pinned source function literally; retained as a parity oracle."""
+    if name == "OLS":
+        result = functions.cc_ols(
+            y=y_train, X=x_train, x_test=x_test, K=k, alpha=alpha,
+            n_grid=n_grid, grid_factor=1.0, random_state=seed,
+        )
+    elif name == "RF":
+        result = functions.cc_rf(
+            y=y_train, X=x_train, x_test=x_test, K=k, alpha=alpha,
+            ntree=config["ntree"], n_grid=n_grid, grid_factor=1.0, random_state=seed,
+        )
+    elif name == "Lasso":
+        result = functions.cc_lasso(
+            y=y_train, X=x_train, x_test=x_test, K=k, alpha=alpha,
+            n_grid=n_grid, grid_factor=1.0, random_state=seed,
+            lambda_=config["lambda_"],
+        )
+    else:
+        raise ValueError(name)
+    return attach_paper_linear_calibrator(
+        result,
+        functions,
+        n_train=len(y_train),
+        k=k,
+        alpha=alpha,
+        seed=seed,
+    )
+
+
+def intervals_from_p_values(
+    p_values, grid, *, functions, alpha: float, m: int, used: int, u_values
+):
+    """Vectorize only the source's deterministic p/e aggregation stage.
+
+    The pinned implementation loops over every grid/test pair in Python. This
+    function evaluates the same formulas over NumPy arrays while retaining the
+    fold axis and its reduction order. Large temporary arrays are created one
+    calibrator at a time to keep the Parkinson peak memory bounded.
+    """
+    p_values = np.asarray(p_values, dtype=float)
+    grid = np.asarray(grid, dtype=float)
+    u_values = np.asarray(u_values, dtype=float)
+    if p_values.ndim != 3 or p_values.shape[0] != len(grid):
+        raise RuntimeError("unexpected p-value/grid shape in vectorized adapter")
+    if p_values.shape[2] != len(u_values):
+        raise RuntimeError("unexpected p-value/randomization shape")
+    if not np.isfinite(p_values).all() or np.any((p_values <= 0.0) | (p_values > 1.0)):
+        raise RuntimeError("p-values must be finite and in (0,1]")
+    if not np.isfinite(u_values).all() or np.any((u_values <= 0.0) | (u_values >= 1.0)):
+        raise RuntimeError("randomization draws must be finite and in (0,1)")
+
+    folds = p_values.shape[1]
+    fold_denominators = np.arange(1, folds + 1, dtype=float)[None, :, None]
+    randomizer = u_values[None, :]
+    pv_cc = np.mean(p_values, axis=1)
+
+    cumulative_p = np.cumsum(p_values, axis=1) / fold_denominators
+    pv_ecc = np.min(cumulative_p, axis=1)
+    del cumulative_p
+    pv_ucc = pv_cc / (2.0 - randomizer)
+    pv_eucc = np.minimum(p_values[:, 0, :] / (2.0 - randomizer), pv_ecc)
+    pv_ccs = (
+        1.0 + np.sum(p_values * (m + 1.0) - 1.0, axis=1)
+    ) / (used + 1.0)
+
+    e_ind = np.mean((p_values <= alpha).astype(float) / alpha, axis=1) / randomizer
+    e_log = np.mean(-np.log(p_values), axis=1) / randomizer
+    e_power = np.mean(5.0 * (1.0 - p_values) ** 4, axis=1) / randomizer
+    e_sqrt = np.mean(p_values ** (-0.5) - 1.0, axis=1) / randomizer
+    e_linear = np.mean(2.0 * (1.0 - p_values), axis=1) / randomizer
+
+    c_value, location = functions.get_C_s(alpha, m)
+    e_values = functions.f_p_to_e(p_values, alpha, c_value, location)
+    e_mean = np.mean(e_values, axis=1) / randomizer
+    cumulative_e = np.cumsum(e_values, axis=1) / fold_denominators
+    e_exch = np.max(cumulative_e, axis=1)
+    e_exch_u = np.maximum(e_exch, e_values[:, 0, :] / randomizer)
+    del cumulative_e, e_values
+
+    c_value_2, location_2 = functions.get_C_s(2.0 * alpha, m)
+    e_values_2 = functions.f_p_to_e(
+        p_values, 2.0 * alpha, c_value_2, location_2
+    )
+    e_mean_2 = np.mean(e_values_2, axis=1) / randomizer
+    del e_values_2
+
+    def p_intervals(values):
+        return [
+            functions.set_cc(values[:, index], grid, alpha)
+            for index in range(values.shape[1])
+        ]
+
+    def e_intervals(values, level=alpha):
+        return [
+            functions.set_cc_eval(values[:, index], grid, level)
+            for index in range(values.shape[1])
+        ]
+
+    return {
+        "p_vals": p_values,
+        "ys": grid,
+        "int_cc": p_intervals(pv_cc),
+        "int_cce": p_intervals(pv_ecc),
+        "int_ccu": p_intervals(pv_ucc),
+        "int_cceu": p_intervals(pv_eucc),
+        "int_ccs": p_intervals(pv_ccs),
+        "int_cc_eval": e_intervals(e_mean),
+        "int_cc_ev_exch": e_intervals(e_exch),
+        "int_cc_ev_exch_U": e_intervals(e_exch_u),
+        "int_cc_eval_2alpha": e_intervals(e_mean_2, 2.0 * alpha),
+        "int_cc_eval_ind": e_intervals(e_ind),
+        "int_cc_eval_sqrt": e_intervals(e_sqrt),
+        "int_cc_eval_log": e_intervals(e_log),
+        "int_cc_eval_pow": e_intervals(e_power),
+        "int_cc_eval_linear": e_intervals(e_linear),
+    }
+
+
+def call_vectorized_author_model(
+    name, functions, y_train, x_train, x_test, *, k, alpha, config, seed,
+    n_grid=300,
+):
+    """Reproduce the source estimator/p-value core with vectorized aggregation."""
+    y_train = np.asarray(y_train).ravel()
+    x_train = np.asarray(x_train)
+    x_test = np.asarray(x_test)
+    if x_test.ndim == 1:
+        x_test = x_test.reshape(1, -1)
+    n_train = len(y_train)
+    n_test = x_test.shape[0]
+    grid = np.linspace(-np.max(np.abs(y_train)), np.max(np.abs(y_train)), num=n_grid)
+    m = n_train // k
+    if m == 0:
+        raise ValueError("n < K: cannot form equal-size folds")
+    used = m * k
+    rng = np.random.default_rng(seed)
+    indices = rng.permutation(n_train)[:used]
+    folds = indices.reshape(k, m)
+    p_values = np.empty((n_grid, k, n_test), dtype=float)
+
+    for fold in range(k):
+        calibration_idx = folds[fold]
+        fit_idx = np.setdiff1d(indices, calibration_idx)
+        if name == "OLS":
+            fitted = functions.ols_pseudo(x_train[fit_idx, :], y_train[fit_idx])
+            calibration_prediction = functions.ols_pseudo_predict(
+                fitted, x_train[calibration_idx, :]
+            )
+            test_prediction = functions.ols_pseudo_predict(fitted, x_test)
+        elif name == "RF":
+            fitted = functions.RandomForestRegressor(
+                n_estimators=config["ntree"],
+                max_features=1.0,
+                n_jobs=-1,
+                random_state=seed,
+            )
+            fitted.fit(x_train[fit_idx, :], y_train[fit_idx])
+            calibration_prediction = fitted.predict(x_train[calibration_idx, :])
+            test_prediction = fitted.predict(x_test)
+        elif name == "Lasso":
+            fitted = functions.Lasso(
+                alpha=config["lambda_"],
+                fit_intercept=True,
+                max_iter=10000,
+                random_state=seed,
+            )
+            fitted.fit(x_train[fit_idx, :], y_train[fit_idx])
+            calibration_prediction = fitted.predict(x_train[calibration_idx, :])
+            test_prediction = fitted.predict(x_test)
+        else:
+            raise ValueError(name)
+
+        calibration_errors = np.abs(
+            y_train[calibration_idx] - np.asarray(calibration_prediction).ravel()
+        )
+        candidate_errors = np.abs(
+            grid[:, None] - np.asarray(test_prediction).ravel()[None, :]
+        )
+        comparisons = (
+            calibration_errors[:, None, None] >= candidate_errors[None, :, :]
+        )
+        p_values[:, fold, :] = (1.0 + comparisons.sum(axis=0)) / (m + 1.0)
+
+    # Do not retain the largest foldwise comparison tensor while constructing
+    # the full set of aggregated e/p arrays (material for Parkinson memory).
+    del comparisons, candidate_errors, calibration_errors
+    del calibration_prediction, test_prediction, fitted
+    u_values = rng.random(n_test)
+    return intervals_from_p_values(
+        p_values,
+        grid,
+        functions=functions,
+        alpha=alpha,
+        m=m,
+        used=used,
+        u_values=u_values,
+    )
+
+
+def call_author_model(
+    name, functions, y_train, x_train, x_test, *, k, alpha, config, seed
+):
+    return call_vectorized_author_model(
+        name,
+        functions,
+        y_train,
+        x_train,
+        x_test,
+        k=k,
+        alpha=alpha,
+        config=config,
+        seed=seed,
+    )
+
+
+def validated_completed_seeds(rows, dataset_key, k):
+    """Validate a resumable checkpoint and return its complete seed set."""
+    expected_cells = {(model, method) for model in MODELS for method, _ in METHOD_KEYS}
+    cells_by_seed = defaultdict(set)
+    for row in rows:
+        if str(row["dataset_key"]) != dataset_key or int(row["folds"]) != k:
+            raise RuntimeError(f"checkpoint scope mismatch for {dataset_key}")
+        seed = int(row["seed"])
+        if seed not in SEEDS:
+            raise RuntimeError(f"unexpected checkpoint seed for {dataset_key}: {seed}")
+        cell = (str(row["model"]), str(row["method"]))
+        if cell in cells_by_seed[seed]:
+            raise RuntimeError(f"duplicate checkpoint cell for {dataset_key}, seed {seed}: {cell}")
+        coverage = float(row["coverage"])
+        length = float(row["length"])
+        if not (math.isfinite(coverage) and math.isfinite(length)):
+            raise RuntimeError(
+                f"non-finite checkpoint metric for {dataset_key}, seed {seed}: {cell}"
+            )
+        if not (0.0 <= coverage <= 1.0 and length >= 0.0):
+            raise RuntimeError(
+                f"out-of-range checkpoint metric for {dataset_key}, seed {seed}: "
+                f"{cell} coverage={coverage}, length={length}"
+            )
+        cells_by_seed[seed].add(cell)
+    for seed, cells in cells_by_seed.items():
+        if cells != expected_cells:
+            missing = sorted(expected_cells - cells)
+            extra = sorted(cells - expected_cells)
+            raise RuntimeError(
+                f"incomplete checkpoint seed for {dataset_key}, seed {seed}: "
+                f"missing={missing}, extra={extra}"
+            )
+    return set(cells_by_seed)
+
+
+def write_json_atomic(path, payload):
+    """Atomically replace a JSON artifact so an interrupted write cannot look complete."""
+    temporary = path.with_name(path.name + ".tmp")
+    temporary.write_text(
+        json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    temporary.replace(path)
+
+
+def write_checkpoint(path, protocol, dataset_key, k, rows):
+    completed = validated_completed_seeds(rows, dataset_key, k)
+    payload = {
+        "protocol": protocol,
+        "dataset_key": dataset_key,
+        "folds": k,
+        "completed_seeds": sorted(completed),
+        "rows": rows,
+    }
+    write_json_atomic(path, payload)
+
+
+def load_checkpoint(path, protocol, dataset_key, k):
+    if not path.exists():
+        return []
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if payload.get("protocol") != protocol:
+        raise RuntimeError(f"checkpoint protocol mismatch for {dataset_key}")
+    if payload.get("dataset_key") != dataset_key or int(payload.get("folds")) != k:
+        raise RuntimeError(f"checkpoint metadata mismatch for {dataset_key}")
+    rows = payload.get("rows", [])
+    completed = validated_completed_seeds(rows, dataset_key, k)
+    if completed != {int(seed) for seed in payload.get("completed_seeds", [])}:
+        raise RuntimeError(f"checkpoint seed summary mismatch for {dataset_key}")
+    return rows
+
+
+def write_completed_output(path, protocol, dataset_key, k, rows):
+    completed = validated_completed_seeds(rows, dataset_key, k)
+    expected_rows = len(SEEDS) * len(MODELS) * len(METHOD_KEYS)
+    if completed != set(SEEDS) or len(rows) != expected_rows:
+        raise RuntimeError(f"refusing incomplete final output for {dataset_key}")
+    write_json_atomic(
+        path,
+        {
+            "protocol": protocol,
+            "dataset_key": dataset_key,
+            "folds": k,
+            "rows": rows,
+        },
+    )
+
+
+def load_completed_output(path, protocol, dataset_key, k):
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if payload.get("protocol") != protocol:
+        raise RuntimeError(f"completed-output protocol mismatch for {dataset_key}")
+    if payload.get("dataset_key") != dataset_key or int(payload.get("folds")) != k:
+        raise RuntimeError(f"completed-output metadata mismatch for {dataset_key}")
+    rows = payload.get("rows", [])
+    completed = validated_completed_seeds(rows, dataset_key, k)
+    expected_rows = len(SEEDS) * len(MODELS) * len(METHOD_KEYS)
+    if completed != set(SEEDS) or len(rows) != expected_rows:
+        raise RuntimeError(f"incomplete final output for {dataset_key}")
+    return rows
+
+
+def run_dataset(
+    dataset_key,
+    k,
+    data_loader,
+    functions,
+    *,
+    protocol,
+    checkpoint,
+    existing_rows,
+    model_runner=call_author_model,
+):
+    x, y, config = data_loader.load_dataset(dataset_key)
+    n_train = config["n_train"]
+    n_test = config["n_test"] if config["n_test"] is not None else y.shape[0] - n_train
+    alpha = 0.1
+    rows = list(existing_rows)
+    completed_seeds = validated_completed_seeds(rows, dataset_key, k)
+    for seed in SEEDS:
+        if seed in completed_seeds:
+            print(f"{dataset_key}: resume retaining seed {seed}", flush=True)
+            continue
+        rng = np.random.default_rng(seed)
+        indices = np.arange(y.shape[0])
+        train_idx = rng.choice(indices, size=n_train, replace=False)
+        test_idx = np.setdiff1d(indices, train_idx)
+        if len(test_idx) != n_test:
+            raise RuntimeError(f"unexpected test size for {dataset_key}: {len(test_idx)} != {n_test}")
+        y_train, x_train = y[train_idx], x[train_idx, :]
+        y_test, x_test = y[test_idx], x[test_idx, :]
+        for model_name in MODELS:
+            result = model_runner(
+                model_name, functions, y_train, x_train, x_test,
+                k=k, alpha=alpha, config=config, seed=seed,
+            )
+            for method_name, interval_key in METHOD_KEYS:
+                intervals = result[interval_key]
+                if len(intervals) != len(y_test):
+                    raise RuntimeError(
+                        f"unexpected interval count for {dataset_key}, seed {seed}, "
+                        f"{model_name}/{method_name}: {len(intervals)} != {len(y_test)}"
+                    )
+                coverage = float(
+                    np.nanmean(
+                        [
+                            functions.cov_int(interval, truth)
+                            for interval, truth in zip(intervals, y_test)
+                        ]
+                    )
+                )
+                length = float(
+                    np.nanmean([functions.len_int(interval) for interval in intervals])
+                )
+                rows.append(
+                    {
+                        "dataset_key": dataset_key,
+                        "dataset": config["name"],
+                        "folds": k,
+                        "seed": seed,
+                        "model": model_name,
+                        "method": method_name,
+                        "coverage": coverage,
+                        "length": length,
+                    }
+                )
+        completed_seeds = validated_completed_seeds(rows, dataset_key, k)
+        if seed not in completed_seeds:
+            raise RuntimeError(f"seed {seed} did not produce a complete checkpoint")
+        write_checkpoint(checkpoint, protocol, dataset_key, k, rows)
+        print(f"{dataset_key}: completed seed {seed}", flush=True)
+    return rows
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--source", type=Path, required=True)
+    parser.add_argument("--output-dir", type=Path, required=True)
+    parser.add_argument("--force", action="store_true")
+    parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--input-check", action="store_true",
+                        help="load all bundled author datasets without running estimators")
+    args = parser.parse_args()
+
+    os.environ.setdefault("OMP_NUM_THREADS", "1")
+    os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")
+    os.environ.setdefault("MKL_NUM_THREADS", "1")
+    os.environ.setdefault("NUMEXPR_NUM_THREADS", "1")
+    source_root = args.source.resolve()
+    source_dir = source_root / "e-ccp"
+    output_dir = args.output_dir.resolve()
+    # The released loader accesses its bundled CSVs through paths relative to
+    # e-ccp/.  Keep this wrapper outside the source tree, but reproduce that
+    # working-directory contract exactly before invoking author functions.
+    os.chdir(source_dir)
+    sys.path.insert(0, str(source_dir))
+    data_loader = importlib.import_module("data_loader")
+    functions = importlib.import_module("eccp_utils")
+    protocol = {
+        "source": source_descriptor(source_root),
+        "datasets": PAPER_DATASETS,
+        "seeds": list(SEEDS),
+        "models": list(MODELS),
+        "methods": [name for name, _ in METHOD_KEYS],
+        "alpha": 0.1,
+        "grid_points": 300,
+        "execution_adapter": EXECUTION_ADAPTER,
+    }
+    if args.dry_run:
+        print(json.dumps(protocol, sort_keys=True))
+        return
+    if args.input_check:
+        inputs = {}
+        for dataset_key, folds in PAPER_DATASETS.items():
+            x, y, config = data_loader.load_dataset(dataset_key)
+            inputs[dataset_key] = {
+                "folds": folds,
+                "n_features": int(x.shape[1]),
+                "n_rows": int(x.shape[0]),
+                "n_train": int(config["n_train"]),
+            }
+        print(json.dumps({"protocol": protocol, "inputs": inputs}, sort_keys=True))
+        return
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    write_json_atomic(output_dir / "protocol.json", protocol)
+    for dataset_key, k in PAPER_DATASETS.items():
+        output = output_dir / f"{dataset_key}.json"
+        if output.exists() and not args.force:
+            rows = load_completed_output(output, protocol, dataset_key, k)
+            print(f"resume: retaining verified {output.name} ({len(rows)} rows)")
+            continue
+        checkpoint = output_dir / f".{dataset_key}.partial.json"
+        if args.force:
+            write_checkpoint(checkpoint, protocol, dataset_key, k, [])
+            existing_rows = []
+        else:
+            existing_rows = load_checkpoint(checkpoint, protocol, dataset_key, k)
+        if existing_rows:
+            print(
+                f"resume: {dataset_key} checkpoint has "
+                f"{len(validated_completed_seeds(existing_rows, dataset_key, k))} seeds",
+                flush=True,
+            )
+        rows = run_dataset(
+            dataset_key,
+            k,
+            data_loader,
+            functions,
+            protocol=protocol,
+            checkpoint=checkpoint,
+            existing_rows=existing_rows,
+        )
+        completed = validated_completed_seeds(rows, dataset_key, k)
+        if completed != set(SEEDS) or len(rows) != len(SEEDS) * len(MODELS) * len(METHOD_KEYS):
+            raise RuntimeError(f"full raw-row integrity failed for {dataset_key}")
+        write_completed_output(output, protocol, dataset_key, k, rows)
+        display_output = args.output_dir / output.name
+        print(f"completed {dataset_key}: {len(rows)} raw rows -> {display_output}")
+
+
+if __name__ == "__main__":
+    main()
+
+````
+
+
+````output
+boston: completed seed 45
+boston: completed seed 46
+boston: completed seed 47
+boston: completed seed 48
+boston: completed seed 49
+boston: completed seed 50
+boston: completed seed 51
+boston: completed seed 52
+boston: completed seed 53
+boston: completed seed 54
+boston: completed seed 55
+boston: completed seed 56
+boston: completed seed 57
+boston: completed seed 58
+boston: completed seed 59
+boston: completed seed 60
+boston: completed seed 61
+boston: completed seed 62
+boston: completed seed 63
+boston: completed seed 64
+boston: completed seed 65
+boston: completed seed 66
+boston: completed seed 67
+boston: completed seed 68
+boston: completed seed 69
+boston: completed seed 70
+boston: completed seed 71
+boston: completed seed 72
+boston: completed seed 73
+boston: completed seed 74
+boston: completed seed 75
+boston: completed seed 76
+boston: completed seed 77
+boston: completed seed 78
+boston: completed seed 79
+boston: completed seed 80
+boston: completed seed 81
+boston: completed seed 82
+boston: completed seed 83
+boston: completed seed 84
+boston: completed seed 85
+boston: completed seed 86
+boston: completed seed 87
+boston: completed seed 88
+boston: completed seed 89
+boston: completed seed 90
+boston: completed seed 91
+boston: completed seed 92
+boston: completed seed 93
+boston: completed seed 94
+boston: completed seed 95
+boston: completed seed 96
+boston: completed seed 97
+boston: completed seed 98
+boston: completed seed 99
+boston: completed seed 100
+boston: completed seed 101
+boston: completed seed 102
+boston: completed seed 103
+boston: completed seed 104
+boston: completed seed 105
+boston: completed seed 106
+boston: completed seed 107
+boston: completed seed 108
+boston: completed seed 109
+boston: completed seed 110
+boston: completed seed 111
+boston: completed seed 112
+boston: completed seed 113
+boston: completed seed 114
+boston: completed seed 115
+boston: completed seed 116
+boston: completed seed 117
+boston: completed seed 118
+boston: completed seed 119
+boston: completed seed 120
+boston: completed seed 121
+boston: completed seed 122
+boston: completed seed 123
+boston: completed seed 124
+boston: completed seed 125
+boston: completed seed 126
+boston: completed seed 127
+boston: completed seed 128
+boston: completed seed 129
+boston: completed seed 130
+boston: completed seed 131
+boston: completed seed 132
+boston: completed seed 133
+boston: completed seed 134
+boston: completed seed 135
+boston: completed seed 136
+boston: completed seed 137
+boston: completed seed 138
+boston: completed seed 139
+boston: completed seed 140
+boston: completed seed 141
+boston: completed seed 142
+boston: completed seed 143
+boston: completed seed 144
+completed boston: 3900 raw rows -> outputs/raw/author_ccp/boston.json
+abalone: completed seed 45
+abalone: completed seed 46
+abalone: completed seed 47
+abalone: completed seed 48
+abalone: completed seed 49
+abalone: completed seed 50
+abalone: completed seed 51
+abalone: completed seed 52
+abalone: completed seed 53
+abalone: completed seed 54
+abalone: completed seed 55
+abalone: completed seed 56
+abalone: completed seed 57
+abalone: completed seed 58
+abalone: completed seed 59
+abalone: completed seed 60
+abalone: completed seed 61
+abalone: completed seed 62
+abalone: completed seed 63
+abalone: completed seed 64
+abalone: completed seed 65
+abalone: completed seed 66
+abalone: completed seed 67
+abalone: completed seed 68
+abalone: completed seed 69
+abalone: completed seed 70
+abalone: completed seed 71
+abalone: completed seed 72
+abalone: completed seed 73
+abalone: completed seed 74
+abalone: completed seed 75
+abalone: completed seed 76
+abalone: completed seed 77
+abalone: completed seed 78
+abalone: completed seed 79
+abalone: completed seed 80
+abalone: completed seed 81
+abalone: completed seed 82
+abalone: completed seed 83
+abalone: completed seed 84
+abalone: completed seed 85
+abalone: completed seed 86
+abalone: completed seed 87
+abalone: completed seed 88
+abalone: completed seed 89
+abalone: completed seed 90
+abalone: completed seed 91
+abalone: completed seed 92
+abalone: completed seed 93
+abalone: completed seed 94
+abalone: completed seed 95
+abalone: completed seed 96
+abalone: completed seed 97
+abalone: completed seed 98
+abalone: completed seed 99
+abalone: completed seed 100
+abalone: completed seed 101
+abalone: completed seed 102
+abalone: completed seed 103
+abalone: completed seed 104
+abalone: completed seed 105
+abalone: completed seed 106
+abalone: completed seed 107
+abalone: completed seed 108
+abalone: completed seed 109
+abalone: completed seed 110
+abalone: completed seed 111
+abalone: completed seed 112
+abalone: completed seed 113
+abalone: completed seed 114
+abalone: completed seed 115
+abalone: completed seed 116
+abalone: completed seed 117
+abalone: completed seed 118
+abalone: completed seed 119
+abalone: completed seed 120
+abalone: completed seed 121
+abalone: completed seed 122
+abalone: completed seed 123
+abalone: completed seed 124
+abalone: completed seed 125
+abalone: completed seed 126
+abalone: completed seed 127
+abalone: completed seed 128
+abalone: completed seed 129
+abalone: completed seed 130
+abalone: completed seed 131
+abalone: completed seed 132
+abalone: completed seed 133
+abalone: completed seed 134
+abalone: completed seed 135
+abalone: completed seed 136
+abalone: completed seed 137
+abalone: completed seed 138
+abalone: completed seed 139
+abalone: completed seed 140
+abalone: completed seed 141
+abalone: completed seed 142
+abalone: completed seed 143
+abalone: completed seed 144
+upstream/e-ccp/data_loader.py:32: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '[ 0.81569539  0.81569539  0.81569539 ... -0.43136086 -0.43136086
+ -0.43136086]' has dtype incompatible with int64, please explicitly cast to a compatible dtype first.
+  Xdf.iloc[:, 0:12] = scaler.fit_transform(Xdf.iloc[:, 0:12])
+completed abalone: 3900 raw rows -> outputs/raw/author_ccp/abalone.json
+parkinson: completed seed 45
+parkinson: completed seed 46
+parkinson: completed seed 47
+parkinson: completed seed 48
+parkinson: completed seed 49
+parkinson: completed seed 50
+parkinson: completed seed 51
+parkinson: completed seed 52
+parkinson: completed seed 53
+parkinson: completed seed 54
+parkinson: completed seed 55
+parkinson: completed seed 56
+parkinson: completed seed 57
+parkinson: completed seed 58
+parkinson: completed seed 59
+parkinson: completed seed 60
+parkinson: completed seed 61
+parkinson: completed seed 62
+parkinson: completed seed 63
+parkinson: completed seed 64
+parkinson: completed seed 65
+parkinson: completed seed 66
+parkinson: completed seed 67
+parkinson: completed seed 68
+parkinson: completed seed 69
+parkinson: completed seed 70
+parkinson: completed seed 71
+parkinson: completed seed 72
+parkinson: completed seed 73
+parkinson: completed seed 74
+parkinson: completed seed 75
+parkinson: completed seed 76
+parkinson: completed seed 77
+parkinson: completed seed 78
+parkinson: completed seed 79
+parkinson: completed seed 80
+parkinson: completed seed 81
+parkinson: completed seed 82
+parkinson: completed seed 83
+parkinson: completed seed 84
+parkinson: completed seed 85
+parkinson: completed seed 86
+parkinson: completed seed 87
+parkinson: completed seed 88
+parkinson: completed seed 89
+parkinson: completed seed 90
+parkinson: completed seed 91
+parkinson: completed seed 92
+parkinson: completed seed 93
+parkinson: completed seed 94
+parkinson: completed seed 95
+parkinson: completed seed 96
+parkinson: completed seed 97
+parkinson: completed seed 98
+parkinson: completed seed 99
+parkinson: completed seed 100
+parkinson: completed seed 101
+parkinson: completed seed 102
+parkinson: completed seed 103
+parkinson: completed seed 104
+parkinson: completed seed 105
+parkinson: completed seed 106
+parkinson: completed seed 107
+parkinson: completed seed 108
+parkinson: completed seed 109
+parkinson: completed seed 110
+parkinson: completed seed 111
+parkinson: completed seed 112
+parkinson: completed seed 113
+parkinson: completed seed 114
+parkinson: completed seed 115
+parkinson: completed seed 116
+parkinson: completed seed 117
+parkinson: completed seed 118
+parkinson: completed seed 119
+parkinson: completed seed 120
+parkinson: completed seed 121
+parkinson: completed seed 122
+parkinson: completed seed 123
+parkinson: completed seed 124
+parkinson: completed seed 125
+parkinson: completed seed 126
+parkinson: completed seed 127
+parkinson: completed seed 128
+parkinson: completed seed 129
+parkinson: completed seed 130
+parkinson: completed seed 131
+parkinson: completed seed 132
+parkinson: completed seed 133
+parkinson: completed seed 134
+parkinson: completed seed 135
+parkinson: completed seed 136
+parkinson: completed seed 137
+parkinson: completed seed 138
+parkinson: completed seed 139
+parkinson: completed seed 140
+parkinson: completed seed 141
+parkinson: completed seed 142
+parkinson: completed seed 143
+parkinson: completed seed 144
+completed parkinson: 3900 raw rows -> outputs/raw/author_ccp/parkinson.json
+
+````
+
+
+---
+<!-- trackio-cell
+{"type": "code", "id": "cell_b65e5caaabf2", "created_at": "2026-07-19T18:54:34+00:00", "title": "Independent full CCP raw verification", "command": ["python", "repro/src/verify_ccp_results.py", "--raw-dir", "outputs/raw/author_ccp", "--output", "outputs/claim3_independent.json"], "exit_code": 0, "duration_s": 0.139}
+-->
+````bash
+$ python repro/src/verify_ccp_results.py --raw-dir outputs/raw/author_ccp --output outputs/claim3_independent.json
+````
+
+exit 0 · 0.1s
+
+
+````python title=verify_ccp_results.py
+#!/usr/bin/env python3
+"""Independent raw-row aggregation for the full author CCP protocol."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import math
+import statistics
+from collections import defaultdict
+from pathlib import Path
+
+
+EMPIRICAL_COVERAGE_SHORTFALL_TOLERANCE = 0.02
+MIN_SUBSTANTIAL_RELATIVE_REDUCTION = 0.10
+P2E_METHOD = "ECCP"
+P2E_COVERAGE_METHODS = ("ECCP", "ECCP_exch", "UR-ECCP_exch")
+CALIBRATOR_BASELINES = {
+    "AoN": "ECCP(ind)",
+    "sqrt": "ECCP(sqrt)",
+    "log": "ECCP(log)",
+    "linear": "ECCP(linear)",
+}
+
+
+def mean_and_sd(values: list[float]) -> tuple[float | None, float | None]:
+    if not values or not all(math.isfinite(value) for value in values):
+        return None, None
+    return statistics.fmean(values), statistics.stdev(values) if len(values) > 1 else 0.0
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--raw-dir", type=Path, required=True)
+    parser.add_argument("--output", type=Path, required=True)
+    args = parser.parse_args()
+
+    protocol = json.loads((args.raw_dir / "protocol.json").read_text(encoding="utf-8"))
+    expected_seeds = set(protocol["seeds"])
+    expected_models = set(protocol["models"])
+    expected_methods = set(protocol["methods"])
+    expected_cells = {
+        (dataset_key, model, method, seed)
+        for dataset_key in protocol["datasets"]
+        for model in expected_models
+        for method in expected_methods
+        for seed in expected_seeds
+    }
+    grouped: dict[tuple[str, str, str], list[dict[str, object]]] = defaultdict(list)
+    observed_cells: set[tuple[str, str, str, int]] = set()
+    duplicate_cells: set[tuple[str, str, str, int]] = set()
+    unexpected_rows = 0
+    nonfinite_rows = 0
+    invalid_metric_rows = 0
+    structural_integrity = {dataset_key: True for dataset_key in protocol["datasets"]}
+    total_rows = 0
+    for dataset_key, folds in protocol["datasets"].items():
+        payload = json.loads((args.raw_dir / f"{dataset_key}.json").read_text(encoding="utf-8"))
+        if (
+            payload.get("protocol") != protocol
+            or payload.get("dataset_key") != dataset_key
+            or int(payload.get("folds", -1)) != folds
+        ):
+            structural_integrity[dataset_key] = False
+        for row in payload["rows"]:
+            total_rows += 1
+            row_dataset = str(row["dataset_key"])
+            model = str(row["model"])
+            method = str(row["method"])
+            seed = int(row["seed"])
+            cell = (row_dataset, model, method, seed)
+            coverage = float(row["coverage"])
+            length = float(row["length"])
+            finite = math.isfinite(coverage) and math.isfinite(length)
+            metric_range_valid = (
+                finite and 0.0 <= coverage <= 1.0 and length >= 0.0
+            )
+            valid_scope = (
+                row_dataset == dataset_key
+                and model in expected_models
+                and method in expected_methods
+                and seed in expected_seeds
+                and int(row["folds"]) == folds
+            )
+            if not valid_scope:
+                unexpected_rows += 1
+                structural_integrity[dataset_key] = False
+            if not finite:
+                nonfinite_rows += 1
+                structural_integrity[dataset_key] = False
+            elif not metric_range_valid:
+                invalid_metric_rows += 1
+                structural_integrity[dataset_key] = False
+            if cell in observed_cells:
+                duplicate_cells.add(cell)
+                structural_integrity[dataset_key] = False
+            observed_cells.add(cell)
+            if valid_scope:
+                grouped[(row_dataset, model, method)].append(row)
+
+    summaries = {}
+    integrity = {}
+    for dataset_key, folds in protocol["datasets"].items():
+        summaries[dataset_key] = {}
+        integrity[dataset_key] = structural_integrity[dataset_key]
+        for model in expected_models:
+            summaries[dataset_key][model] = {}
+            for method in expected_methods:
+                rows = grouped[(dataset_key, model, method)]
+                seed_set = {int(row["seed"]) for row in rows}
+                valid = len(rows) == len(expected_seeds) and seed_set == expected_seeds and all(int(row["folds"]) == folds for row in rows)
+                integrity[dataset_key] = integrity[dataset_key] and valid
+                coverages = [float(row["coverage"]) for row in rows]
+                lengths = [float(row["length"]) for row in rows]
+                coverage_mean, coverage_sd = mean_and_sd(coverages)
+                length_mean, length_sd = mean_and_sd(lengths)
+                summaries[dataset_key][model][method] = {
+                    "seed_count": len(rows),
+                    "coverage_mean": coverage_mean,
+                    "coverage_sd": coverage_sd,
+                    "length_mean": length_mean,
+                    "length_sd": length_sd,
+                }
+
+    nominal_coverage = 1.0 - protocol["alpha"]
+    eccp_coverage_means = [
+        float(methods["ECCP"]["coverage_mean"])
+        for models in summaries.values()
+        for methods in models.values()
+        if "ECCP" in methods and methods["ECCP"]["coverage_mean"] is not None
+    ]
+    eccp_coverage_pass_count = sum(
+        coverage >= nominal_coverage - EMPIRICAL_COVERAGE_SHORTFALL_TOLERANCE
+        for coverage in eccp_coverage_means
+    )
+    p2e_coverage_means = [
+        float(methods[method]["coverage_mean"])
+        for models in summaries.values()
+        for methods in models.values()
+        for method in P2E_COVERAGE_METHODS
+        if method in methods and methods[method]["coverage_mean"] is not None
+    ]
+    p2e_coverage_pass_count = sum(
+        coverage >= nominal_coverage - EMPIRICAL_COVERAGE_SHORTFALL_TOLERANCE
+        for coverage in p2e_coverage_means
+    )
+    efficiency_comparisons = []
+    for dataset_key, models in summaries.items():
+        for model, methods in models.items():
+            p2e = methods.get(P2E_METHOD, {})
+            p2e_value = p2e.get("length_mean")
+            if p2e_value is None:
+                continue
+            p2e_length = float(p2e_value)
+            for calibrator, baseline_method in CALIBRATOR_BASELINES.items():
+                baseline_value = methods.get(baseline_method, {}).get("length_mean")
+                if baseline_value is None:
+                    continue
+                baseline_length = float(baseline_value)
+                relative_reduction = (
+                    (baseline_length - p2e_length) / baseline_length
+                    if baseline_length > 0.0
+                    else None
+                )
+                is_classical = calibrator != "AoN"
+                efficiency_comparisons.append(
+                    {
+                        "dataset": dataset_key,
+                        "model": model,
+                        "calibrator": calibrator,
+                        "p2e_method": P2E_METHOD,
+                        "baseline_method": baseline_method,
+                        "p2e_length": p2e_length,
+                        "baseline_length": baseline_length,
+                        "absolute_reduction": baseline_length - p2e_length,
+                        "relative_reduction": relative_reduction,
+                        "p2e_not_longer": p2e_length <= baseline_length,
+                        "p2e_strictly_shorter": p2e_length < baseline_length,
+                        "classical_substantial_gain": (
+                            is_classical
+                            and relative_reduction is not None
+                            and relative_reduction >= MIN_SUBSTANTIAL_RELATIVE_REDUCTION
+                        ),
+                    }
+                )
+
+    aon_comparisons = [
+        row for row in efficiency_comparisons if row["calibrator"] == "AoN"
+    ]
+    classical_comparisons = [
+        row for row in efficiency_comparisons if row["calibrator"] != "AoN"
+    ]
+    finite_reductions = [
+        float(row["relative_reduction"])
+        for row in efficiency_comparisons
+        if row["relative_reduction"] is not None
+    ]
+    classical_finite_reductions = [
+        float(row["relative_reduction"])
+        for row in classical_comparisons
+        if row["relative_reduction"] is not None
+    ]
+    not_longer_count = sum(row["p2e_not_longer"] for row in efficiency_comparisons)
+    strictly_shorter_count = sum(
+        row["p2e_strictly_shorter"] for row in efficiency_comparisons
+    )
+    aon_strictly_shorter_count = sum(
+        row["p2e_strictly_shorter"] for row in aon_comparisons
+    )
+    classical_substantial_count = sum(
+        row["classical_substantial_gain"] for row in classical_comparisons
+    )
+    result = {
+        "protocol": protocol,
+        "rows_seen": total_rows,
+        "summaries": summaries,
+        "calibrator_efficiency_comparisons": efficiency_comparisons,
+        "summary": {
+            "all_full_seed_cells_present": all(integrity.values()),
+            "dataset_integrity": integrity,
+            "expected_rows": len(protocol["datasets"]) * len(expected_models) * len(expected_methods) * len(expected_seeds),
+            "observed_unique_cells": len(observed_cells),
+            "expected_unique_cells": len(expected_cells),
+            "duplicate_cell_count": len(duplicate_cells),
+            "unexpected_row_count": unexpected_rows,
+            "nonfinite_row_count": nonfinite_rows,
+            "invalid_metric_row_count": invalid_metric_rows,
+            "exact_cell_set": observed_cells == expected_cells,
+            "eccp_empirical_coverage_cell_count": len(eccp_coverage_means),
+            "eccp_empirical_coverage_pass_count": eccp_coverage_pass_count,
+            "all_eccp_empirical_coverage_within_tolerance": (
+                bool(eccp_coverage_means)
+                and eccp_coverage_pass_count == len(eccp_coverage_means)
+            ),
+            "empirical_coverage_shortfall_tolerance": EMPIRICAL_COVERAGE_SHORTFALL_TOLERANCE,
+            "minimum_eccp_empirical_coverage": (
+                min(eccp_coverage_means) if eccp_coverage_means else None
+            ),
+            "p2e_empirical_coverage_cell_count": len(p2e_coverage_means),
+            "p2e_empirical_coverage_pass_count": p2e_coverage_pass_count,
+            "all_p2e_empirical_coverage_within_tolerance": (
+                bool(p2e_coverage_means)
+                and p2e_coverage_pass_count == len(p2e_coverage_means)
+            ),
+            "minimum_p2e_empirical_coverage": (
+                min(p2e_coverage_means) if p2e_coverage_means else None
+            ),
+            "nominal_coverage": nominal_coverage,
+            "calibrator_efficiency_comparison_count": len(efficiency_comparisons),
+            "p2e_not_longer_count": not_longer_count,
+            "p2e_strictly_shorter_count": strictly_shorter_count,
+            "all_p2e_not_longer_than_existing_calibrators": (
+                bool(efficiency_comparisons)
+                and not_longer_count == len(efficiency_comparisons)
+            ),
+            "aon_comparison_count": len(aon_comparisons),
+            "aon_strictly_shorter_count": aon_strictly_shorter_count,
+            "all_p2e_strictly_shorter_than_aon": (
+                bool(aon_comparisons)
+                and aon_strictly_shorter_count == len(aon_comparisons)
+            ),
+            "classical_comparison_count": len(classical_comparisons),
+            "classical_substantial_gain_count": classical_substantial_count,
+            "all_classical_efficiency_gains_substantial": (
+                bool(classical_comparisons)
+                and classical_substantial_count == len(classical_comparisons)
+            ),
+            "minimum_substantial_relative_reduction": MIN_SUBSTANTIAL_RELATIVE_REDUCTION,
+            "minimum_observed_relative_reduction": (
+                min(finite_reductions) if finite_reductions else None
+            ),
+            "minimum_classical_relative_reduction": (
+                min(classical_finite_reductions)
+                if classical_finite_reductions
+                else None
+            ),
+        },
+    }
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    args.output.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    print(json.dumps(result["summary"], sort_keys=True))
+
+
+if __name__ == "__main__":
+    main()
+
+````
+
+
+````output
+{"all_classical_efficiency_gains_substantial": true, "all_eccp_empirical_coverage_within_tolerance": true, "all_full_seed_cells_present": true, "all_p2e_empirical_coverage_within_tolerance": true, "all_p2e_not_longer_than_existing_calibrators": true, "all_p2e_strictly_shorter_than_aon": true, "aon_comparison_count": 9, "aon_strictly_shorter_count": 9, "calibrator_efficiency_comparison_count": 36, "classical_comparison_count": 27, "classical_substantial_gain_count": 27, "dataset_integrity": {"abalone": true, "boston": true, "parkinson": true}, "duplicate_cell_count": 0, "eccp_empirical_coverage_cell_count": 9, "eccp_empirical_coverage_pass_count": 9, "empirical_coverage_shortfall_tolerance": 0.02, "exact_cell_set": true, "expected_rows": 11700, "expected_unique_cells": 11700, "invalid_metric_row_count": 0, "minimum_classical_relative_reduction": 0.23664123574004337, "minimum_eccp_empirical_coverage": 0.8902991304347826, "minimum_observed_relative_reduction": 0.0017866878285227466, "minimum_p2e_empirical_coverage": 0.8902991304347826, "minimum_substantial_relative_reduction": 0.1, "nominal_coverage": 0.9, "nonfinite_row_count": 0, "observed_unique_cells": 11700, "p2e_empirical_coverage_cell_count": 27, "p2e_empirical_coverage_pass_count": 27, "p2e_not_longer_count": 36, "p2e_strictly_shorter_count": 36, "unexpected_row_count": 0}
+
+````
+
+
+---
+<!-- trackio-cell
+{"type": "markdown", "id": "cell_c4c0578d3fce", "created_at": "2026-07-19T18:54:47+00:00", "title": "Claim 3 verdict"}
+-->
+Claim 3 is verified in 18 independent theorem-domain cases. The normalized sigmoid has expectation one, finite log-values (strict positivity), a strictly negative analytic derivative (smoothness and invertibility), and a closed-form inverse that round-trips numerically. Pointwise P2E values dominate AoN, so every weighted or unweighted aggregate P2E e-value is at least the corresponding AoN aggregate and the P2E prediction set is a subset. The full released CCP results additionally show strict empirical improvement over AoN in 9/9 matched dataset/model cells.
