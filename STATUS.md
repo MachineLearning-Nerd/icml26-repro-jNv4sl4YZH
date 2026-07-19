@@ -225,5 +225,6 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   current per-seed-checkpointed CA wrapper, which revalidates and retains the
   three completed datasets before resuming the missing one. Only after all
   four files exist does it execute the unchanged strict 1,920-cell Claim 2
-  verifier and start Claim 3. The replacement handoff is live at PID `3527321`;
-  the complete `18/18` test suite and shell syntax check pass.
+  verifier and start Claim 3. Recovery failures retain any completed seed
+  checkpoints and retry after 60 seconds. The replacement handoff is live at
+  PID `3528025`; the complete `18/18` test suite and shell syntax check pass.
