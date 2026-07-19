@@ -296,3 +296,10 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   manifest nor an evidence bundle. The legacy final-task worker remained
   compute-active at `97.8%` CPU with `23:09:30` CPU time, `191,984 kB` RSS, and
   zero swap; the serialized CA-to-CCP and post-CCP handoffs remain alive.
+- At `2026-07-19 20:08 IST`, the legacy final-task worker remained compute-active
+  at `97.8%` CPU with `23:38:31` CPU time and about `194 MB` RSS. The three
+  completed 480-row artifacts remain intact; `dataset_361234.json` has not yet
+  been promoted, so the strict Claim-2 gate correctly has not started CCP.
+  Both durable handoffs and the shared HF drain are alive. Primary-source
+  fixture audit commit `e6295ce` leaves the repository clean and raises the
+  complete suite to 23 passing tests without reducing any paper-scale work.
