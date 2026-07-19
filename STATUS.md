@@ -236,4 +236,8 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   randomization stream, but reconstructs the paper-specified F3 intervals as
   `ECCP(linear)` from those returned p-values. The protocol remains exactly 13
   methods and 11,700 cells. A dedicated numerical falsifier proves the two
-  formulas differ; the expanded suite passes `19/19`. Commit: `e278564`.
+  formulas differ. A second test invokes the real pinned OLS CCP primitive and
+  independently replays its RNG, reproducing the source power-calibrator
+  intervals exactly before checking the corrected linear construction. The
+  expanded suite passes `20/20`; both audits are captured in Trackio. Commits:
+  `e278564`, `935df3e`, and `c3ce549`.
