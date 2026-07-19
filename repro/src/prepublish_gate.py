@@ -26,6 +26,30 @@ HEADLINE_TOLERANCES = {
     "length_relative_tolerance": 0.05,
     "length_sd_relative_tolerance": 0.10,
 }
+EXPECTED_CCP_PROTOCOL = {
+    "source": "Nabil-Ala/P2E_calibration@66cb1e1c76d1b1d3d133fe6cb3896c95d48b5974",
+    "datasets": {"boston": 15, "abalone": 15, "parkinson": 20},
+    "seeds": list(range(45, 145)),
+    "models": ["OLS", "RF", "Lasso"],
+    "methods": [
+        "mod-cross",
+        "e-mod-cross",
+        "u-mod-cross",
+        "eu-mod-cross",
+        "cross",
+        "ECCP",
+        "ECCP_exch",
+        "UR-ECCP_exch",
+        "ECCP(ind)",
+        "ECCP(sqrt)",
+        "ECCP(log)",
+        "ECCP(linear)",
+        "ECCP (2α)",
+    ],
+    "alpha": 0.1,
+    "grid_points": 300,
+    "execution_adapter": "vectorized-exact-postprocessing-v1",
+}
 TEXT_SUFFIXES = {
     "", ".cfg", ".csv", ".gitignore", ".ini", ".json", ".md", ".py",
     ".sh", ".toml", ".txt", ".yaml", ".yml",
@@ -61,6 +85,11 @@ def assert_summary(payload: dict[str, object], required_true: tuple[str, ...]) -
     assert isinstance(summary, dict)
     for key in required_true:
         assert summary.get(key) is True, f"summary gate failed: {key}={summary.get(key)!r}"
+
+
+def assert_exact_ccp_protocol(protocol: dict[str, object]) -> None:
+    """Reject self-consistent CCP output produced at any non-paper scope."""
+    assert protocol == EXPECTED_CCP_PROTOCOL, "CCP paper protocol drift"
 
 
 def text_files() -> list[Path]:
@@ -320,7 +349,7 @@ def main() -> None:
         ),
     )
     claim3_summary = claim3["summary"]
-    assert claim3["protocol"]["execution_adapter"] == "vectorized-exact-postprocessing-v1"
+    assert_exact_ccp_protocol(claim3["protocol"])
     assert claim3["rows_seen"] == claim3_summary["expected_rows"] == 11_700
     assert claim3_summary["observed_unique_cells"] == 11_700
     assert claim3_summary["duplicate_cell_count"] == 0

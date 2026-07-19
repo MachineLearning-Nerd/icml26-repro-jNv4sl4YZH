@@ -29,9 +29,11 @@ python - <<'PY'
 import json
 from pathlib import Path
 
+from repro.src.prepublish_gate import assert_exact_ccp_protocol
+
 result = json.loads(Path("outputs/claim3_independent.json").read_text())
 summary = result["summary"]
-assert result["protocol"]["execution_adapter"] == "vectorized-exact-postprocessing-v1"
+assert_exact_ccp_protocol(result["protocol"])
 assert summary["all_full_seed_cells_present"]
 assert result["rows_seen"] == 11_700
 assert summary["expected_rows"] == 11_700

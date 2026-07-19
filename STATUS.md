@@ -273,3 +273,11 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   interval extraction). Literal-versus-vectorized tests require bit-identical p-values and
   exact intervals for OLS, RF, Lasso, and all 13 methods. Adapter provenance is
   part of the raw protocol and final gate.
+- The post-CCP and prepublication gates now bind the raw evidence to the exact
+  paper protocol rather than trusting a self-declared but internally
+  consistent protocol: pinned source SHA; Boston/Abalone at 15 folds and
+  Parkinson at 20; seeds 45--144; OLS/RF/Lasso; the ordered 13-method tuple;
+  alpha 0.1; 300 grid points; and the parity-checked execution adapter.
+  Negative controls independently remove a dataset, seed, model, or method and
+  alter alpha, grid size, or adapter; every drift is rejected. All 22 tests and
+  the no-write publication preflight pass.

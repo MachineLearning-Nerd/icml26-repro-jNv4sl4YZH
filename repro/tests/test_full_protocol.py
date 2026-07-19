@@ -4,6 +4,8 @@ import unittest
 from pathlib import Path
 
 from repro.src.prepublish_gate import (
+    EXPECTED_CCP_PROTOCOL,
+    assert_exact_ccp_protocol,
     hygiene_gate,
     sha256,
     validate_artifact_bundle,
@@ -157,6 +159,30 @@ class FullProtocolTests(unittest.TestCase):
     def test_expected_ccp_raw_cell_count(self):
         self.assertEqual(len(PAPER_DATASETS) * 3 * len(METHOD_KEYS) * 100, 11700)
         self.assertEqual(EXECUTION_ADAPTER, "vectorized-exact-postprocessing-v1")
+        expected = {
+            "source": "Nabil-Ala/P2E_calibration@66cb1e1c76d1b1d3d133fe6cb3896c95d48b5974",
+            "datasets": PAPER_DATASETS,
+            "seeds": list(range(45, 145)),
+            "models": ["OLS", "RF", "Lasso"],
+            "methods": [name for name, _ in METHOD_KEYS],
+            "alpha": 0.1,
+            "grid_points": 300,
+            "execution_adapter": EXECUTION_ADAPTER,
+        }
+        self.assertEqual(EXPECTED_CCP_PROTOCOL, expected)
+        assert_exact_ccp_protocol(expected)
+        for key, drifted_value in (
+            ("source", "Nabil-Ala/P2E_calibration@wrong-sha"),
+            ("datasets", {"boston": 15, "abalone": 15}),
+            ("seeds", list(range(45, 144))),
+            ("models", ["OLS", "RF"]),
+            ("methods", expected["methods"][:-1]),
+            ("alpha", 0.2),
+            ("grid_points", 299),
+            ("execution_adapter", "literal-source"),
+        ):
+            with self.subTest(key=key), self.assertRaises(AssertionError):
+                assert_exact_ccp_protocol({**expected, key: drifted_value})
 
     def test_trackio_evidence_bundle_is_hash_indexed_and_roundtrips_json(self):
         root = Path(__file__).resolve().parents[2]
