@@ -81,6 +81,10 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   `README.md` now gives the exact official clone/commit verification,
   environment installation, 1,920-cell CA, 11,700-cell CCP, independent
   verification, test, and final-gate commands for a fresh public clone.
+- Read-only checks against the installed Hugging Face CLI and existing public
+  challenge artifacts confirmed the publisher's Space JSON fields, tag/SHA
+  checks, recursive bucket JSON fields, exact-size artifact lookup, and Space
+  download options match the live CLI/API shapes.
 - Ran all fifteen local mechanism/protocol/author-launcher/raw-verifier and
   paper-headline drift-control tests successfully (including positive and
   deliberately incomplete raw fixtures), including local-only Trackio artifact
