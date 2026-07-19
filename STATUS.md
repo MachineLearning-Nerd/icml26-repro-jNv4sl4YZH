@@ -484,4 +484,6 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   CPU with three complete 480-row artifacts; both serialized handoffs and the
   shared HF drain remained alive. The shared drain has published all 42 current
   backlog entries, and this paper will join it atomically only after the full
-  three-claim gate and first GitHub push succeed.
+  three-claim gate and first GitHub push succeed. The audit implementation is
+  committed at `9f23d62`; refreshed post-CCP watcher PID `3575557` owns its
+  singleton lock and the active CA worker was not interrupted.
