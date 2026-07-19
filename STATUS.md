@@ -319,3 +319,12 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   publisher is retried on a nonzero GitHub/HF/readback exit, at 60-second
   intervals. This preserves the completed evidence and canonical queue entry
   across transient external failures without rerunning the heavy CCP sweep.
+- A fresh released-input audit explains the long final CA task: `361234` retains
+  4,177 rows, versus 1,030, 1,503, and 1,066 for the three completed tasks. The
+  author WECA loop evaluates 508 sampled/baseline weights over a calibration
+  split, 512 candidate values, and calibration-score comparisons, so its
+  dominant cost grows roughly quadratically with row count. Scaling the three
+  observed completed-task durations by squared row-count ratios projects
+  approximately 25--40 hours for `361234` (median about 29.5 hours). Its current
+  ~16.7-hour final-task runtime is therefore consistent with expected finite
+  work, not evidence of a hang; the active legacy process should remain intact.
