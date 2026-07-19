@@ -241,3 +241,14 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   intervals exactly before checking the corrected linear construction. The
   expanded suite passes `20/20`; both audits are captured in Trackio. Commits:
   `e278564`, `935df3e`, and `c3ce549`.
+- Claim 2's substantial-efficiency evidence is now gated across both paper
+  applications, not CA alone. The exact 13-method CCP tuple and its mappings
+  to AoN, log, square-root, and the paper-corrected linear calibrator are pinned
+  in tests. The independent verifier must produce exactly 36 matched CCP
+  comparisons: P2E no longer than the baseline in 36/36, strictly shorter in
+  36/36 and 9/9 AoN cells, with all 27/27 classical-calibrator reductions at
+  least 10%. Equality
+  at the AoN boundary and a 5% classical reduction both fail the intended
+  strict/materiality gates. The renderer and prepublication gate enforce these
+  counts before writing the final claim verdict. The complete `20/20` suite is
+  captured in Trackio. Commits: `5719dc8` and `3f4c511`.
