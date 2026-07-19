@@ -196,11 +196,13 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   full 18-test suite and shell syntax check pass. The legacy CA process was not
   interrupted; only its idle old handoff was replaced by the stricter durable
   handoff (PID `3482976`).
-- From `2026-07-19 15:39–15:48 IST`, a twelve-interval, ten-minute liveness
-  watch observed the final `361234` task gain essentially one CPU-second per
-  wall-second on every interval (`547.77` CPU seconds between the first and
-  last recorded samples) while RSS stayed
-  exactly `194,300 kB` and process swap stayed zero. The worker, exact-PID
+- From `2026-07-19 15:39–16:56 IST`, repeated 50-second liveness samples
+  observed the final `361234` task gain essentially one CPU-second per
+  wall-second on every interval. At the final sample it had accumulated
+  `20:28:03` of CPU time over `20:57:24` elapsed, RSS remained within
+  `192–194 MB`, and process swap remained zero. The worker, exact-PID
   continuation guard, strict CA-to-CCP handoff, and post-CCP gate watcher all
-  remain alive. No fourth artifact has been promoted yet; this is a long but
-  demonstrably active finite source computation, not a stalled process.
+  remain alive, with empty error logs. The complete `18/18` test suite and
+  non-writing publication preflight also pass. No fourth artifact has been
+  promoted yet; this is a long but demonstrably active finite source
+  computation, not a stalled process.
