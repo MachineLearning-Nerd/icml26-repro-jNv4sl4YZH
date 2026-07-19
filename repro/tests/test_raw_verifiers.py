@@ -206,11 +206,18 @@ class RawVerifierTests(unittest.TestCase):
     def test_ccp_verifier_requires_each_model_method_seed_cell(self):
         with tempfile.TemporaryDirectory() as temp:
             raw = Path(temp)
+            methods = [
+                "ECCP",
+                "ECCP(ind)",
+                "ECCP(sqrt)",
+                "ECCP(log)",
+                "ECCP(linear)",
+            ]
             protocol = {
                 "datasets": {"toy": 3},
                 "seeds": [45, 46],
                 "models": ["OLS"],
-                "methods": ["ECCP"],
+                "methods": methods,
                 "alpha": 0.1,
             }
             rows = [
@@ -219,11 +226,18 @@ class RawVerifierTests(unittest.TestCase):
                     "folds": 3,
                     "seed": seed,
                     "model": "OLS",
-                    "method": "ECCP",
+                    "method": method,
                     "coverage": 0.9,
-                    "length": 1.0,
+                    "length": (
+                        1.0
+                        if method == "ECCP"
+                        else 1.1
+                        if method == "ECCP(ind)"
+                        else 2.0
+                    ),
                 }
                 for seed in protocol["seeds"]
+                for method in methods
             ]
             (raw / "protocol.json").write_text(json.dumps(protocol), encoding="utf-8")
             payload = {
@@ -235,7 +249,7 @@ class RawVerifierTests(unittest.TestCase):
             (raw / "toy.json").write_text(json.dumps(payload), encoding="utf-8")
             passed = invoke("verify_ccp_results.py", raw, raw / "passed.json")
             self.assertTrue(passed["summary"]["all_full_seed_cells_present"])
-            self.assertEqual(passed["summary"]["expected_rows"], 2)
+            self.assertEqual(passed["summary"]["expected_rows"], 10)
             self.assertTrue(passed["summary"]["exact_cell_set"])
             self.assertEqual(passed["summary"]["duplicate_cell_count"], 0)
             self.assertEqual(passed["summary"]["unexpected_row_count"], 0)
@@ -244,6 +258,84 @@ class RawVerifierTests(unittest.TestCase):
             self.assertEqual(passed["summary"]["eccp_empirical_coverage_pass_count"], 1)
             self.assertTrue(
                 passed["summary"]["all_eccp_empirical_coverage_within_tolerance"]
+            )
+            self.assertEqual(
+                passed["summary"]["calibrator_efficiency_comparison_count"], 4
+            )
+            self.assertEqual(passed["summary"]["p2e_strictly_shorter_count"], 4)
+            self.assertTrue(
+                passed["summary"]["all_p2e_not_longer_than_existing_calibrators"]
+            )
+            self.assertEqual(passed["summary"]["aon_strictly_shorter_count"], 1)
+            self.assertTrue(
+                passed["summary"]["all_p2e_strictly_shorter_than_aon"]
+            )
+            self.assertEqual(
+                passed["summary"]["classical_substantial_gain_count"], 3
+            )
+            self.assertTrue(
+                passed["summary"]["all_classical_efficiency_gains_substantial"]
+            )
+
+            aon_better_rows = [
+                {
+                    **row,
+                    "length": 0.9 if row["method"] == "ECCP(ind)" else row["length"],
+                }
+                for row in rows
+            ]
+            payload["rows"] = aon_better_rows
+            (raw / "toy.json").write_text(json.dumps(payload), encoding="utf-8")
+            aon_failure = invoke(
+                "verify_ccp_results.py", raw, raw / "aon_failure.json"
+            )
+            self.assertFalse(
+                aon_failure["summary"]["all_p2e_not_longer_than_existing_calibrators"]
+            )
+            self.assertFalse(
+                aon_failure["summary"]["all_p2e_strictly_shorter_than_aon"]
+            )
+
+            aon_equal_rows = [
+                {
+                    **row,
+                    "length": 1.0 if row["method"] == "ECCP(ind)" else row["length"],
+                }
+                for row in rows
+            ]
+            payload["rows"] = aon_equal_rows
+            (raw / "toy.json").write_text(json.dumps(payload), encoding="utf-8")
+            aon_equality = invoke(
+                "verify_ccp_results.py", raw, raw / "aon_equality.json"
+            )
+            self.assertTrue(
+                aon_equality["summary"]["all_p2e_not_longer_than_existing_calibrators"]
+            )
+            self.assertFalse(
+                aon_equality["summary"]["all_p2e_strictly_shorter_than_aon"]
+            )
+
+            weak_classical_rows = [
+                {
+                    **row,
+                    "length": (
+                        1.05
+                        if row["method"] in {"ECCP(sqrt)", "ECCP(log)", "ECCP(linear)"}
+                        else row["length"]
+                    ),
+                }
+                for row in rows
+            ]
+            payload["rows"] = weak_classical_rows
+            (raw / "toy.json").write_text(json.dumps(payload), encoding="utf-8")
+            weak_classical = invoke(
+                "verify_ccp_results.py", raw, raw / "weak_classical.json"
+            )
+            self.assertEqual(
+                weak_classical["summary"]["classical_substantial_gain_count"], 0
+            )
+            self.assertFalse(
+                weak_classical["summary"]["all_classical_efficiency_gains_substantial"]
             )
 
             payload["rows"] = [{**row, "coverage": 0.85} for row in rows]

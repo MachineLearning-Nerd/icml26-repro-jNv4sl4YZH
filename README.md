@@ -88,8 +88,10 @@ python repro/src/prepublish_gate.py \
 After the full source runs finish, `python repro/src/prepublish_gate.py` reruns
 all independent checks and tests, validates every raw cell, verifies the
 Trackio evidence and source pin, checks all 68 reported mean/SD scalars in the
-17 paper headline cells, scans for secrets/local paths, and emits a SHA-256
-manifest only if the complete publication gate passes. It also creates
+17 paper headline cells, requires all 24 CA material-efficiency comparisons
+and all 36 CCP calibrator comparisons (including nine AoN cells), scans for
+secrets/local paths, and emits a SHA-256 manifest only if the complete
+publication gate passes. It also creates
 a hash-indexed JSONL bundle containing seven summary/report artifacts and all
 seven full raw dataset files; Trackio recognizes this format and promotes
 it to the Hugging Face artifact bucket on publication.

@@ -13,6 +13,7 @@ from repro.src.prepublish_gate import (
 )
 from repro.src.render_final_logbook import build_cells
 from repro.src.run_author_ccp import METHOD_KEYS, PAPER_DATASETS
+from repro.src.verify_ccp_results import CALIBRATOR_BASELINES
 
 
 class FullProtocolTests(unittest.TestCase):
@@ -88,7 +89,33 @@ class FullProtocolTests(unittest.TestCase):
         self.assertEqual(protocol["claim_2_conformal_aggregation"]["openml_task_ids"], [361234, 361235, 361237, 361244])
         self.assertEqual(protocol["claim_3_cross_conformal"]["seeds"], 100)
         self.assertEqual(PAPER_DATASETS, {"boston": 15, "abalone": 15, "parkinson": 20})
-        self.assertEqual(len(METHOD_KEYS), 13)
+        self.assertEqual(
+            tuple(name for name, _ in METHOD_KEYS),
+            (
+                "mod-cross",
+                "e-mod-cross",
+                "u-mod-cross",
+                "eu-mod-cross",
+                "cross",
+                "ECCP",
+                "ECCP_exch",
+                "UR-ECCP_exch",
+                "ECCP(ind)",
+                "ECCP(sqrt)",
+                "ECCP(log)",
+                "ECCP(linear)",
+                "ECCP (2α)",
+            ),
+        )
+        self.assertEqual(
+            CALIBRATOR_BASELINES,
+            {
+                "AoN": "ECCP(ind)",
+                "sqrt": "ECCP(sqrt)",
+                "log": "ECCP(log)",
+                "linear": "ECCP(linear)",
+            },
+        )
 
         headlines = json.loads(
             (root / "repro/configs/paper_headlines.json").read_text(encoding="utf-8")
@@ -234,10 +261,22 @@ class FullProtocolTests(unittest.TestCase):
                 "all_full_seed_cells_present": True,
                 "exact_cell_set": True,
                 "all_eccp_empirical_coverage_within_tolerance": True,
+                "all_p2e_not_longer_than_existing_calibrators": True,
+                "all_p2e_strictly_shorter_than_aon": True,
+                "all_classical_efficiency_gains_substantial": True,
                 "eccp_empirical_coverage_cell_count": 9,
                 "eccp_empirical_coverage_pass_count": 9,
                 "empirical_coverage_shortfall_tolerance": 0.02,
                 "expected_rows": 11_700,
+                "calibrator_efficiency_comparison_count": 36,
+                "p2e_not_longer_count": 36,
+                "p2e_strictly_shorter_count": 36,
+                "aon_comparison_count": 9,
+                "aon_strictly_shorter_count": 9,
+                "classical_comparison_count": 27,
+                "classical_substantial_gain_count": 27,
+                "minimum_substantial_relative_reduction": 0.10,
+                "minimum_classical_relative_reduction": 0.50,
             },
             "summaries": {
                 dataset: {

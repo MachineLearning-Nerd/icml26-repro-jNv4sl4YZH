@@ -68,6 +68,9 @@ def build_cells(
         "all_full_seed_cells_present",
         "exact_cell_set",
         "all_eccp_empirical_coverage_within_tolerance",
+        "all_p2e_not_longer_than_existing_calibrators",
+        "all_p2e_strictly_shorter_than_aon",
+        "all_classical_efficiency_gains_substantial",
     )
     require_true(headline_summary, "all_within_tolerance")
 
@@ -85,6 +88,16 @@ def build_cells(
         raise RuntimeError("Claim 3 raw-row count is not 11,700")
     if c3_summary["eccp_empirical_coverage_pass_count"] != 9:
         raise RuntimeError("Claim 3 does not pass all nine ECCP coverage sanity checks")
+    if c3_summary["calibrator_efficiency_comparison_count"] != 36:
+        raise RuntimeError("CCP does not contain all 36 calibrator comparisons")
+    if c3_summary["p2e_strictly_shorter_count"] != 36:
+        raise RuntimeError("P2E is not strictly shorter in all 36 CCP comparisons")
+    if c3_summary["aon_strictly_shorter_count"] != 9:
+        raise RuntimeError("P2E does not strictly dominate AoN in all nine CCP cells")
+    if c3_summary["classical_substantial_gain_count"] != 27:
+        raise RuntimeError("P2E does not clear all 27 classical CCP materiality checks")
+    if c3_summary["minimum_substantial_relative_reduction"] != 0.10:
+        raise RuntimeError("CCP materiality threshold drifted from 10%")
     if headline_summary["comparison_count"] != 17:
         raise RuntimeError("headline cell count is not 17")
     if headline_summary["scalar_comparison_count"] != 68:
@@ -124,11 +137,22 @@ def build_cells(
         "claim3_eccp_coverage_min": min(ccp_coverages),
         "claim3_eccp_coverage_max": max(ccp_coverages),
         "claim3_valid_tail_to_alpha_max": valid_tail_ratio,
+        "claim2_ccp_efficiency_wins": int(c3_summary["p2e_strictly_shorter_count"]),
+        "claim2_ccp_efficiency_comparisons": int(
+            c3_summary["calibrator_efficiency_comparison_count"]
+        ),
+        "claim2_ccp_aon_wins": int(c3_summary["aon_strictly_shorter_count"]),
+        "claim2_ccp_classical_material_wins": int(
+            c3_summary["classical_substantial_gain_count"]
+        ),
+        "claim2_ccp_minimum_classical_relative_reduction": float(
+            c3_summary["minimum_classical_relative_reduction"]
+        ),
         "headline_cells": int(headline_summary["comparison_count"]),
         "headline_scalars": int(headline_summary["scalar_comparison_count"]),
     }
 
-    claim2_markdown = f"""Claim 2 is verified at the complete released scale. The independent verifier accepted exactly {summary['claim2_raw_rows']:,} unique finite raw cells (four OpenML tasks, 20 fixed seeds, 24 methods) with no missing, duplicate, unexpected, or non-finite cells. P2E clears the predeclared 10% materiality threshold against log, square-root, and linear p-to-e calibrators in {summary['claim2_efficiency_wins']}/{summary['claim2_efficiency_comparisons']} matched WECA/UR-WECA comparisons; relative length reductions range from {100 * summary['claim2_minimum_relative_reduction']:.2f}% to {100 * summary['claim2_maximum_relative_reduction']:.2f}%. The eight P2E CA coverage means span {summary['claim2_p2e_coverage_min']:.4f}–{summary['claim2_p2e_coverage_max']:.4f}."""
+    claim2_markdown = f"""Claim 2 is verified at the complete released scale in both applications. The independent CA verifier accepted exactly {summary['claim2_raw_rows']:,} unique finite raw cells (four OpenML tasks, 20 fixed seeds, 24 methods) with no missing, duplicate, unexpected, or non-finite cells. P2E clears the predeclared 10% materiality threshold against log, square-root, and linear p-to-e calibrators in {summary['claim2_efficiency_wins']}/{summary['claim2_efficiency_comparisons']} matched WECA/UR-WECA comparisons; relative length reductions range from {100 * summary['claim2_minimum_relative_reduction']:.2f}% to {100 * summary['claim2_maximum_relative_reduction']:.2f}%. The full CCP evidence independently requires P2E to be strictly shorter in {summary['claim2_ccp_efficiency_wins']}/{summary['claim2_ccp_efficiency_comparisons']} matched model/dataset/calibrator cells, including {summary['claim2_ccp_aon_wins']}/9 all-or-nothing comparisons; all {summary['claim2_ccp_classical_material_wins']}/27 classical-calibrator reductions clear 10%, with a minimum of {100 * summary['claim2_ccp_minimum_classical_relative_reduction']:.2f}%. The eight P2E CA coverage means span {summary['claim2_p2e_coverage_min']:.4f}–{summary['claim2_p2e_coverage_max']:.4f}."""
 
     claim3_markdown = f"""Claim 3 is verified by complementary empirical and mechanism evidence. The full released CCP protocol produced exactly {summary['claim3_raw_rows']:,} unique finite cells (three datasets, 100 seeds, three models, 13 methods), with ECCP coverage means spanning {summary['claim3_eccp_coverage_min']:.4f}–{summary['claim3_eccp_coverage_max']:.4f}; all nine ECCP and all eight CA P2E cells remain within the predeclared two-percentage-point empirical shortfall tolerance. An independent sparse LP maximized rejection probability over every joint coupling with uniform conformal-rank marginals in eight fixed-weight cases: two equal-weight ECCP cases and six nonuniform tuning-independent WECA cases. All valid cases stayed at or below alpha (maximum tail/alpha ratio {summary['claim3_valid_tail_to_alpha_max']:.6f}), while inference-adaptive max weighting failed 8/8. The empirical rule is a gross-undercoverage sanity check; the exact finite-sample guarantee comes from the rank/e-value certificate. Together with the CA outputs, this checks both applications named by the claim and WECA's independent-tuning condition."""
 
@@ -141,8 +165,8 @@ def build_cells(
 | Item | This reproduction | Paper protocol |
 | --- | --- | --- |
 | Claim 1 | {summary['claim1_cells']} exact finite-rank cells + independent source cross-check | Full claimed mechanism |
-| Claim 2 / CA | {summary['claim2_raw_rows']:,} raw cells; four tasks x 20 seeds x 24 methods | Same released tasks, seeds, methods, M=512, B=500 |
-| Claim 3 / CCP | {summary['claim3_raw_rows']:,} raw cells; three datasets x 100 seeds x three models x 13 methods | Same released data, seeds, models, and K=15/15/20 |
+| Claim 2 / CA | {summary['claim2_raw_rows']:,} raw cells; four tasks x 20 seeds x 24 methods; 24 material efficiency checks | Same released tasks, seeds, methods, M=512, B=500 |
+| Claims 2-3 / CCP | {summary['claim3_raw_rows']:,} raw cells; three datasets x 100 seeds x three models x 13 methods; 36 calibrator comparisons | Same released data, seeds, models, and K=15/15/20 |
 | Hardware | Local CPU; no GPU | CPU-compatible released implementation |
 | External compute cost | $0 | No cloud run required |
 | Outcome | 3/3 claims verified; 6 possible points | Full challenge-claim scope |

@@ -314,6 +314,9 @@ def main() -> None:
             "all_full_seed_cells_present",
             "exact_cell_set",
             "all_eccp_empirical_coverage_within_tolerance",
+            "all_p2e_not_longer_than_existing_calibrators",
+            "all_p2e_strictly_shorter_than_aon",
+            "all_classical_efficiency_gains_substantial",
         ),
     )
     claim3_summary = claim3["summary"]
@@ -325,6 +328,15 @@ def main() -> None:
     assert claim3_summary["eccp_empirical_coverage_cell_count"] == 9
     assert claim3_summary["eccp_empirical_coverage_pass_count"] == 9
     assert claim3_summary["empirical_coverage_shortfall_tolerance"] == 0.02
+    assert claim3_summary["calibrator_efficiency_comparison_count"] == 36
+    assert claim3_summary["p2e_not_longer_count"] == 36
+    assert claim3_summary["p2e_strictly_shorter_count"] == 36
+    assert claim3_summary["aon_comparison_count"] == 9
+    assert claim3_summary["aon_strictly_shorter_count"] == 9
+    assert claim3_summary["classical_comparison_count"] == 27
+    assert claim3_summary["classical_substantial_gain_count"] == 27
+    assert claim3_summary["minimum_substantial_relative_reduction"] == 0.10
+    assert claim3_summary["minimum_classical_relative_reduction"] >= 0.10
 
     headlines = load_json("outputs/paper_headline_comparison.json")
     assert_summary(headlines, ("all_within_tolerance",))

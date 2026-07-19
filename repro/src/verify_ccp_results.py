@@ -12,6 +12,14 @@ from pathlib import Path
 
 
 EMPIRICAL_COVERAGE_SHORTFALL_TOLERANCE = 0.02
+MIN_SUBSTANTIAL_RELATIVE_REDUCTION = 0.10
+P2E_METHOD = "ECCP"
+CALIBRATOR_BASELINES = {
+    "AoN": "ECCP(ind)",
+    "sqrt": "ECCP(sqrt)",
+    "log": "ECCP(log)",
+    "linear": "ECCP(linear)",
+}
 
 
 def mean_and_sd(values: list[float]) -> tuple[float | None, float | None]:
@@ -115,10 +123,77 @@ def main() -> None:
         coverage >= nominal_coverage - EMPIRICAL_COVERAGE_SHORTFALL_TOLERANCE
         for coverage in eccp_coverage_means
     )
+    efficiency_comparisons = []
+    for dataset_key, models in summaries.items():
+        for model, methods in models.items():
+            p2e = methods.get(P2E_METHOD, {})
+            p2e_value = p2e.get("length_mean")
+            if p2e_value is None:
+                continue
+            p2e_length = float(p2e_value)
+            for calibrator, baseline_method in CALIBRATOR_BASELINES.items():
+                baseline_value = methods.get(baseline_method, {}).get("length_mean")
+                if baseline_value is None:
+                    continue
+                baseline_length = float(baseline_value)
+                relative_reduction = (
+                    (baseline_length - p2e_length) / baseline_length
+                    if baseline_length > 0.0
+                    else None
+                )
+                is_classical = calibrator != "AoN"
+                efficiency_comparisons.append(
+                    {
+                        "dataset": dataset_key,
+                        "model": model,
+                        "calibrator": calibrator,
+                        "p2e_method": P2E_METHOD,
+                        "baseline_method": baseline_method,
+                        "p2e_length": p2e_length,
+                        "baseline_length": baseline_length,
+                        "absolute_reduction": baseline_length - p2e_length,
+                        "relative_reduction": relative_reduction,
+                        "p2e_not_longer": p2e_length <= baseline_length,
+                        "p2e_strictly_shorter": p2e_length < baseline_length,
+                        "classical_substantial_gain": (
+                            is_classical
+                            and relative_reduction is not None
+                            and relative_reduction >= MIN_SUBSTANTIAL_RELATIVE_REDUCTION
+                        ),
+                    }
+                )
+
+    aon_comparisons = [
+        row for row in efficiency_comparisons if row["calibrator"] == "AoN"
+    ]
+    classical_comparisons = [
+        row for row in efficiency_comparisons if row["calibrator"] != "AoN"
+    ]
+    finite_reductions = [
+        float(row["relative_reduction"])
+        for row in efficiency_comparisons
+        if row["relative_reduction"] is not None
+    ]
+    classical_finite_reductions = [
+        float(row["relative_reduction"])
+        for row in classical_comparisons
+        if row["relative_reduction"] is not None
+    ]
+    not_longer_count = sum(row["p2e_not_longer"] for row in efficiency_comparisons)
+    strictly_shorter_count = sum(
+        row["p2e_strictly_shorter"] for row in efficiency_comparisons
+    )
+    aon_strictly_shorter_count = sum(
+        row["p2e_strictly_shorter"] for row in aon_comparisons
+    )
+    classical_substantial_count = sum(
+        row["classical_substantial_gain"] for row in classical_comparisons
+    )
     result = {
         "protocol": protocol,
         "rows_seen": total_rows,
         "summaries": summaries,
+        "calibrator_efficiency_comparisons": efficiency_comparisons,
         "summary": {
             "all_full_seed_cells_present": all(integrity.values()),
             "dataset_integrity": integrity,
@@ -140,6 +215,34 @@ def main() -> None:
                 min(eccp_coverage_means) if eccp_coverage_means else None
             ),
             "nominal_coverage": nominal_coverage,
+            "calibrator_efficiency_comparison_count": len(efficiency_comparisons),
+            "p2e_not_longer_count": not_longer_count,
+            "p2e_strictly_shorter_count": strictly_shorter_count,
+            "all_p2e_not_longer_than_existing_calibrators": (
+                bool(efficiency_comparisons)
+                and not_longer_count == len(efficiency_comparisons)
+            ),
+            "aon_comparison_count": len(aon_comparisons),
+            "aon_strictly_shorter_count": aon_strictly_shorter_count,
+            "all_p2e_strictly_shorter_than_aon": (
+                bool(aon_comparisons)
+                and aon_strictly_shorter_count == len(aon_comparisons)
+            ),
+            "classical_comparison_count": len(classical_comparisons),
+            "classical_substantial_gain_count": classical_substantial_count,
+            "all_classical_efficiency_gains_substantial": (
+                bool(classical_comparisons)
+                and classical_substantial_count == len(classical_comparisons)
+            ),
+            "minimum_substantial_relative_reduction": MIN_SUBSTANTIAL_RELATIVE_REDUCTION,
+            "minimum_observed_relative_reduction": (
+                min(finite_reductions) if finite_reductions else None
+            ),
+            "minimum_classical_relative_reduction": (
+                min(classical_finite_reductions)
+                if classical_finite_reductions
+                else None
+            ),
         },
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
