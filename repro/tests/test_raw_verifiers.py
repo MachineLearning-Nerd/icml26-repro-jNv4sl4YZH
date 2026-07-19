@@ -56,6 +56,7 @@ class RawVerifierTests(unittest.TestCase):
                 model: {method: dict(values) for method, values in methods.items()}
                 for model, methods in models.items()
             }
+        matching_ccp = json.loads(json.dumps(ccp))
         with tempfile.TemporaryDirectory() as temp:
             path = Path(temp)
             ca_path, ccp_path, output = path / "ca.json", path / "ccp.json", path / "comparison.json"
@@ -80,6 +81,11 @@ class RawVerifierTests(unittest.TestCase):
             self.assertEqual(matching["summary"]["known_discrepancy_comparison_count"], 27)
             self.assertEqual(matching["summary"]["known_discrepancy_scalar_comparison_count"], 108)
             self.assertEqual(matching["summary"]["known_ca_dispersion_discrepancy_count"], 0)
+            self.assertEqual(matching["summary"]["source_table_replay_comparison_count"], 18)
+            self.assertEqual(
+                matching["summary"]["source_table_replay_scalar_comparison_count"],
+                72,
+            )
 
             ca["summaries"]["dataset_361234"]["UR-WECA(P2E)"][
                 "length_sd"
@@ -119,6 +125,45 @@ class RawVerifierTests(unittest.TestCase):
             self.assertEqual(known["summary"]["unexpected_outside_tolerance_count"], 0)
             self.assertEqual(known["summary"]["known_discrepancy_outside_tolerance_count"], 1)
             ccp["summaries"]["boston"]["OLS"]["ECCP(log)"] = original_known
+            ccp_path.write_text(json.dumps(ccp), encoding="utf-8")
+
+            # Reconstruct the released driver's reversible F1/F2 column swap.
+            # The separate replay gate must bind every available affected
+            # scalar numerically, then reject a mutation in that mapping.
+            for dataset, models in headlines["cross_conformal"].items():
+                for model, methods in models.items():
+                    ccp["summaries"][dataset][model]["ECCP(sqrt)"] = dict(
+                        methods["ECCP(log)"]
+                    )
+                    ccp["summaries"][dataset][model]["ECCP(log)"] = dict(
+                        methods["ECCP(sqrt)"]
+                    )
+            ccp_path.write_text(json.dumps(ccp), encoding="utf-8")
+            subprocess.run(command, cwd=ROOT, check=True, capture_output=True, text=True)
+            replayed = json.loads(output.read_text(encoding="utf-8"))
+            self.assertTrue(
+                replayed["summary"]["all_source_table_replays_within_tolerance"]
+            )
+            self.assertEqual(
+                replayed["summary"]["source_table_replay_within_tolerance_count"],
+                18,
+            )
+            self.assertEqual(
+                replayed["summary"]["source_table_replay_within_tolerance_scalar_count"],
+                72,
+            )
+            ccp["summaries"]["boston"]["OLS"]["ECCP(sqrt)"]["length_mean"] *= 2
+            ccp_path.write_text(json.dumps(ccp), encoding="utf-8")
+            subprocess.run(command, cwd=ROOT, check=True, capture_output=True, text=True)
+            replay_drift = json.loads(output.read_text(encoding="utf-8"))
+            self.assertFalse(
+                replay_drift["summary"]["all_source_table_replays_within_tolerance"]
+            )
+            self.assertEqual(
+                replay_drift["summary"]["source_table_replay_within_tolerance_count"],
+                17,
+            )
+            ccp = json.loads(json.dumps(matching_ccp))
             ccp_path.write_text(json.dumps(ccp), encoding="utf-8")
 
             ca["summaries"]["dataset_361234"]["WECA(P2E)"]["length_mean"] = 99.0

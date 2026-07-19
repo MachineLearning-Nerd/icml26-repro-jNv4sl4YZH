@@ -34,6 +34,16 @@ the released `e-ccp/main.py` fills those three table positions from
 driver, and released utility implementation by SHA-256 and supplies numerical
 witnesses that all three formula pairs differ.
 
+The first two released mistakes are reversible from the formula-faithful raw
+results. The comparator therefore performs a second, explicitly labeled source
+table replay: current square-root output is checked against the paper's F1/log
+position, and current log output against its F2/square-root position. All 18
+dataset/model/column cells (72 mean/SD scalars) must pass the same predeclared
+tolerances. The F3 position cannot be replayed from the paper-faithful 13-method
+artifact because the released driver used an undocumented power calibrator;
+that position remains covered by the exact source/TeX hash contract and is not
+silently added to or relabeled in the claim result.
+
 The exact released CA run also exposes one narrow finite-seed dispersion
 discrepancy: for `dataset_361234 / UR-WECA(P2E)`, coverage mean/SD and length
 mean pass, while the 20-seed sample length SD is `0.201898618094345` versus the
@@ -45,7 +55,8 @@ unexpected drift.
 The fail-closed policy therefore requires all 94 unaffected cells (376 scalars)
 to reproduce within the predeclared tolerances, requires the one exact CA
 dispersion cell and all 27 CCP source-discrepant cells to be classified, and
-rejects any outside-tolerance cell outside those certified sets. The empirical
+requires all 72 reversible source-position scalars to replay within tolerance.
+It rejects any outside-tolerance cell outside those certified sets. The empirical
 claim verifier keeps the actual paper-defined log/square-root/linear formulas;
 it never swaps labels, substitutes the released power calibrator, or widens a
 tolerance merely to make the appendix table appear to match.

@@ -15,6 +15,18 @@ KNOWN_CCP_TABLE_DISCREPANCY_METHODS = {
     "ECCP(linear)": "paper F3=2(1-p), released table position uses 5(1-p)^4",
 }
 
+# The released driver placed square-root output under the paper's F1/log
+# column and log output under its F2/square-root column.  Those two mistakes
+# are reversible from the formula-faithful raw results, so require a numerical
+# table replay instead of merely classifying the affected cells.  The F3
+# position used a power calibrator that the paper never specified; its source
+# contract remains hash-bound separately because the paper-faithful 13-method
+# run intentionally retains linear F3 rather than silently substituting power.
+SOURCE_TABLE_REPLAY_METHODS = {
+    "ECCP(log)": "ECCP(sqrt)",
+    "ECCP(sqrt)": "ECCP(log)",
+}
+
 # The exact released CA run (20 fixed seeds, pinned source/data) reproduces the
 # first three reported statistics for this cell, but its sample SD is
 # 0.201898618094345 versus the paper's rounded 0.18.  This is one scalar, not a
@@ -200,10 +212,31 @@ def main() -> None:
     ]
     unexpected_outside = [item for item in unaffected if not item["within_tolerance"]]
 
+    source_table_replays: list[dict[str, object]] = []
+    for dataset, models in headlines["cross_conformal"].items():
+        for model, methods in models.items():
+            for paper_method, released_method in SOURCE_TABLE_REPLAY_METHODS.items():
+                source_table_replays.append(
+                    {
+                        "study": "released_source_table_replay",
+                        "dataset": dataset,
+                        "model": model,
+                        "paper_method": paper_method,
+                        "released_method": released_method,
+                        "reason": KNOWN_CCP_TABLE_DISCREPANCY_METHODS[paper_method],
+                        **comparison(
+                            ccp["summaries"][dataset][model][released_method],
+                            methods[paper_method],
+                            policy,
+                        ),
+                    }
+                )
+
     result = {
         "paper_source": headlines["source"],
         "comparison_policy": policy,
         "comparisons": comparisons,
+        "source_table_replay_comparisons": source_table_replays,
         "summary": {
             "comparison_count": len(comparisons),
             "within_tolerance_count": sum(item["within_tolerance"] for item in comparisons),
@@ -233,6 +266,19 @@ def main() -> None:
             ),
             "known_discrepancy_outside_tolerance_count": sum(
                 not item["within_tolerance"] for item in known_ccp_discrepancies
+            ),
+            "source_table_replay_comparison_count": len(source_table_replays),
+            "source_table_replay_within_tolerance_count": sum(
+                item["within_tolerance"] for item in source_table_replays
+            ),
+            "source_table_replay_scalar_comparison_count": sum(
+                len(item["metric_checks"]) for item in source_table_replays
+            ),
+            "source_table_replay_within_tolerance_scalar_count": sum(
+                sum(item["metric_checks"].values()) for item in source_table_replays
+            ),
+            "all_source_table_replays_within_tolerance": all(
+                item["within_tolerance"] for item in source_table_replays
             ),
             "known_ca_dispersion_discrepancy_count": len(known_ca_dispersion),
             "known_ca_dispersion_scalar_count": sum(

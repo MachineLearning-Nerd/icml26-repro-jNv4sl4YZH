@@ -656,7 +656,11 @@ def main() -> None:
     headlines = load_json("outputs/paper_headline_comparison.json")
     assert_summary(
         headlines,
-        ("all_unaffected_within_tolerance", "all_outside_tolerance_cells_accounted_for"),
+        (
+            "all_unaffected_within_tolerance",
+            "all_outside_tolerance_cells_accounted_for",
+            "all_source_table_replays_within_tolerance",
+        ),
     )
     assert headlines["paper_source"] == headline_config["source"]
     assert all(
@@ -671,6 +675,13 @@ def main() -> None:
     assert headlines["summary"]["unaffected_within_tolerance_scalar_count"] == 376
     assert headlines["summary"]["known_discrepancy_comparison_count"] == 27
     assert headlines["summary"]["known_discrepancy_scalar_comparison_count"] == 108
+    assert headlines["summary"]["source_table_replay_comparison_count"] == 18
+    assert headlines["summary"]["source_table_replay_within_tolerance_count"] == 18
+    assert headlines["summary"]["source_table_replay_scalar_comparison_count"] == 72
+    assert (
+        headlines["summary"]["source_table_replay_within_tolerance_scalar_count"]
+        == 72
+    )
     assert headlines["summary"]["known_ca_dispersion_discrepancy_count"] == 1
     assert headlines["summary"]["known_ca_dispersion_scalar_count"] == 4
     assert headlines["summary"]["known_ca_dispersion_within_tolerance_scalar_count"] == 3

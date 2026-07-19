@@ -532,5 +532,7 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   gate preserves formula-faithful labels, requires all 376 unaffected paper
   scalars to pass, exactly classifies the one CA finite-seed length-SD mismatch
   (`0.201898618094345` reproduced versus `0.18` reported), classifies the 108
-  CCP source-affected scalars, and rejects any unexpected drift. The evidence
+  CCP source-affected scalars, numerically replays all 72 scalars in the
+  reversible released log/square-root column swap, and rejects any unexpected
+  drift. The evidence
   bundle will contain 21 records.

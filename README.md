@@ -117,7 +117,9 @@ the 122 tabulated paper cells, requires all 376 unaffected scalars to pass,
 requires the exact one-scalar CA finite-seed dispersion mismatch to be
 explicitly disclosed, and requires all 108 scalars in the
 paper/released-code F1/F2/F3 inconsistency to be source-hash-bound and
-explicitly classified. It also requires all 24 CA material-efficiency comparisons
+explicitly classified. The reversible released log/square-root column swap is
+additionally replayed against the paper table, and all 72 available scalars
+must pass the same fixed tolerances. It also requires all 24 CA material-efficiency comparisons
 and all 36 CCP calibrator comparisons (including nine AoN cells), scans for
 secrets/local paths, and emits a SHA-256 manifest only if the complete
 publication gate passes. It also creates
