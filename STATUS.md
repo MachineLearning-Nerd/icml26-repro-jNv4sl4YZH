@@ -436,4 +436,5 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   emitting neither manifest nor bundle. At `2026-07-19 21:24 IST`, the
   untouched CA worker remained active at `97.9%` CPU with `24:53:42` CPU time
   and about `191 MB` RSS; both serialized handoffs and the shared HF drain
-  remained alive.
+  remained alive. The implementation is committed at `a421cbd`; the refreshed
+  post-CCP watcher owns its singleton lock as PID `3567976`.
