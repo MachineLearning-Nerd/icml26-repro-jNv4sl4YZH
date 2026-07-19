@@ -138,6 +138,12 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   `5%/10%`. Editing the configuration cannot widen those values unnoticed.
   The comparator now aborts on any non-finite input or nonpositive paper length
   denominator; a NaN fixture is rejected rather than serialized.
+- Audited the rendered logbook for stale status contradictions. Scaffold-time
+  Claim 2, Claim 3, mechanism, and Conclusion cells are now explicitly dated
+  historical notes and name the later evidence-derived verdict that supersedes
+  them. The final Conclusion still becomes authoritative only when pinned and
+  containing `FULL_GATE_READY: jNv4sl4YZH`. Trackio's agent reader confirms the
+  hierarchy; 18 tests and a 63-file hygiene scan pass.
 - Ran all eighteen local mechanism/protocol/author-launcher/raw-verifier and
   paper-headline drift-control tests successfully (including positive and
   deliberately incomplete raw fixtures), including local-only Trackio artifact

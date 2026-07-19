@@ -5,7 +5,7 @@
 <!-- trackio-cell
 {"type": "markdown", "id": "cell_eb2f15259b0e", "created_at": "2026-07-18T12:24:41+00:00", "title": "Current outcome", "pinned": true, "pinned_at": "2026-07-18T12:24:49+00:00"}
 -->
-Claim 1 is verified by two independent paths. Claims 2 and 3 are not yet asserted: their full paper-scale source runs and independent raw-result checks are required before this logbook can be published.
+**Initial gate state (2026-07-18; historical):** Claim 1 was verified by two independent paths, while Claims 2 and 3 were intentionally not asserted before their paper-scale runs. This scaffold-time note is superseded only by the later pinned **Final outcome** cell containing `FULL_GATE_READY: jNv4sl4YZH`; without that marker, publication remains prohibited.
 
 ## Scope & cost
 
@@ -15,4 +15,4 @@ Claim 1 is verified by two independent paths. Claims 2 and 3 are not yet asserte
 | C2 | Four OpenML tasks x 20 seeds, queued | Same released source protocol |
 | C3 | Three datasets x 100 seeds, queued | Same released source protocol |
 | Hardware | Local CPU; no GPU required | Local CPU |
-| Outcome | In progress; no publication claim | Pending full execution |
+| Outcome at scaffold time | In progress; no publication claim | Superseded only by the later pinned full-gate verdict |

@@ -5,7 +5,7 @@
 <!-- trackio-cell
 {"type": "markdown", "id": "cell_6c5d46256087", "created_at": "2026-07-18T12:24:40+00:00", "title": "Full protocol queued"}
 -->
-The full cross-conformal protocol will run the three bundled paper datasets with 100 seeds each and the paper fold counts: Boston `K=15`, Abalone `K=15`, Parkinson `K=20`. The source estimators remain unmodified; the wrapper only supplies the paper configuration and persists raw rows for independent aggregation. Results are pending execution.
+**Initial execution plan (2026-07-18; historical):** the full cross-conformal protocol was configured for the three bundled paper datasets with 100 seeds each and the paper fold counts: Boston `K=15`, Abalone `K=15`, Parkinson `K=20`. The source estimators remain unmodified; the wrapper only supplies the paper configuration and persists raw rows for independent aggregation. The authoritative outcome is the later **Claim 3 verdict** cell, which the final gate derives from exactly 11,700 verified raw cells plus the exact mechanism certificate.
 
 
 ---
@@ -210,7 +210,7 @@ if __name__ == "__main__":
 <!-- trackio-cell
 {"type": "markdown", "id": "cell_71325b8b46f5", "created_at": "2026-07-18T12:27:18+00:00", "title": "Mechanism check result"}
 -->
-A clean-room enumeration of six finite rank/fold configurations confirms that arithmetic e-merging retains exact mean one and that the Markov prediction-set event reaches at least `1-alpha` in every case. A deliberately invalid 2x scaling falls below the required coverage in 2/6 configurations (for example, `.8264 < .9` at `n=10`, two folds), while being accidentally conservative in the other configurations. This is retained as a control result, not generalized. The full 100-seed source CCP protocol is still required and remains pending.
+**Initial six-case nonuniform audit (historical):** this first clean-room enumeration confirmed that arithmetic e-merging retains exact mean one and that the Markov prediction-set event reaches at least `1-alpha` in six WECA-style configurations. The later **Expanded mechanism verdict** adds two explicit equal-weight ECCP cases and is authoritative: 8/8 valid cases pass and outcome-adaptive weighting fails 8/8. Neither mechanism cell replaces the separately required 11,700-cell empirical CCP verdict.
 
 
 ---
