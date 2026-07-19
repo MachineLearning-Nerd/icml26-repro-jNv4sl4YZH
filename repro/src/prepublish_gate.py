@@ -675,6 +675,24 @@ def main() -> None:
     assert headlines["summary"]["unaffected_within_tolerance_scalar_count"] == 376
     assert headlines["summary"]["known_discrepancy_comparison_count"] == 27
     assert headlines["summary"]["known_discrepancy_scalar_comparison_count"] == 108
+    replay_contract = {
+        (dataset, model, paper_method, released_method)
+        for dataset in ("boston", "abalone", "parkinson")
+        for model in ("OLS", "RF", "Lasso")
+        for paper_method, released_method in (
+            ("ECCP(log)", "ECCP(sqrt)"),
+            ("ECCP(sqrt)", "ECCP(log)"),
+        )
+    }
+    assert {
+        (
+            row["dataset"],
+            row["model"],
+            row["paper_method"],
+            row["released_method"],
+        )
+        for row in headlines["source_table_replay_comparisons"]
+    } == replay_contract
     assert headlines["summary"]["source_table_replay_comparison_count"] == 18
     assert headlines["summary"]["source_table_replay_within_tolerance_count"] == 18
     assert headlines["summary"]["source_table_replay_scalar_comparison_count"] == 72

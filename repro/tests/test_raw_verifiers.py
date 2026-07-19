@@ -86,6 +86,16 @@ class RawVerifierTests(unittest.TestCase):
                 matching["summary"]["source_table_replay_scalar_comparison_count"],
                 72,
             )
+            self.assertEqual(
+                {
+                    (row["paper_method"], row["released_method"])
+                    for row in matching["source_table_replay_comparisons"]
+                },
+                {
+                    ("ECCP(log)", "ECCP(sqrt)"),
+                    ("ECCP(sqrt)", "ECCP(log)"),
+                },
+            )
 
             ca["summaries"]["dataset_361234"]["UR-WECA(P2E)"][
                 "length_sd"
