@@ -227,12 +227,20 @@ def main() -> None:
     claim2 = load_json("outputs/claim2_independent.json")
     assert_summary(
         claim2,
-        ("all_four_tasks_present", "all_full_seed_method_cells_present", "exact_cell_set"),
+        (
+            "all_four_tasks_present",
+            "all_full_seed_method_cells_present",
+            "exact_cell_set",
+            "all_substantial_efficiency_gains",
+        ),
     )
     claim2_summary = claim2["summary"]
     assert claim2["rows_seen"] == claim2_summary["expected_rows"] == 1_920
     assert claim2_summary["observed_unique_cells"] == 1_920
     assert claim2_summary["comparison_count"] == claim2_summary["p2e_shorter_count"] == 24
+    assert claim2_summary["substantial_efficiency_gain_count"] == 24
+    assert claim2_summary["minimum_substantial_relative_reduction"] == 0.10
+    assert claim2_summary["minimum_observed_relative_reduction"] >= 0.10
     assert claim2_summary["duplicate_cell_count"] == 0
     assert claim2_summary["unexpected_row_count"] == 0
     assert claim2_summary["nonfinite_row_count"] == 0

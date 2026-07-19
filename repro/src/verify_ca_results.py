@@ -12,6 +12,7 @@ from pathlib import Path
 
 
 COMPARATORS = ("log", "sqrt", "linear")
+MIN_SUBSTANTIAL_RELATIVE_REDUCTION = 0.10
 CALIBRATORS = ("log", "linear", "sqrt", "AoN", "P2E")
 EXPECTED_METHODS = (
     "CM",
@@ -127,6 +128,11 @@ def main() -> None:
                     continue
                 p2e_length = float(p2e_value)
                 baseline_length = float(baseline_value)
+                relative_reduction = (
+                    (baseline_length - p2e_length) / baseline_length
+                    if baseline_length > 0.0
+                    else None
+                )
                 comparisons.append(
                     {
                         "dataset": dataset,
@@ -135,11 +141,22 @@ def main() -> None:
                         "p2e_length": p2e_length,
                         "baseline_length": baseline_length,
                         "absolute_reduction": baseline_length - p2e_length,
+                        "relative_reduction": relative_reduction,
                         "p2e_is_shorter": p2e_length < baseline_length,
+                        "substantial_efficiency_gain": (
+                            relative_reduction is not None
+                            and relative_reduction >= MIN_SUBSTANTIAL_RELATIVE_REDUCTION
+                        ),
                     }
                 )
 
     target = 1.0 - float(protocol["alpha"])
+    substantial_count = sum(row["substantial_efficiency_gain"] for row in comparisons)
+    finite_relative_reductions = [
+        float(row["relative_reduction"])
+        for row in comparisons
+        if row["relative_reduction"] is not None
+    ]
     result = {
         "protocol": protocol,
         "rows_seen": rows_seen,
@@ -158,6 +175,14 @@ def main() -> None:
             "exact_cell_set": observed_cells == expected_cells,
             "comparison_count": len(comparisons),
             "p2e_shorter_count": sum(row["p2e_is_shorter"] for row in comparisons),
+            "substantial_efficiency_gain_count": substantial_count,
+            "all_substantial_efficiency_gains": (
+                bool(comparisons) and substantial_count == len(comparisons)
+            ),
+            "minimum_substantial_relative_reduction": MIN_SUBSTANTIAL_RELATIVE_REDUCTION,
+            "minimum_observed_relative_reduction": (
+                min(finite_relative_reductions) if finite_relative_reductions else None
+            ),
             "nominal_coverage": target,
         },
     }

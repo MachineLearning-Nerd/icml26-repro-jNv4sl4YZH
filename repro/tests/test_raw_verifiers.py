@@ -104,7 +104,7 @@ class RawVerifierTests(unittest.TestCase):
                     "Method": method,
                     "Seed": seed,
                     "Coverage": 0.95,
-                    "Avg Length": 1.0,
+                    "Avg Length": 0.8 if method.endswith("(P2E)") else 1.0,
                 }
                 for method in load_ca_methods()
                 for seed in protocol["seeds"]
@@ -119,6 +119,36 @@ class RawVerifierTests(unittest.TestCase):
             self.assertEqual(passed["summary"]["duplicate_cell_count"], 0)
             self.assertEqual(passed["summary"]["unexpected_row_count"], 0)
             self.assertEqual(passed["summary"]["nonfinite_row_count"], 0)
+            self.assertEqual(passed["summary"]["comparison_count"], 6)
+            self.assertEqual(passed["summary"]["p2e_shorter_count"], 6)
+            self.assertEqual(
+                passed["summary"]["substantial_efficiency_gain_count"], 6
+            )
+            self.assertTrue(passed["summary"]["all_substantial_efficiency_gains"])
+            self.assertAlmostEqual(
+                passed["summary"]["minimum_observed_relative_reduction"], 0.2
+            )
+
+            payload["rows"] = [
+                {
+                    **row,
+                    "Avg Length": 0.95
+                    if str(row["Method"]).endswith("(P2E)")
+                    else row["Avg Length"],
+                }
+                for row in rows
+            ]
+            (raw / "toy.json").write_text(json.dumps(payload), encoding="utf-8")
+            merely_shorter = invoke(
+                "verify_ca_results.py", raw, raw / "merely_shorter.json"
+            )
+            self.assertEqual(merely_shorter["summary"]["p2e_shorter_count"], 6)
+            self.assertEqual(
+                merely_shorter["summary"]["substantial_efficiency_gain_count"], 0
+            )
+            self.assertFalse(
+                merely_shorter["summary"]["all_substantial_efficiency_gains"]
+            )
 
             payload["rows"] = rows[:-1]
             (raw / "toy.json").write_text(json.dumps(payload), encoding="utf-8")

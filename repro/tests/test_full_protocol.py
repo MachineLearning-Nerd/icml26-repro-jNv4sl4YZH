@@ -114,9 +114,17 @@ class FullProtocolTests(unittest.TestCase):
                 "expected_rows": 1_920,
                 "comparison_count": 24,
                 "p2e_shorter_count": 24,
+                "substantial_efficiency_gain_count": 24,
+                "all_substantial_efficiency_gains": True,
+                "minimum_substantial_relative_reduction": 0.10,
+                "minimum_observed_relative_reduction": 0.90,
             },
             "efficiency_comparisons": [
-                {"absolute_reduction": 9.0, "baseline_length": 10.0}
+                {
+                    "absolute_reduction": 9.0,
+                    "baseline_length": 10.0,
+                    "relative_reduction": 0.90,
+                }
                 for _ in range(24)
             ],
             "summaries": {

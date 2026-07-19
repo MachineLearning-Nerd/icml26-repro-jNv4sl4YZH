@@ -51,6 +51,7 @@ def build_cells(
         "all_four_tasks_present",
         "all_full_seed_method_cells_present",
         "exact_cell_set",
+        "all_substantial_efficiency_gains",
     )
     require_true(
         mechanism_summary,
@@ -68,6 +69,10 @@ def build_cells(
         raise RuntimeError("Claim 2 raw-row count is not 1,920")
     if c2_summary["comparison_count"] != 24 or c2_summary["p2e_shorter_count"] != 24:
         raise RuntimeError("Claim 2 does not pass all 24 efficiency comparisons")
+    if c2_summary["substantial_efficiency_gain_count"] != 24:
+        raise RuntimeError("Claim 2 does not pass all 24 substantial-gain checks")
+    if c2_summary["minimum_substantial_relative_reduction"] != 0.10:
+        raise RuntimeError("Claim 2 materiality threshold drifted from 10%")
     if claim3["rows_seen"] != 11_700 or c3_summary["expected_rows"] != 11_700:
         raise RuntimeError("Claim 3 raw-row count is not 11,700")
     if headline_summary["comparison_count"] != 17:
@@ -79,10 +84,7 @@ def build_cells(
 
     efficiency = claim2["efficiency_comparisons"]
     assert isinstance(efficiency, list)
-    relative_reductions = [
-        float(row["absolute_reduction"]) / float(row["baseline_length"])
-        for row in efficiency
-    ]
+    relative_reductions = [float(row["relative_reduction"]) for row in efficiency]
     ca_coverages = [
         float(methods[method]["coverage_mean"])
         for methods in claim2["summaries"].values()
@@ -116,7 +118,7 @@ def build_cells(
         "headline_scalars": int(headline_summary["scalar_comparison_count"]),
     }
 
-    claim2_markdown = f"""Claim 2 is verified at the complete released scale. The independent verifier accepted exactly {summary['claim2_raw_rows']:,} unique finite raw cells (four OpenML tasks, 20 fixed seeds, 24 methods) with no missing, duplicate, unexpected, or non-finite cells. P2E is shorter than log, square-root, and linear p-to-e calibrators in {summary['claim2_efficiency_wins']}/{summary['claim2_efficiency_comparisons']} matched WECA/UR-WECA comparisons; relative length reductions range from {100 * summary['claim2_minimum_relative_reduction']:.2f}% to {100 * summary['claim2_maximum_relative_reduction']:.2f}%. The eight P2E CA coverage means span {summary['claim2_p2e_coverage_min']:.4f}–{summary['claim2_p2e_coverage_max']:.4f}."""
+    claim2_markdown = f"""Claim 2 is verified at the complete released scale. The independent verifier accepted exactly {summary['claim2_raw_rows']:,} unique finite raw cells (four OpenML tasks, 20 fixed seeds, 24 methods) with no missing, duplicate, unexpected, or non-finite cells. P2E clears the predeclared 10% materiality threshold against log, square-root, and linear p-to-e calibrators in {summary['claim2_efficiency_wins']}/{summary['claim2_efficiency_comparisons']} matched WECA/UR-WECA comparisons; relative length reductions range from {100 * summary['claim2_minimum_relative_reduction']:.2f}% to {100 * summary['claim2_maximum_relative_reduction']:.2f}%. The eight P2E CA coverage means span {summary['claim2_p2e_coverage_min']:.4f}–{summary['claim2_p2e_coverage_max']:.4f}."""
 
     claim3_markdown = f"""Claim 3 is verified by complementary empirical and mechanism evidence. The full released CCP protocol produced exactly {summary['claim3_raw_rows']:,} unique finite cells (three datasets, 100 seeds, three models, 13 methods), with ECCP coverage means spanning {summary['claim3_eccp_coverage_min']:.4f}–{summary['claim3_eccp_coverage_max']:.4f}. An independent sparse LP maximized rejection probability over every joint coupling with uniform conformal-rank marginals in six nonuniform fixed-weight cases; all valid cases stayed at or below alpha (maximum tail/alpha ratio {summary['claim3_valid_tail_to_alpha_max']:.6f}), while inference-adaptive max weighting failed 6/6. Together with the CA outputs, this checks both applications named by the claim and WECA's independent-tuning condition."""
 

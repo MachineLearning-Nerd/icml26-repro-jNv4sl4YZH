@@ -91,6 +91,15 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   pinned in `repro/configs/jury_claims.json` and
   `docs/jury_claim_evidence_matrix.md`; the publication gate enforces this
   snapshot. All `16/16` tests pass after adding the claim-scope check.
+- Tightened C2's qualitative word "substantial" into a fail-closed numerical
+  rule before the final dataset exists: every one of the 24 matched P2E versus
+  log/square-root/linear comparisons must reduce interval length by at least
+  10%. The verifier now records per-comparison relative reductions and the
+  minimum; the renderer and final gate require all 24 to pass. A dedicated
+  negative test confirms that results can be shorter in 6/6 comparisons yet
+  correctly fail when the reduction is only 5%. The 18 comparisons from the
+  three completed real datasets currently exceed this threshold by a wide
+  margin (minimum `87.82%`).
 - Ran all fifteen local mechanism/protocol/author-launcher/raw-verifier and
   paper-headline drift-control tests successfully (including positive and
   deliberately incomplete raw fixtures), including local-only Trackio artifact
