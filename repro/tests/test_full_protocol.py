@@ -435,13 +435,20 @@ class FullProtocolTests(unittest.TestCase):
                 "all_merged_expectations_exact": True,
                 "all_markov_coverage_events_pass": True,
                 "all_arbitrary_dependence_coverage_pass": True,
+                "all_randomized_uniform_coverage_events_pass": True,
+                "all_randomized_arbitrary_dependence_coverage_pass": True,
                 "invalid_scaling_control_detected": True,
                 "invalid_arbitrary_dependence_detected": True,
+                "invalid_randomized_arbitrary_dependence_detected": True,
                 "adaptive_weight_control_detected": True,
+                "adaptive_randomized_weight_control_detected": True,
                 "invalid_scaling_control_rejection_count": 2,
                 "invalid_arbitrary_dependence_rejection_count": 4,
+                "invalid_randomized_arbitrary_dependence_rejection_count": 8,
                 "adaptive_weight_rejection_count": 8,
+                "adaptive_randomized_weight_rejection_count": 8,
                 "maximum_valid_tail_to_alpha_ratio": 0.95,
+                "maximum_valid_randomized_tail_to_alpha_ratio": 1.0,
             }
         }
         weca_independence = {

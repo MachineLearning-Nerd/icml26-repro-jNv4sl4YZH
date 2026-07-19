@@ -39,13 +39,16 @@ but unpublished.
    counts; independently recompute all interval coverages/lengths and include
    nominal/invalid-calibrator controls. A separate eight-cell finite-rank
    e-merge enumeration already verifies the exact mean-one mechanism and all
-   `1-alpha` Markov events. An exact sparse linear program additionally
-   maximizes failure probability over every joint coupling with the required
-   uniform conformal-rank marginals: all 8/8 fixed-weight worst cases remain at
-   or below `alpha`, including two equal-weight ECCP and six nonuniform
-   tuning-independent WECA cases. A 2x-invalid-e-value control is correctly
-   reported as only 4/8 under the LP (it remains conservative in four cases),
-   while forbidden outcome-adaptive max weighting violates the bound in 8/8.
+   deterministic `1-alpha` Markov events. Exact sparse linear programs
+   additionally maximize both deterministic-threshold rejection probability
+   and the paper's independent-uniform randomized-threshold failure probability
+   over every joint coupling with the required uniform conformal-rank
+   marginals: all 8/8 fixed-weight worst cases remain at or below `alpha`,
+   including two equal-weight ECCP and six nonuniform tuning-independent WECA
+   cases. A 2x-invalid-e-value control is correctly reported as only 4/8 under
+   the deterministic LP (it remains conservative in four cases) but fails 8/8
+   randomized LPs, while forbidden outcome-adaptive max weighting violates
+   both bounds in 8/8.
    This directly checks both ECCP and WECA's independent-tuning requirement,
    but does not replace the queued empirical run.
 
@@ -103,9 +106,10 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   margin (minimum `87.82%`).
 - Expanded the exact C3 mechanism suite from six nonuniform WECA cases to
   eight cases by adding explicit equal-weight two- and three-fold ECCP merges.
-  All 8/8 valid arbitrary-dependence LP optima pass; outcome-adaptive weighting
-  fails 8/8. A separate permutation enumeration independently matches the
-  two-fold LP optimum, and malformed/negative/non-normalized weights are
+  All 8/8 valid arbitrary-dependence LP optima pass for both deterministic and
+  paper-exact randomized thresholds; outcome-adaptive weighting fails 8/8
+  under both rules. Separate permutation enumerations independently match the
+  two-fold deterministic and randomized LP optima, and malformed/negative/non-normalized weights are
   rejected. The refreshed result is captured in Trackio and closes the
   previously implicit ECCP mechanism scope.
 - Added a pre-final-result empirical coverage sanity gate for both applications
@@ -389,3 +393,19 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   manifest nor evidence bundle. At `2026-07-19 20:55 IST`, the untouched
   legacy CA worker remained compute-active at `97.9%` CPU with `24:24:44` CPU
   time and about `193 MB` RSS; both serialized handoffs remained alive.
+- The Claim-3 mechanism certificate now matches the released randomized
+  constructions exactly. For every rank tuple it evaluates both the ordinary
+  `1/alpha` failure indicator and the conditional failure cost
+  `min(alpha * merged_e, 1)` induced by the independent uniform threshold used
+  by ECCP and UR-WECA, then maximizes each over all couplings with uniform rank
+  marginals. All 8/8 valid cases pass both adversarial LPs; the maximum
+  randomized failure/alpha ratio is `1.0`. Invalid 2x scaling fails all 8/8
+  randomized LPs, and inference-adaptive max weighting fails 8/8 under both
+  thresholds. The updated output and source are captured in Trackio, and the
+  renderer and publication gate require the new deterministic-plus-randomized
+  fields. All 28 tests, compilation, shell checks, hygiene, and no-write
+  publication preflight pass. A real premature gate accepts the expanded
+  mechanism certificate and then still stops at the missing fourth CA artifact,
+  emitting neither manifest nor bundle. At `2026-07-19 21:03 IST`, the
+  untouched CA worker remained compute-active at `97.9%` CPU with `24:33:01`
+  CPU time and about `193 MB` RSS; both serialized handoffs remained alive.

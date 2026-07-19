@@ -354,8 +354,12 @@ def main() -> None:
             "all_arbitrary_dependence_coverage_pass",
             "all_markov_coverage_events_pass",
             "all_merged_expectations_exact",
+            "all_randomized_arbitrary_dependence_coverage_pass",
+            "all_randomized_uniform_coverage_events_pass",
+            "adaptive_randomized_weight_control_detected",
             "adaptive_weight_control_detected",
             "invalid_arbitrary_dependence_detected",
+            "invalid_randomized_arbitrary_dependence_detected",
             "invalid_scaling_control_detected",
         ),
     )
@@ -363,8 +367,10 @@ def main() -> None:
     assert mechanism["summary"]["equal_weight_case_count"] == 2
     assert mechanism["summary"]["nonuniform_weight_case_count"] == 6
     assert mechanism["summary"]["invalid_arbitrary_dependence_rejection_count"] == 4
+    assert mechanism["summary"]["invalid_randomized_arbitrary_dependence_rejection_count"] == 8
     assert mechanism["summary"]["invalid_scaling_control_rejection_count"] == 2
     assert mechanism["summary"]["adaptive_weight_rejection_count"] == 8
+    assert mechanism["summary"]["adaptive_randomized_weight_rejection_count"] == 8
 
     weca_independence = load_json("outputs/weca_independence_audit.json")
     assert weca_independence["source"] == (
@@ -483,6 +489,7 @@ def main() -> None:
         ),
         ".trackio/logbook/pages/claim-3/page.md": (
             "Independent full CCP raw verification",
+            "Deterministic and randomized arbitrary-dependence coupling LP",
         ),
         ".trackio/logbook/pages/methods-source-audit/page.md": (
             "Primary TeX table fixture audit",

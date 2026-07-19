@@ -15,9 +15,10 @@ protocol, rather than treating a small synthetic example as a substitute:
    advertised `1 - alpha` guarantee; the paper-scale CCP runs cover Boston,
    Abalone, and Parkinson data with 100 seeds each.
 
-The mechanism audit includes exact rank-tuple enumeration and a sparse linear
-program over every joint coupling with the prescribed rank marginals, so the
-coverage check is not restricted to independent folds. See
+The mechanism audit includes exact rank-tuple enumeration and sparse linear
+programs over every joint coupling with the prescribed rank marginals, for
+both deterministic and the paper's independent-uniform randomized thresholds,
+so the coverage check is not restricted to independent folds. See
 [`docs/arbitrary_dependence_coverage.md`](docs/arbitrary_dependence_coverage.md).
 The exact current jury wording and the evidence/gate for each claim are mapped
 in [`docs/jury_claim_evidence_matrix.md`](docs/jury_claim_evidence_matrix.md).
