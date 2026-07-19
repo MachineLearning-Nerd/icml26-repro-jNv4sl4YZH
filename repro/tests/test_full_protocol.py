@@ -27,6 +27,11 @@ from repro.src.verify_paper_table_fixture import (
     SOURCE_URL,
     mismatch_paths,
 )
+from repro.src.verify_weca_independence import (
+    METHODS_SHA256,
+    WECA_FUNCTION_SHA256,
+    source_contract,
+)
 
 
 class FullProtocolTests(unittest.TestCase):
@@ -285,6 +290,31 @@ class FullProtocolTests(unittest.TestCase):
         self.assertEqual(mismatch_paths({"cell": 1.0}, {"cell": 2.0}), ["cell"])
         self.assertEqual(mismatch_paths({"cell": 1.0}, {"cell": 1.0}), [])
 
+    def test_weca_independence_audit_is_bound_to_released_source(self):
+        root = Path(__file__).resolve().parents[2]
+        audit = json.loads(
+            (root / "outputs/weca_independence_audit.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        self.assertEqual(audit["methods_sha256"], METHODS_SHA256)
+        self.assertEqual(audit["function_contract"]["sha256"], WECA_FUNCTION_SHA256)
+        self.assertEqual(
+            audit["summary"],
+            {
+                "all_illegal_test_adaptive_controls_change": True,
+                "all_required_flow_present": True,
+                "all_split_partitions_disjoint": True,
+                "all_weights_independent_of_final_calibration": True,
+                "all_weights_independent_of_test_data_and_outcomes": True,
+                "case_count": 6,
+            },
+        )
+        source = (root / "upstream/e-ca/methods.py").read_text(encoding="utf-8")
+        self.assertEqual(source_contract(source)["sha256"], WECA_FUNCTION_SHA256)
+        with self.assertRaises(RuntimeError):
+            source_contract(source.replace("X2 = _rows(X_calib, i2)", "X2 = X_test"))
+
     def test_trackio_evidence_bundle_is_hash_indexed_and_roundtrips_json(self):
         root = Path(__file__).resolve().parents[2]
         with tempfile.TemporaryDirectory(dir=root / "outputs") as temp:
@@ -383,6 +413,16 @@ class FullProtocolTests(unittest.TestCase):
                 "maximum_valid_tail_to_alpha_ratio": 0.95,
             }
         }
+        weca_independence = {
+            "summary": {
+                "all_illegal_test_adaptive_controls_change": True,
+                "all_required_flow_present": True,
+                "all_split_partitions_disjoint": True,
+                "all_weights_independent_of_final_calibration": True,
+                "all_weights_independent_of_test_data_and_outcomes": True,
+                "case_count": 6,
+            }
+        }
         claim3 = {
             "protocol": {"execution_adapter": "vectorized-exact-postprocessing-v1"},
             "rows_seen": 11_700,
@@ -424,11 +464,15 @@ class FullProtocolTests(unittest.TestCase):
             }
         }
 
-        cells = build_cells(claim1, claim2, mechanism, claim3, headlines)
+        cells = build_cells(
+            claim1, claim2, mechanism, weca_independence, claim3, headlines
+        )
         self.assertIn("FULL_GATE_READY: jNv4sl4YZH", cells["conclusion"])
         self.assertIn("24/24", cells["claim_2"])
         self.assertEqual(cells["summary"]["headline_scalars"], 392)
 
         claim2["summary"]["p2e_shorter_count"] = 23
         with self.assertRaises(RuntimeError):
-            build_cells(claim1, claim2, mechanism, claim3, headlines)
+            build_cells(
+                claim1, claim2, mechanism, weca_independence, claim3, headlines
+            )

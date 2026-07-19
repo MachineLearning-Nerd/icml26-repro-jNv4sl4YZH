@@ -315,6 +315,7 @@ def main() -> None:
         [sys.executable, "repro/src/verify_p2e_identity.py", "--output", "outputs/claim1_independent.json"],
         [sys.executable, "repro/src/crosscheck_source_p2e.py", "--source", "upstream", "--output", "outputs/claim1_source_crosscheck.json"],
         [sys.executable, "repro/src/verify_e_merge_coverage.py", "--output", "outputs/claim3_independent_e_merge.json"],
+        [sys.executable, "repro/src/verify_weca_independence.py", "--source", "upstream", "--output", "outputs/weca_independence_audit.json"],
         [sys.executable, "repro/src/verify_ca_results.py", "--raw-dir", "outputs/raw/author_ca", "--output", "outputs/claim2_independent.json"],
         [sys.executable, "repro/src/verify_ccp_results.py", "--raw-dir", "outputs/raw/author_ccp", "--output", "outputs/claim3_independent.json"],
         [sys.executable, "repro/src/verify_paper_table_fixture.py", "--output", "outputs/paper_table_fixture_audit.json"],
@@ -361,6 +362,25 @@ def main() -> None:
     assert mechanism["summary"]["invalid_arbitrary_dependence_rejection_count"] == 4
     assert mechanism["summary"]["invalid_scaling_control_rejection_count"] == 2
     assert mechanism["summary"]["adaptive_weight_rejection_count"] == 8
+
+    weca_independence = load_json("outputs/weca_independence_audit.json")
+    assert weca_independence["source"] == (
+        "Nabil-Ala/P2E_calibration@66cb1e1c76d1b1d3d133fe6cb3896c95d48b5974"
+    )
+    assert weca_independence["methods_sha256"] == (
+        "dda5d2429d4ca8c77be6a3b04bb3c159360bf3af58d1087a5f31cc17ea44cf86"
+    )
+    assert weca_independence["function_contract"]["sha256"] == (
+        "541a30601a5346d0adbcf50bb9dcfd2e5e8317f7403fb4540516680a52751bfb"
+    )
+    assert weca_independence["summary"] == {
+        "all_illegal_test_adaptive_controls_change": True,
+        "all_required_flow_present": True,
+        "all_split_partitions_disjoint": True,
+        "all_weights_independent_of_final_calibration": True,
+        "all_weights_independent_of_test_data_and_outcomes": True,
+        "case_count": 6,
+    }
 
     claim2 = load_json("outputs/claim2_independent.json")
     assert_exact_ca_protocol(claim2["protocol"])
@@ -455,14 +475,24 @@ def main() -> None:
     assert headlines["summary"]["within_tolerance_scalar_count"] == 392
 
     required_trackio_text = {
-        ".trackio/logbook/pages/claim-2/page.md": "Independent full CA raw verification",
-        ".trackio/logbook/pages/claim-3/page.md": "Independent full CCP raw verification",
-        ".trackio/logbook/pages/methods-source-audit/page.md": "Primary TeX table fixture audit",
-        ".trackio/logbook/pages/conclusion/page.md": "FULL_GATE_READY: jNv4sl4YZH",
+        ".trackio/logbook/pages/claim-2/page.md": (
+            "Independent full CA raw verification",
+        ),
+        ".trackio/logbook/pages/claim-3/page.md": (
+            "Independent full CCP raw verification",
+        ),
+        ".trackio/logbook/pages/methods-source-audit/page.md": (
+            "Primary TeX table fixture audit",
+            "WECA independent-tuning audit",
+        ),
+        ".trackio/logbook/pages/conclusion/page.md": (
+            "FULL_GATE_READY: jNv4sl4YZH",
+        ),
     }
-    for relative, marker in required_trackio_text.items():
+    for relative, markers in required_trackio_text.items():
         content = (ROOT / relative).read_text(encoding="utf-8")
-        assert marker in content, f"missing Trackio marker {marker!r} in {relative}"
+        for marker in markers:
+            assert marker in content, f"missing Trackio marker {marker!r} in {relative}"
 
     hygiene = hygiene_gate()
     artifacts = (
@@ -470,6 +500,7 @@ def main() -> None:
         "outputs/claim1_source_crosscheck.json",
         "outputs/claim2_independent.json",
         "outputs/claim3_independent_e_merge.json",
+        "outputs/weca_independence_audit.json",
         "outputs/claim3_independent.json",
         "outputs/paper_table_fixture_audit.json",
         "outputs/paper_headline_comparison.json",

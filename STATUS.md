@@ -358,3 +358,18 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   wording-drift controls fail; a real live refresh returned all three exact
   texts. The publisher additionally requires this live verification proof from
   the fresh gate. All 26 tests pass.
+- Claim 3 now includes a direct audit of WECA's independent-tuning assumption,
+  not only the abstract fixed-weight coupling LP. The audit is bound to the
+  pinned `methods.py` and `Evalue_aggregation_weighted` hashes, verifies the
+  released `i1/i2/i3` disjoint dataflow, and runs six released-seed
+  noninterference cases. Arbitrarily changing every final-calibration row or
+  every test covariate/outcome changes selected weights by exactly zero in all
+  cases; a forbidden test-adaptive control changes in 6/6. The final gate,
+  evidence-derived verdict, Trackio, and 16-record bundle now require this
+  artifact. All 27 tests, compilation, shell syntax, preflight, and diff hygiene
+  pass while the legacy final CA task remains uninterrupted.
+- A real premature invocation of the expanded final gate refreshed the live
+  claims, revalidated Claim 1, the eight coupling LP cases, and all six WECA
+  noninterference cases, then stopped at the absent fourth CA artifact. It
+  emitted neither `prepublish_gate.json` nor the 16-record evidence bundle, so
+  the new mechanism evidence does not weaken the full-scale fail-closed rule.

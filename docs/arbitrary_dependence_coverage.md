@@ -38,5 +38,11 @@ instead chooses a one-hot weight on the largest e-value *after observing the
 inference tuple*. That forbidden outcome-adaptive weighting violates the bound
 in all 8/8 cases, with worst-case tail/alpha ratios from `1.818` to `3.636`.
 This cleanly isolates why WECA's weights must come from its independent tuning
-split. This is a finite mechanism audit; the separate full
+split. The complementary source-bound audit
+`repro/src/verify_weca_independence.py` pins the released `methods.py` and WECA
+function hashes, confirms the three calibration partitions are disjoint, and
+reruns the routine across six released seeds. Replacing every final-calibration
+row or every test covariate/outcome leaves each selected weight bit-identical;
+a deliberately forbidden test-outcome-adaptive rule changes in all six cases.
+This is a finite mechanism audit; the separate full
 Boston/Abalone/Parkinson source run remains required for the empirical claim.

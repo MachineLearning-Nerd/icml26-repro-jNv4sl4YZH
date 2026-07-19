@@ -58,6 +58,13 @@ PY
 
 trackio logbook run \
   --page "Methods & source audit" \
+  --title "WECA independent-tuning audit" \
+  -- python repro/src/verify_weca_independence.py \
+  --source upstream \
+  --output outputs/weca_independence_audit.json
+
+trackio logbook run \
+  --page "Methods & source audit" \
   --title "Primary TeX table fixture audit" \
   -- python repro/src/verify_paper_table_fixture.py \
   --output outputs/paper_table_fixture_audit.json

@@ -1,0 +1,196 @@
+{
+  "cases": [
+    {
+      "baseline_weight": [
+        0.3374252443136454,
+        0.3278789386574905,
+        0.33469581702886425
+      ],
+      "final_calibration_mutation_max_abs_weight_change": 0.0,
+      "illegal_test_adaptive_control_changes": true,
+      "illegal_test_adaptive_weights": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ]
+      ],
+      "seed": 42,
+      "split_is_disjoint_partition": true,
+      "split_sizes": {
+        "final_calibration": 20,
+        "tuning": 10,
+        "weight_calibration": 10
+      },
+      "test_mutation_max_abs_weight_change": 0.0
+    },
+    {
+      "baseline_weight": [
+        0.39546198954297845,
+        0.5930180594914135,
+        0.011519950965607977
+      ],
+      "final_calibration_mutation_max_abs_weight_change": 0.0,
+      "illegal_test_adaptive_control_changes": true,
+      "illegal_test_adaptive_weights": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ]
+      ],
+      "seed": 0,
+      "split_is_disjoint_partition": true,
+      "split_sizes": {
+        "final_calibration": 20,
+        "tuning": 10,
+        "weight_calibration": 10
+      },
+      "test_mutation_max_abs_weight_change": 0.0
+    },
+    {
+      "baseline_weight": [
+        0.15880448167679984,
+        0.04564996889225682,
+        0.7955455494309432
+      ],
+      "final_calibration_mutation_max_abs_weight_change": 0.0,
+      "illegal_test_adaptive_control_changes": true,
+      "illegal_test_adaptive_weights": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ]
+      ],
+      "seed": 1,
+      "split_is_disjoint_partition": true,
+      "split_sizes": {
+        "final_calibration": 20,
+        "tuning": 10,
+        "weight_calibration": 10
+      },
+      "test_mutation_max_abs_weight_change": 0.0
+    },
+    {
+      "baseline_weight": [
+        0.30745014424701217,
+        0.4454924156641316,
+        0.24705744008885633
+      ],
+      "final_calibration_mutation_max_abs_weight_change": 0.0,
+      "illegal_test_adaptive_control_changes": true,
+      "illegal_test_adaptive_weights": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ]
+      ],
+      "seed": 7,
+      "split_is_disjoint_partition": true,
+      "split_sizes": {
+        "final_calibration": 20,
+        "tuning": 10,
+        "weight_calibration": 10
+      },
+      "test_mutation_max_abs_weight_change": 0.0
+    },
+    {
+      "baseline_weight": [
+        0.24801565616967766,
+        0.14895724156125947,
+        0.6030271022690629
+      ],
+      "final_calibration_mutation_max_abs_weight_change": 0.0,
+      "illegal_test_adaptive_control_changes": true,
+      "illegal_test_adaptive_weights": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ]
+      ],
+      "seed": 10,
+      "split_is_disjoint_partition": true,
+      "split_sizes": {
+        "final_calibration": 20,
+        "tuning": 10,
+        "weight_calibration": 10
+      },
+      "test_mutation_max_abs_weight_change": 0.0
+    },
+    {
+      "baseline_weight": [
+        0.3614311367971118,
+        0.29961196346993363,
+        0.3389568997329545
+      ],
+      "final_calibration_mutation_max_abs_weight_change": 0.0,
+      "illegal_test_adaptive_control_changes": true,
+      "illegal_test_adaptive_weights": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ]
+      ],
+      "seed": 13,
+      "split_is_disjoint_partition": true,
+      "split_sizes": {
+        "final_calibration": 20,
+        "tuning": 10,
+        "weight_calibration": 10
+      },
+      "test_mutation_max_abs_weight_change": 0.0
+    }
+  ],
+  "function_contract": {
+    "all_required_flow_present": true,
+    "end_line": 509,
+    "function": "Evalue_aggregation_weighted",
+    "required_flow_checks": 11,
+    "sha256": "541a30601a5346d0adbcf50bb9dcfd2e5e8317f7403fb4540516680a52751bfb",
+    "start_line": 388
+  },
+  "methods_sha256": "dda5d2429d4ca8c77be6a3b04bb3c159360bf3af58d1087a5f31cc17ea44cf86",
+  "source": "Nabil-Ala/P2E_calibration@66cb1e1c76d1b1d3d133fe6cb3896c95d48b5974",
+  "summary": {
+    "all_illegal_test_adaptive_controls_change": true,
+    "all_required_flow_present": true,
+    "all_split_partitions_disjoint": true,
+    "all_weights_independent_of_final_calibration": true,
+    "all_weights_independent_of_test_data_and_outcomes": true,
+    "case_count": 6
+  }
+}

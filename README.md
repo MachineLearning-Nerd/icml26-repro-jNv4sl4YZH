@@ -66,6 +66,8 @@ python repro/src/verify_ccp_results.py \
 
 python repro/src/verify_e_merge_coverage.py \
   --output outputs/claim3_independent_e_merge.json
+python repro/src/verify_weca_independence.py \
+  --source upstream --output outputs/weca_independence_audit.json
 python repro/src/compare_paper_headlines.py \
   --ca outputs/claim2_independent.json \
   --ccp outputs/claim3_independent.json \
@@ -101,13 +103,14 @@ Trackio evidence and source pin, checks all 392 reported mean/SD scalars in the
 and all 36 CCP calibrator comparisons (including nine AoN cells), scans for
 secrets/local paths, and emits a SHA-256 manifest only if the complete
 publication gate passes. It also creates
-a hash-indexed JSONL bundle containing seven summary/report artifacts and all
+a hash-indexed JSONL bundle containing nine summary/report artifacts and all
 seven full raw dataset files; Trackio recognizes this format and promotes
 it to the Hugging Face artifact bucket on publication.
 
 `repro/src/publish_after_gate.sh` is the final idempotent publication step. It
 accepts only a passing three-claim gate, pushes the public GitHub repository,
-publishes the Trackio Space, and reads both services back. Success requires
+atomically joins the single shared Hugging Face publication queue, and reads
+both services back after the shared drain publishes the Trackio Space. Success requires
 the public challenge tags, a nonempty Space commit SHA, the final Conclusion
 marker, and an artifact-bucket copy of the evidence bundle with the exact
 local byte size. Trackio's local-only metadata is deliberately gitignored so

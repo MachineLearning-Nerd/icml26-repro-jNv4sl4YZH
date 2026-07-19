@@ -18,6 +18,15 @@ construct the finite rank distribution and P2E threshold separately, recompute
 the e-value expectation and p/e set equality, and reconstruct coverage and
 length summaries from raw output rows.
 
+The WECA guarantee additionally requires its selected nonuniform weights not
+to depend on final inference e-values. The pinned source partitions calibration
+indices into `i1/i2/i3`, builds candidate weights from `i1` scores and `i2`
+covariates, then evaluates final p/e-values only with `i3`. A separate
+source-hash-bound noninterference audit mutates all `i3` rows and, independently,
+all test covariates/outcomes across six released seeds. The returned weights are
+bit-identical in all 12 mutations, whereas a deliberately test-adaptive control
+changes in 6/6 cases.
+
 ## Environment compatibility
 
 The released requirements leave package versions unconstrained. Its Parkinson
