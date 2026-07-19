@@ -12,7 +12,7 @@ from repro.src.prepublish_gate import (
     write_artifact_bundle,
 )
 from repro.src.render_final_logbook import build_cells
-from repro.src.run_author_ccp import METHOD_KEYS, PAPER_DATASETS
+from repro.src.run_author_ccp import EXECUTION_ADAPTER, METHOD_KEYS, PAPER_DATASETS
 from repro.src.verify_ccp_results import CALIBRATOR_BASELINES
 
 
@@ -156,6 +156,7 @@ class FullProtocolTests(unittest.TestCase):
 
     def test_expected_ccp_raw_cell_count(self):
         self.assertEqual(len(PAPER_DATASETS) * 3 * len(METHOD_KEYS) * 100, 11700)
+        self.assertEqual(EXECUTION_ADAPTER, "vectorized-exact-postprocessing-v1")
 
     def test_trackio_evidence_bundle_is_hash_indexed_and_roundtrips_json(self):
         root = Path(__file__).resolve().parents[2]
@@ -256,6 +257,7 @@ class FullProtocolTests(unittest.TestCase):
             }
         }
         claim3 = {
+            "protocol": {"execution_adapter": "vectorized-exact-postprocessing-v1"},
             "rows_seen": 11_700,
             "summary": {
                 "all_full_seed_cells_present": True,

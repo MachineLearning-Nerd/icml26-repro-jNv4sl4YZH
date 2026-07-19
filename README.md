@@ -75,7 +75,11 @@ python -m unittest discover -s repro/tests -v
 
 The CA run evaluates 1,920 raw method/seed cells (four OpenML tasks, 20
 seeds). The CCP run evaluates 11,700 raw model/method/seed cells (three bundled
-datasets, 100 seeds). These are long CPU runs, not smoke tests. After they
+datasets, 100 seeds). CCP uses the fail-closed
+`vectorized-exact-postprocessing-v1` adapter: all source estimator, grid,
+foldwise p-value, and RNG outputs are preserved, while deterministic p/e
+aggregation is vectorized. Literal-source parity is tested across OLS, RF, and
+Lasso for all 13 methods. These are long CPU runs, not smoke tests. After they
 finish, build the evidence-derived logbook cells and execute the final gate:
 
 ```bash

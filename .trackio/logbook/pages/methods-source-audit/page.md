@@ -409,3 +409,186 @@ Ran 20 tests in 9.134s
 OK
 
 ````
+
+
+---
+<!-- trackio-cell
+{"type": "code", "id": "cell_d33060a58c6b", "created_at": "2026-07-19T13:45:10+00:00", "title": "Parity-checked CCP vectorization benchmark", "command": ["python", "repro/src/benchmark_ccp_postprocessing.py", "--source", "upstream"], "exit_code": 0, "duration_s": 2.009}
+-->
+````bash
+$ python repro/src/benchmark_ccp_postprocessing.py --source upstream
+````
+
+exit 0 · 2.0s
+
+
+````python title=benchmark_ccp_postprocessing.py
+#!/usr/bin/env python3
+"""Reproducible microbenchmark for literal versus vectorized CCP calibration."""
+
+from __future__ import annotations
+
+import argparse
+import importlib.util
+import json
+import time
+from pathlib import Path
+
+import numpy as np
+
+
+def load_functions(source: Path):
+    path = source.resolve() / "e-ccp/eccp_utils.py"
+    spec = importlib.util.spec_from_file_location("benchmark_eccp_utils", path)
+    if not spec or not spec.loader:
+        raise RuntimeError(f"cannot import pinned source from {path}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def literal_kernel(p_values, u_values, functions, c1, s1, c2, s2):
+    grid_points, folds, test_points = p_values.shape
+    outputs = np.empty((8, grid_points, test_points), dtype=float)
+    denominators = np.arange(1, folds + 1)
+    for test_index in range(test_points):
+        u_value = u_values[test_index]
+        for grid_index in range(grid_points):
+            values = p_values[grid_index, :, test_index]
+            e_values = functions.f_p_to_e(values, 0.1, c1, s1)
+            cumulative = np.cumsum(e_values) / denominators
+            outputs[:, grid_index, test_index] = (
+                np.mean((values <= 0.1).astype(float) / 0.1) / u_value,
+                np.mean(-np.log(values)) / u_value,
+                np.mean(5.0 * (1.0 - values) ** 4) / u_value,
+                np.mean(values ** (-0.5) - 1.0) / u_value,
+                np.mean(e_values) / u_value,
+                np.max(cumulative),
+                max(np.max(cumulative), e_values[0] / u_value),
+                np.mean(functions.f_p_to_e(values, 0.2, c2, s2)) / u_value,
+            )
+    return outputs
+
+
+def vectorized_kernel(p_values, u_values, functions, c1, s1, c2, s2):
+    folds = p_values.shape[1]
+    randomizer = u_values[None, :]
+    e_values = functions.f_p_to_e(p_values, 0.1, c1, s1)
+    cumulative = np.cumsum(e_values, axis=1) / np.arange(
+        1, folds + 1, dtype=float
+    )[None, :, None]
+    return np.stack(
+        (
+            np.mean((p_values <= 0.1).astype(float) / 0.1, axis=1) / randomizer,
+            np.mean(-np.log(p_values), axis=1) / randomizer,
+            np.mean(5.0 * (1.0 - p_values) ** 4, axis=1) / randomizer,
+            np.mean(p_values ** (-0.5) - 1.0, axis=1) / randomizer,
+            np.mean(e_values, axis=1) / randomizer,
+            np.max(cumulative, axis=1),
+            np.maximum(np.max(cumulative, axis=1), e_values[:, 0, :] / randomizer),
+            np.mean(functions.f_p_to_e(p_values, 0.2, c2, s2), axis=1)
+            / randomizer,
+        )
+    )
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--source", type=Path, required=True)
+    args = parser.parse_args()
+    functions = load_functions(args.source)
+
+    folds, calibration_per_fold = 20, 150
+    grid_points, test_points = 300, 10
+    rng = np.random.default_rng(20260719)
+    p_values = rng.integers(
+        1,
+        calibration_per_fold + 2,
+        size=(grid_points, folds, test_points),
+    ).astype(float) / (calibration_per_fold + 1.0)
+    u_values = rng.random(test_points)
+    c1, s1 = functions.get_C_s(0.1, calibration_per_fold)
+    c2, s2 = functions.get_C_s(0.2, calibration_per_fold)
+
+    started = time.perf_counter()
+    literal = literal_kernel(p_values, u_values, functions, c1, s1, c2, s2)
+    literal_seconds = time.perf_counter() - started
+    started = time.perf_counter()
+    vectorized = vectorized_kernel(p_values, u_values, functions, c1, s1, c2, s2)
+    vectorized_seconds = time.perf_counter() - started
+    max_abs_error = float(np.max(np.abs(literal - vectorized)))
+    if max_abs_error > 1e-12:
+        raise RuntimeError(f"vectorized kernel parity failed: {max_abs_error}")
+
+    scale = (2_875 / test_points) * 3 * 100
+    result = {
+        "shape": {
+            "grid_points": grid_points,
+            "folds": folds,
+            "test_points": test_points,
+        },
+        "literal_seconds": literal_seconds,
+        "vectorized_seconds": vectorized_seconds,
+        "speedup": literal_seconds / vectorized_seconds,
+        "max_abs_error": max_abs_error,
+        "projected_parkinson_literal_kernel_hours": literal_seconds * scale / 3600,
+        "projected_parkinson_vectorized_kernel_hours": vectorized_seconds * scale / 3600,
+        "projection_scope": "calibrator kernel only; excludes model fitting and interval extraction",
+    }
+    print(json.dumps(result, sort_keys=True))
+
+
+if __name__ == "__main__":
+    main()
+
+````
+
+
+````output
+{"literal_seconds": 0.32446587714366615, "max_abs_error": 1.4210854715202004e-14, "projected_parkinson_literal_kernel_hours": 7.773661639900335, "projected_parkinson_vectorized_kernel_hours": 0.2797201787567853, "projection_scope": "calibrator kernel only; excludes model fitting and interval extraction", "shape": {"folds": 20, "grid_points": 300, "test_points": 10}, "speedup": 27.79085039359809, "vectorized_seconds": 0.011675277026370168}
+
+````
+
+
+---
+<!-- trackio-cell
+{"type": "code", "id": "cell_167eaa1d956c", "created_at": "2026-07-19T13:45:36+00:00", "title": "Vectorized CCP parity and adversarial audit", "command": ["python", "-m", "unittest", "discover", "-s", "repro/tests", "-v"], "exit_code": 0, "duration_s": 8.424}
+-->
+````bash
+$ python -m unittest discover -s repro/tests -v
+````
+
+exit 0 · 8.4s
+
+
+````output
+test_ca_dry_run_uses_released_full_protocol_and_portable_provenance (test_author_runner_preflight.AuthorRunnerPreflightTests.test_ca_dry_run_uses_released_full_protocol_and_portable_provenance) ... ok
+test_ccp_input_preflight_loads_author_bundles_at_paper_fold_counts (test_author_runner_preflight.AuthorRunnerPreflightTests.test_ccp_input_preflight_loads_author_bundles_at_paper_fold_counts) ... ok
+test_ccp_rng_replay_matches_real_source_power_intervals (test_author_runner_preflight.AuthorRunnerPreflightTests.test_ccp_rng_replay_matches_real_source_power_intervals) ... ok
+test_ccp_seed_checkpoint_accepts_complete_cells_and_rejects_partial_cells (test_author_runner_preflight.AuthorRunnerPreflightTests.test_ccp_seed_checkpoint_accepts_complete_cells_and_rejects_partial_cells) ... boston: completed seed 45
+ok
+test_ccp_wrapper_reconstructs_the_paper_f3_linear_calibrator (test_author_runner_preflight.AuthorRunnerPreflightTests.test_ccp_wrapper_reconstructs_the_paper_f3_linear_calibrator) ... ok
+test_vectorized_aggregation_matches_scalar_oracle_at_paper_fold_counts (test_author_runner_preflight.AuthorRunnerPreflightTests.test_vectorized_aggregation_matches_scalar_oracle_at_paper_fold_counts) ... ok
+test_vectorized_ccp_adapter_matches_all_literal_source_model_paths (test_author_runner_preflight.AuthorRunnerPreflightTests.test_vectorized_ccp_adapter_matches_all_literal_source_model_paths) ... ok
+test_exact_enumerations_pass_and_invalid_control_fails (test_e_merge_coverage.EMergeCoverageTests.test_exact_enumerations_pass_and_invalid_control_fails) ... ok
+test_lp_rejects_invalid_weight_vectors (test_e_merge_coverage.EMergeCoverageTests.test_lp_rejects_invalid_weight_vectors) ... ok
+test_two_fold_lp_matches_independent_permutation_enumeration (test_e_merge_coverage.EMergeCoverageTests.test_two_fold_lp_matches_independent_permutation_enumeration) ... ok
+test_expected_ccp_raw_cell_count (test_full_protocol.FullProtocolTests.test_expected_ccp_raw_cell_count) ... ok
+test_final_logbook_renderer_fails_closed_and_emits_gate_marker (test_full_protocol.FullProtocolTests.test_final_logbook_renderer_fails_closed_and_emits_gate_marker) ... ok
+test_official_jury_claim_snapshot_has_three_claims_and_six_points (test_full_protocol.FullProtocolTests.test_official_jury_claim_snapshot_has_three_claims_and_six_points) ... ok
+test_protocol_matches_released_paper_scale (test_full_protocol.FullProtocolTests.test_protocol_matches_released_paper_scale) ... ok
+test_publication_metadata_and_local_artifact_hygiene (test_full_protocol.FullProtocolTests.test_publication_metadata_and_local_artifact_hygiene) ... ok
+test_trackio_evidence_bundle_is_hash_indexed_and_roundtrips_json (test_full_protocol.FullProtocolTests.test_trackio_evidence_bundle_is_hash_indexed_and_roundtrips_json) ... ok
+test_classic_calibrator_controls_expand_the_set (test_p2e_identity.P2EIdentityTests.test_classic_calibrator_controls_expand_the_set) ... ok
+test_full_grid_summary_passes (test_p2e_identity.P2EIdentityTests.test_full_grid_summary_passes) ... ok
+test_p2e_exactly_preserves_each_finite_rank_set (test_p2e_identity.P2EIdentityTests.test_p2e_exactly_preserves_each_finite_rank_set) ... ok
+test_ca_verifier_requires_each_method_seed_cell (test_raw_verifiers.RawVerifierTests.test_ca_verifier_requires_each_method_seed_cell) ... ok
+test_ccp_verifier_requires_each_model_method_seed_cell (test_raw_verifiers.RawVerifierTests.test_ccp_verifier_requires_each_model_method_seed_cell) ... ok
+test_paper_headline_comparison_reports_matching_and_drifted_cells (test_raw_verifiers.RawVerifierTests.test_paper_headline_comparison_reports_matching_and_drifted_cells) ... ok
+
+----------------------------------------------------------------------
+Ran 22 tests in 7.734s
+
+OK
+
+````

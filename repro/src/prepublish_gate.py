@@ -320,6 +320,7 @@ def main() -> None:
         ),
     )
     claim3_summary = claim3["summary"]
+    assert claim3["protocol"]["execution_adapter"] == "vectorized-exact-postprocessing-v1"
     assert claim3["rows_seen"] == claim3_summary["expected_rows"] == 11_700
     assert claim3_summary["observed_unique_cells"] == 11_700
     assert claim3_summary["duplicate_cell_count"] == 0

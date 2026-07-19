@@ -53,3 +53,29 @@ uses the same `numpy.nanmean` aggregation as the released driver; interval
 counts are checked before aggregation and any non-finite seed summary is
 rejected before checkpoint promotion. A fake-source execution test exercises
 this behavior.
+
+## Exact vectorized CCP adapter
+
+The literal released functions perform deterministic p/e aggregation in a
+Python loop over every candidate-grid/test-point pair. A measured Parkinson-
+shaped microkernel (`K=20`, 300 grid points) took about `0.32 s` for ten test
+points versus `0.012 s` when vectorized, a roughly `27x` local speedup. Extrapolating only
+that loop (not model fitting) across 2,875 Parkinson test points, three models,
+and 100 seeds gives roughly `7.7` literal CPU-hours versus `0.28` vectorized
+CPU-hours. This is a calibrator-kernel projection, not an end-to-end runtime
+claim; model fitting and interval extraction are excluded.
+
+The full runner therefore uses the named
+`vectorized-exact-postprocessing-v1` adapter. It reproduces the source fold
+permutation, OLS/RF/Lasso fits, candidate grid, foldwise p-values, and RNG
+draws, then evaluates the same deterministic aggregation formulas with NumPy
+arrays. Parallel seeds were rejected because the released random forest
+already uses all local cores; that route would oversubscribe the host and raise
+RAM risk. The largest Parkinson p-value tensor is about 138 MB, and temporary
+calibrator arrays are evaluated one at a time.
+
+A dedicated parity test executes both literal and vectorized paths for OLS,
+RF, and Lasso. It requires bit-identical grids and foldwise p-values and exact
+interval equality for all 13 published method cells, including the separately
+audited paper-linear F3 reconstruction. The protocol records the adapter name,
+and the final publication gate rejects output missing that provenance.

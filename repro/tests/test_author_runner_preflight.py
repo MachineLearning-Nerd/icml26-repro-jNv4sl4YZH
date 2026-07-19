@@ -53,6 +53,177 @@ def load_ca_runner():
 
 
 class AuthorRunnerPreflightTests(unittest.TestCase):
+    def test_vectorized_aggregation_matches_scalar_oracle_at_paper_fold_counts(self):
+        import numpy as np
+
+        runner = load_ccp_runner()
+        source_path = ROOT / "upstream/e-ccp/eccp_utils.py"
+        spec = importlib.util.spec_from_file_location(
+            "pinned_eccp_utils_scalar_oracle", source_path
+        )
+        assert spec and spec.loader
+        functions = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(functions)
+
+        def normalized(intervals):
+            return [
+                None if value is None else np.asarray(value).tolist()
+                for value in intervals
+            ]
+
+        for folds, m, seed in ((15, 26, 1), (15, 266, 2), (20, 150, 3)):
+            rng = np.random.default_rng(seed)
+            grid = np.linspace(-3.0, 3.0, 41)
+            p_values = rng.integers(
+                1, m + 2, size=(len(grid), folds, 7)
+            ).astype(float) / (m + 1.0)
+            # Include draws close to relevant rejection boundaries as well as
+            # generic uniform values.
+            u_values = rng.random(7)
+            u_values[:3] = np.array([0.1, 0.2, 0.5])
+            vectorized = runner.intervals_from_p_values(
+                p_values,
+                grid,
+                functions=functions,
+                alpha=0.1,
+                m=m,
+                used=m * folds,
+                u_values=u_values,
+            )
+
+            scalar_arrays = {
+                key: np.empty((len(grid), 7), dtype=float)
+                for key in (
+                    "int_cc", "int_cce", "int_ccu", "int_cceu", "int_ccs",
+                    "int_cc_eval", "int_cc_ev_exch", "int_cc_ev_exch_U",
+                    "int_cc_eval_2alpha", "int_cc_eval_ind",
+                    "int_cc_eval_sqrt", "int_cc_eval_log",
+                    "int_cc_eval_pow", "int_cc_eval_linear",
+                )
+            }
+            c1, s1 = functions.get_C_s(0.1, m)
+            c2, s2 = functions.get_C_s(0.2, m)
+            for test_index, u_value in enumerate(u_values):
+                for grid_index in range(len(grid)):
+                    values = p_values[grid_index, :, test_index]
+                    cumulative_p = np.cumsum(values) / np.arange(1, folds + 1)
+                    p_mean = np.mean(values)
+                    scalar_arrays["int_cc"][grid_index, test_index] = p_mean
+                    scalar_arrays["int_cce"][grid_index, test_index] = np.min(cumulative_p)
+                    scalar_arrays["int_ccu"][grid_index, test_index] = p_mean / (2.0 - u_value)
+                    scalar_arrays["int_cceu"][grid_index, test_index] = min(
+                        values[0] / (2.0 - u_value), np.min(cumulative_p)
+                    )
+                    scalar_arrays["int_ccs"][grid_index, test_index] = (
+                        1.0 + np.sum(values * (m + 1.0) - 1.0)
+                    ) / (m * folds + 1.0)
+
+                    e_values = functions.f_p_to_e(values, 0.1, c1, s1)
+                    cumulative_e = np.cumsum(e_values) / np.arange(1, folds + 1)
+                    scalar_arrays["int_cc_eval"][grid_index, test_index] = np.mean(e_values) / u_value
+                    scalar_arrays["int_cc_ev_exch"][grid_index, test_index] = np.max(cumulative_e)
+                    scalar_arrays["int_cc_ev_exch_U"][grid_index, test_index] = max(
+                        np.max(cumulative_e), e_values[0] / u_value
+                    )
+                    scalar_arrays["int_cc_eval_2alpha"][grid_index, test_index] = (
+                        np.mean(functions.f_p_to_e(values, 0.2, c2, s2)) / u_value
+                    )
+                    scalar_arrays["int_cc_eval_ind"][grid_index, test_index] = np.mean(
+                        (values <= 0.1).astype(float) / 0.1
+                    ) / u_value
+                    scalar_arrays["int_cc_eval_sqrt"][grid_index, test_index] = np.mean(
+                        values ** (-0.5) - 1.0
+                    ) / u_value
+                    scalar_arrays["int_cc_eval_log"][grid_index, test_index] = np.mean(
+                        -np.log(values)
+                    ) / u_value
+                    scalar_arrays["int_cc_eval_pow"][grid_index, test_index] = np.mean(
+                        5.0 * (1.0 - values) ** 4
+                    ) / u_value
+                    scalar_arrays["int_cc_eval_linear"][grid_index, test_index] = np.mean(
+                        2.0 * (1.0 - values)
+                    ) / u_value
+
+            p_keys = {"int_cc", "int_cce", "int_ccu", "int_cceu", "int_ccs"}
+            for key, values in scalar_arrays.items():
+                level = 0.2 if key == "int_cc_eval_2alpha" else 0.1
+                expected = [
+                    (
+                        functions.set_cc(values[:, index], grid, 0.1)
+                        if key in p_keys
+                        else functions.set_cc_eval(values[:, index], grid, level)
+                    )
+                    for index in range(values.shape[1])
+                ]
+                self.assertEqual(
+                    normalized(vectorized[key]),
+                    normalized(expected),
+                    f"K={folds},m={m},{key}",
+                )
+
+    def test_vectorized_ccp_adapter_matches_all_literal_source_model_paths(self):
+        import numpy as np
+
+        runner = load_ccp_runner()
+        source_path = ROOT / "upstream/e-ccp/eccp_utils.py"
+        spec = importlib.util.spec_from_file_location(
+            "pinned_eccp_utils_vectorized_parity", source_path
+        )
+        assert spec and spec.loader
+        functions = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(functions)
+
+        rng = np.random.default_rng(20260719)
+        x_train = rng.normal(size=(36, 4))
+        y_train = (
+            0.8 * x_train[:, 0]
+            - 0.3 * x_train[:, 1]
+            + 0.1 * x_train[:, 2] ** 2
+            + rng.normal(scale=0.08, size=36)
+        )
+        x_test = rng.normal(size=(5, 4))
+        config = {"ntree": 5, "lambda_": 0.01}
+
+        def normalized(intervals):
+            return [
+                None if value is None else np.asarray(value).tolist()
+                for value in intervals
+            ]
+
+        for model in runner.MODELS:
+            literal = runner.call_literal_author_model(
+                model,
+                functions,
+                y_train,
+                x_train,
+                x_test,
+                k=3,
+                alpha=0.1,
+                config=config,
+                seed=45,
+                n_grid=37,
+            )
+            vectorized = runner.call_vectorized_author_model(
+                model,
+                functions,
+                y_train,
+                x_train,
+                x_test,
+                k=3,
+                alpha=0.1,
+                config=config,
+                seed=45,
+                n_grid=37,
+            )
+            np.testing.assert_array_equal(vectorized["ys"], literal["ys"])
+            np.testing.assert_array_equal(vectorized["p_vals"], literal["p_vals"])
+            for _, interval_key in runner.METHOD_KEYS:
+                self.assertEqual(
+                    normalized(vectorized[interval_key]),
+                    normalized(literal[interval_key]),
+                    f"{model}/{interval_key}",
+                )
+
     def test_ccp_rng_replay_matches_real_source_power_intervals(self):
         import numpy as np
 
@@ -269,6 +440,7 @@ class AuthorRunnerPreflightTests(unittest.TestCase):
                     protocol=mini_protocol,
                     checkpoint=Path(temp) / ".tiny.partial.json",
                     existing_rows=[],
+                    model_runner=lambda *_args, **_kwargs: TinyFunctions._result(),
                 )
             finally:
                 runner.SEEDS = original_seeds
@@ -331,6 +503,10 @@ class AuthorRunnerPreflightTests(unittest.TestCase):
     def test_ccp_input_preflight_loads_author_bundles_at_paper_fold_counts(self):
         result = run_preflight("run_author_ccp.py", "--input-check")
         self.assertEqual(result["protocol"]["source"], SOURCE)
+        self.assertEqual(
+            result["protocol"]["execution_adapter"],
+            "vectorized-exact-postprocessing-v1",
+        )
         self.assertEqual(
             result["inputs"],
             {

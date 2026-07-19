@@ -262,3 +262,14 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   final renderer, prepublication gate, tests, documentation, and captured
   Trackio audit now all require the same 98-cell/392-scalar totals (`a5505cd`,
   `010fb7c`, `8adf111`).
+- A pre-CCP runtime audit compared literal source execution, seed-level
+  parallelism, and exact vectorization. Parallel seeds were rejected because
+  released RF already uses all cores. The selected
+  `vectorized-exact-postprocessing-v1` adapter preserves the source fold split,
+  estimators, grids, p-values, and RNG, while replacing only scalar p/e
+  aggregation. The reproducible Parkinson-shaped microbenchmark measured
+  roughly `27x` for that kernel (about `7.7` projected literal versus `0.28`
+  vectorized CPU-hours over the full Parkinson protocol, excluding fitting and
+  interval extraction). Literal-versus-vectorized tests require bit-identical p-values and
+  exact intervals for OLS, RF, Lasso, and all 13 methods. Adapter provenance is
+  part of the raw protocol and final gate.
