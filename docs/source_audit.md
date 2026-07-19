@@ -90,15 +90,17 @@ unexpected, and non-finite raw cells.
 A line-by-line audit of the CCP wrapper against `e-ccp/main.py` confirms the
 released split (`default_rng(seed)`, train sample without replacement, sorted
 complement test set), seeds 45–144, three model calls, 300-point grid, 13
-reported methods, and per-test aggregation. It also identifies one material
-source/paper drift: the paper defines its third classical calibrator as
-`F3(p)=2(1-p)`, whereas `e-ccp/eccp_utils.py` names the corresponding output
-`int_cc_eval_pow` and computes `5(1-p)^4`. Treating that output as the paper's
-linear baseline would be incorrect. The wrapper therefore leaves every author
-estimator and returned foldwise p-value untouched, replays the identical local
-randomization stream, and reconstructs only the paper-specified F3 intervals
-as `ECCP(linear)`. A dedicated numerical test verifies the reconstruction and
-proves it differs from the released power expression. The wrapper deliberately
+reported methods, and per-test aggregation. It also identifies a material
+source/paper drift. The paper defines F1/F2/F3 as
+log/square-root/linear, but `e-ccp/main.py` fills those three table positions
+from `int_cc_eval_sqrt`, `int_cc_eval_log`, and `int_cc_eval_pow`. The last
+released output computes `5(1-p)^4`, not the paper's `F3(p)=2(1-p)`. Treating
+those positions as the paper-defined formulas would be incorrect. The wrapper
+therefore leaves every author estimator and returned foldwise p-value
+untouched, preserves honest log and square-root labels, replays the identical
+local randomization stream, and reconstructs the paper-specified F3 intervals
+as `ECCP(linear)`. A hash-bound contract audit and dedicated numerical tests
+verify all three formula differences. The wrapper deliberately
 uses the same `numpy.nanmean` aggregation as the released driver; interval
 counts are checked before aggregation and any non-finite seed summary is
 rejected before checkpoint promotion. A fake-source execution test exercises

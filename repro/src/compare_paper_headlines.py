@@ -9,6 +9,13 @@ import math
 from pathlib import Path
 
 
+KNOWN_CCP_TABLE_DISCREPANCY_METHODS = {
+    "ECCP(log)": "paper F1=-log(p), released table position uses square-root",
+    "ECCP(sqrt)": "paper F2=square-root, released table position uses log",
+    "ECCP(linear)": "paper F3=2(1-p), released table position uses 5(1-p)^4",
+}
+
+
 def comparison(actual: dict[str, object], paper: dict[str, float], policy: dict[str, float]) -> dict[str, object]:
     observed_coverage = float(actual["coverage_mean"])
     observed_coverage_sd = float(actual["coverage_sd"])
@@ -94,15 +101,37 @@ def main() -> None:
     for dataset, models in headlines["cross_conformal"].items():
         for model, methods in models.items():
             for method, paper in methods.items():
+                known_discrepancy = method in KNOWN_CCP_TABLE_DISCREPANCY_METHODS
                 comparisons.append(
                     {
                         "study": "cross_conformal",
                         "dataset": dataset,
                         "model": model,
                         "method": method,
+                        "gate_scope": (
+                            "known_paper_source_discrepancy"
+                            if known_discrepancy
+                            else "unaffected_reproduction"
+                        ),
+                        "discrepancy_reason": (
+                            KNOWN_CCP_TABLE_DISCREPANCY_METHODS.get(method)
+                        ),
                         **comparison(ccp["summaries"][dataset][model][method], paper, policy),
                     }
                 )
+
+    for item in comparisons:
+        item.setdefault("gate_scope", "unaffected_reproduction")
+        item.setdefault("discrepancy_reason", None)
+    unaffected = [
+        item for item in comparisons if item["gate_scope"] == "unaffected_reproduction"
+    ]
+    known_discrepancies = [
+        item
+        for item in comparisons
+        if item["gate_scope"] == "known_paper_source_discrepancy"
+    ]
+    unexpected_outside = [item for item in unaffected if not item["within_tolerance"]]
 
     result = {
         "paper_source": headlines["source"],
@@ -118,6 +147,28 @@ def main() -> None:
             "within_tolerance_scalar_count": sum(
                 sum(item["metric_checks"].values()) for item in comparisons
             ),
+            "unaffected_comparison_count": len(unaffected),
+            "unaffected_scalar_comparison_count": sum(
+                len(item["metric_checks"]) for item in unaffected
+            ),
+            "unaffected_within_tolerance_count": sum(
+                item["within_tolerance"] for item in unaffected
+            ),
+            "unaffected_within_tolerance_scalar_count": sum(
+                sum(item["metric_checks"].values()) for item in unaffected
+            ),
+            "all_unaffected_within_tolerance": all(
+                item["within_tolerance"] for item in unaffected
+            ),
+            "known_discrepancy_comparison_count": len(known_discrepancies),
+            "known_discrepancy_scalar_comparison_count": sum(
+                len(item["metric_checks"]) for item in known_discrepancies
+            ),
+            "known_discrepancy_outside_tolerance_count": sum(
+                not item["within_tolerance"] for item in known_discrepancies
+            ),
+            "unexpected_outside_tolerance_count": len(unexpected_outside),
+            "all_outside_tolerance_cells_accounted_for": not unexpected_outside,
         },
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)

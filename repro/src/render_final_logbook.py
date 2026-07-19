@@ -29,6 +29,7 @@ def build_cells(
     weca_independence: dict[str, object],
     ca_domains: dict[str, object],
     claim3: dict[str, object],
+    calibrator_contract: dict[str, object],
     headlines: dict[str, object],
 ) -> dict[str, object]:
     c1_summary = claim1["summary"]
@@ -38,6 +39,7 @@ def build_cells(
     weca_summary = weca_independence["summary"]
     ca_domain_summary = ca_domains["summary"]
     c3_summary = claim3["summary"]
+    contract_summary = calibrator_contract["summary"]
     headline_summary = headlines["summary"]
     assert isinstance(c1_summary, dict)
     assert isinstance(anchored_summary, dict)
@@ -46,6 +48,7 @@ def build_cells(
     assert isinstance(weca_summary, dict)
     assert isinstance(ca_domain_summary, dict)
     assert isinstance(c3_summary, dict)
+    assert isinstance(contract_summary, dict)
     assert isinstance(headline_summary, dict)
 
     require_true(
@@ -144,7 +147,19 @@ def build_cells(
         "all_p2e_strictly_shorter_than_aon",
         "all_classical_efficiency_gains_substantial",
     )
-    require_true(headline_summary, "all_within_tolerance")
+    require_true(
+        contract_summary,
+        "paper_formula_contract_verified",
+        "released_formula_contract_verified",
+        "released_column_order_verified_for_all_models",
+        "paper_source_column_mismatch_verified",
+        "all_numerical_witness_values_differ",
+    )
+    require_true(
+        headline_summary,
+        "all_unaffected_within_tolerance",
+        "all_outside_tolerance_cells_accounted_for",
+    )
     if claim3.get("protocol", {}).get("execution_adapter") != "vectorized-exact-postprocessing-v1":
         raise RuntimeError("CCP execution adapter is missing or unverified")
 
@@ -178,8 +193,22 @@ def build_cells(
         raise RuntimeError("headline cell count is not 122")
     if headline_summary["scalar_comparison_count"] != 488:
         raise RuntimeError("headline scalar count is not 488")
-    if headline_summary["within_tolerance_scalar_count"] != 488:
-        raise RuntimeError("not all 488 headline scalars pass")
+    if (
+        headline_summary["unaffected_comparison_count"] != 95
+        or headline_summary["unaffected_within_tolerance_count"] != 95
+        or headline_summary["unaffected_scalar_comparison_count"] != 380
+        or headline_summary["unaffected_within_tolerance_scalar_count"] != 380
+    ):
+        raise RuntimeError("not all 95 unaffected paper-table cells pass")
+    if (
+        contract_summary.get("discrepant_method_count") != 3
+        or contract_summary.get("affected_paper_table_cells") != 27
+        or contract_summary.get("affected_paper_table_scalars") != 108
+        or headline_summary["known_discrepancy_comparison_count"] != 27
+        or headline_summary["known_discrepancy_scalar_comparison_count"] != 108
+        or headline_summary["unexpected_outside_tolerance_count"] != 0
+    ):
+        raise RuntimeError("paper/source calibrator discrepancy accounting is incomplete")
 
     efficiency = claim2["efficiency_comparisons"]
     assert isinstance(efficiency, list)
@@ -278,6 +307,18 @@ def build_cells(
         ),
         "headline_cells": int(headline_summary["comparison_count"]),
         "headline_scalars": int(headline_summary["scalar_comparison_count"]),
+        "headline_unaffected_cells": int(
+            headline_summary["unaffected_comparison_count"]
+        ),
+        "headline_unaffected_scalars": int(
+            headline_summary["unaffected_scalar_comparison_count"]
+        ),
+        "headline_discrepancy_cells": int(
+            headline_summary["known_discrepancy_comparison_count"]
+        ),
+        "headline_discrepancy_scalars": int(
+            headline_summary["known_discrepancy_scalar_comparison_count"]
+        ),
     }
 
     claim1_markdown = f"""Claim 1 is verified from both the pinned Definition 2.2 source block and an independent finite-rank construction. At every one of {summary['claim1_cells']} theorem-valid `(n, alpha)` cells, membership under `P_n > alpha` is identical to membership under `F(P_n) < 1/alpha`; the threshold identity also passes exactly. The constructed e-variable has maximum expectation error {summary['claim1_maximum_expectation_error']:.3g}. This directly reproduces the definition of set preservation rather than inferring it from empirical coverage."""
@@ -290,13 +331,13 @@ def build_cells(
 
     claim5_markdown = f"""Claim 5 is verified for data-dependent WECA weights under the proposition's required split independence. The released routine's tuning and final-inference partitions are disjoint, and selected weights remain bit-identical after arbitrary final-calibration or test-data/outcome mutations in {summary['claim3_weca_independence_cases']}/6 seeded cases; the forbidden test-adaptive control changes in 6/6. Exact arbitrary-dependence LPs accept all six nonuniform fixed-weight cases under both deterministic and randomized thresholds, while outcome-adaptive max weighting fails. The full CA verifier accepts exactly {summary['claim2_raw_rows']:,} unique finite cells, and all eight P2E CA coverage means pass the fixed empirical sanity check ({summary['claim2_p2e_coverage_min']:.4f}–{summary['claim2_p2e_coverage_max']:.4f})."""
 
-    claim6_markdown = f"""Claim 6 is verified at the complete released empirical scale. The CCP run contains exactly {summary['claim3_raw_rows']:,} unique finite cells (three datasets, 100 seeds, three models, 13 methods) using the parity-checked `{summary['claim3_execution_adapter']}` adapter. P2E is strictly shorter in {summary['claim2_ccp_efficiency_wins']}/{summary['claim2_ccp_efficiency_comparisons']} matched baseline comparisons: 9/9 AoN cells and {summary['claim2_ccp_classical_material_wins']}/27 log, square-root, and linear calibrator cells, with every classical reduction exceeding the predeclared 10% threshold. The independent CA evidence adds {summary['claim2_efficiency_wins']}/{summary['claim2_efficiency_comparisons']} material P2E wins, ranging from {100 * summary['claim2_minimum_relative_reduction']:.2f}% to {100 * summary['claim2_maximum_relative_reduction']:.2f}% reduction. All {summary['headline_scalars']} reported mean/SD scalars across {summary['headline_cells']} paper-table cells pass the fixed drift tolerances while the P2E coverage checks remain valid."""
+    claim6_markdown = f"""Claim 6 is verified at the complete released empirical scale. The CCP run contains exactly {summary['claim3_raw_rows']:,} unique finite cells (three datasets, 100 seeds, three models, 13 methods) using the parity-checked `{summary['claim3_execution_adapter']}` adapter. P2E is strictly shorter in {summary['claim2_ccp_efficiency_wins']}/{summary['claim2_ccp_efficiency_comparisons']} matched baseline comparisons: 9/9 AoN cells and {summary['claim2_ccp_classical_material_wins']}/27 formula-faithful log, square-root, and linear calibrator cells, with every classical reduction exceeding the predeclared 10% threshold. The independent CA evidence adds {summary['claim2_efficiency_wins']}/{summary['claim2_efficiency_comparisons']} material P2E wins, ranging from {100 * summary['claim2_minimum_relative_reduction']:.2f}% to {100 * summary['claim2_maximum_relative_reduction']:.2f}% reduction. All {summary['headline_unaffected_scalars']} unaffected reported scalars across {summary['headline_unaffected_cells']} paper-table cells pass the fixed drift tolerances. The remaining {summary['headline_discrepancy_cells']} cells ({summary['headline_discrepancy_scalars']} scalars) are explicitly classified by a hash-bound audit: the paper defines F1/F2/F3 as log/square-root/linear, while the released CCP table driver fills those positions with square-root/log/power. No result is relabeled to conceal that discrepancy, and all P2E coverage checks remain valid."""
 
     claim5_markdown += f""" A source-bound audit accounts for all {summary['ca_p2e_contexts']:,} internal CA calibration contexts: {summary['ca_p2e_theorem_contexts']:,} satisfy the theorem domain and {summary['ca_p2e_boundary_contexts']} exact-rank boundary contexts use the released `C=1e6` AoN limit. Those boundary sets remain identical, with maximum numerical deviation {summary['ca_p2e_boundary_max_aon_deviation']:.3g}; they are not mislabeled as positive exact-P2E theorem instances."""
 
     controls_markdown = f"""The controls fail in the intended direction. All {summary['claim1_domain_controls']} excluded theorem-domain boundary cases are rejected, and classical p-to-e calibrators inflate the conformal set in all {c1_summary['classic_control_case_count']} valid finite-rank cases. Invalid 2x e-value scaling violates the arbitrary-dependence deterministic bound in {mechanism_summary['invalid_arbitrary_dependence_rejection_count']}/{mechanism_summary['case_count']} cases and the randomized bound in {mechanism_summary['invalid_randomized_arbitrary_dependence_rejection_count']}/{mechanism_summary['case_count']} cases. It also violates the exchangeable ECCP-Exch and UR-ECCP-Exch orbit bounds in {mechanism_summary['invalid_exchangeable_prefix_rejection_count']}/{mechanism_summary['exchangeable_prefix_case_count']} and {mechanism_summary['invalid_exchangeable_randomized_prefix_rejection_count']}/{mechanism_summary['exchangeable_prefix_case_count']} cases. Inference-adaptive one-hot weights fail both weighted-merge bounds in {mechanism_summary['adaptive_weight_rejection_count']}/{mechanism_summary['case_count']} and {mechanism_summary['adaptive_randomized_weight_rejection_count']}/{mechanism_summary['case_count']} cases. All raw verifiers separately reject protocol drift, missing, duplicate, unexpected or non-finite cells, invalid metric ranges, and insufficient efficiency gains."""
 
-    conclusion_markdown = f"""All six anchored jury claims are verified at the declared scope. The source-bound mechanism audit covers Definition 2.2, Proposition 2.3, Theorem 2.6/Equation 9, Propositions 4.1–4.2, and Section 5; independent exact/numerical certificates verify set preservation, AoN uniqueness, sigmoid properties and dominance, ECCP coverage, and tuning-independent WECA validity. Complete released CA and CCP runs supply {summary['claim2_raw_rows']:,} + {summary['claim3_raw_rows']:,} raw cells and reproduce all {summary['headline_scalars']} reported scalars within fixed tolerances.
+    conclusion_markdown = f"""All six anchored jury claims are verified at the declared scope. The source-bound mechanism audit covers Definition 2.2, Proposition 2.3, Theorem 2.6/Equation 9, Propositions 4.1–4.2, and Section 5; independent exact/numerical certificates verify set preservation, AoN uniqueness, sigmoid properties and dominance, ECCP coverage, and tuning-independent WECA validity. Complete released CA and CCP runs supply {summary['claim2_raw_rows']:,} + {summary['claim3_raw_rows']:,} raw cells. All {summary['headline_unaffected_scalars']} unaffected table scalars reproduce within fixed tolerances; the paper/released-code F1/F2/F3 inconsistency affecting the other {summary['headline_discrepancy_scalars']} scalars is source-hash-bound, numerically witnessed, and disclosed rather than force-fit.
 
 ## Scope & cost
 
@@ -340,6 +381,7 @@ def main() -> None:
         load("outputs/weca_independence_audit.json"),
         load("outputs/ca_p2e_domain_audit.json"),
         load("outputs/claim3_independent.json"),
+        load("outputs/ccp_calibrator_contract_audit.json"),
         load("outputs/paper_headline_comparison.json"),
     )
     output = args.output if args.output.is_absolute() else ROOT / args.output

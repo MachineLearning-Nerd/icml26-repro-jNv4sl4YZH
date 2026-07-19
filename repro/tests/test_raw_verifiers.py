@@ -74,6 +74,26 @@ class RawVerifierTests(unittest.TestCase):
             self.assertEqual(matching["summary"]["comparison_count"], 122)
             self.assertEqual(matching["summary"]["scalar_comparison_count"], 488)
             self.assertEqual(matching["summary"]["within_tolerance_scalar_count"], 488)
+            self.assertTrue(matching["summary"]["all_unaffected_within_tolerance"])
+            self.assertEqual(matching["summary"]["unaffected_comparison_count"], 95)
+            self.assertEqual(matching["summary"]["unaffected_scalar_comparison_count"], 380)
+            self.assertEqual(matching["summary"]["known_discrepancy_comparison_count"], 27)
+            self.assertEqual(matching["summary"]["known_discrepancy_scalar_comparison_count"], 108)
+
+            original_known = dict(
+                ccp["summaries"]["boston"]["OLS"]["ECCP(log)"]
+            )
+            ccp["summaries"]["boston"]["OLS"]["ECCP(log)"]["length_mean"] *= 2
+            ccp_path.write_text(json.dumps(ccp), encoding="utf-8")
+            subprocess.run(command, cwd=ROOT, check=True, capture_output=True, text=True)
+            known = json.loads(output.read_text(encoding="utf-8"))
+            self.assertFalse(known["summary"]["all_within_tolerance"])
+            self.assertTrue(known["summary"]["all_unaffected_within_tolerance"])
+            self.assertTrue(known["summary"]["all_outside_tolerance_cells_accounted_for"])
+            self.assertEqual(known["summary"]["unexpected_outside_tolerance_count"], 0)
+            self.assertEqual(known["summary"]["known_discrepancy_outside_tolerance_count"], 1)
+            ccp["summaries"]["boston"]["OLS"]["ECCP(log)"] = original_known
+            ccp_path.write_text(json.dumps(ccp), encoding="utf-8")
 
             ca["summaries"]["dataset_361234"]["WECA(P2E)"]["length_mean"] = 99.0
             ca_path.write_text(json.dumps(ca), encoding="utf-8")

@@ -358,6 +358,7 @@ def main() -> None:
         [sys.executable, "repro/src/verify_ca_results.py", "--raw-dir", "outputs/raw/author_ca", "--output", "outputs/claim2_independent.json"],
         [sys.executable, "repro/src/verify_ccp_results.py", "--raw-dir", "outputs/raw/author_ccp", "--output", "outputs/claim3_independent.json"],
         [sys.executable, "repro/src/verify_paper_table_fixture.py", "--output", "outputs/paper_table_fixture_audit.json"],
+        [sys.executable, "repro/src/verify_ccp_calibrator_contract.py", "--source", "upstream", "--output", "outputs/ccp_calibrator_contract_audit.json"],
         [sys.executable, "repro/src/compare_paper_headlines.py", "--ca", "outputs/claim2_independent.json", "--ccp", "outputs/claim3_independent.json", "--output", "outputs/paper_headline_comparison.json"],
         [sys.executable, "-m", "unittest", "discover", "-s", "repro/tests", "-v"],
     )
@@ -628,17 +629,49 @@ def main() -> None:
     assert fixture_summary["total_cell_count"] == 122
     assert fixture_summary["scalar_count"] == 488
 
+    calibrator_contract = load_json("outputs/ccp_calibrator_contract_audit.json")
+    assert calibrator_contract["paper_source_archive_sha256"] == (
+        "f5124c39036b9107b01439fdbeb5da82331a70b81a3211e3b36887e08109a2db"
+    )
+    assert calibrator_contract["paper_main_tex_sha256"] == (
+        "49058ff8e986f43770936c09cc97360e5cace8802c6304a80d9e153d342ae857"
+    )
+    assert calibrator_contract["released_main_py_sha256"] == (
+        "4bfabc2a937a633db3d95a70f76e961a5541319b332e1452617ca6f64a8a57d6"
+    )
+    assert calibrator_contract["released_eccp_utils_sha256"] == (
+        "7ef06bed7bef7c72dae5f760cf0f0c2b4cf4318af44f87763ac8cc0ab0687593"
+    )
+    assert calibrator_contract["summary"] == {
+        "paper_formula_contract_verified": True,
+        "released_formula_contract_verified": True,
+        "released_column_order_verified_for_all_models": True,
+        "paper_source_column_mismatch_verified": True,
+        "discrepant_method_count": 3,
+        "affected_paper_table_cells": 27,
+        "affected_paper_table_scalars": 108,
+        "all_numerical_witness_values_differ": True,
+    }
+
     headlines = load_json("outputs/paper_headline_comparison.json")
-    assert_summary(headlines, ("all_within_tolerance",))
+    assert_summary(
+        headlines,
+        ("all_unaffected_within_tolerance", "all_outside_tolerance_cells_accounted_for"),
+    )
     assert headlines["paper_source"] == headline_config["source"]
     assert all(
         headlines["comparison_policy"].get(key) == value
         for key, value in HEADLINE_TOLERANCES.items()
     )
     assert headlines["summary"]["comparison_count"] == 122
-    assert headlines["summary"]["within_tolerance_count"] == 122
     assert headlines["summary"]["scalar_comparison_count"] == 488
-    assert headlines["summary"]["within_tolerance_scalar_count"] == 488
+    assert headlines["summary"]["unaffected_comparison_count"] == 95
+    assert headlines["summary"]["unaffected_within_tolerance_count"] == 95
+    assert headlines["summary"]["unaffected_scalar_comparison_count"] == 380
+    assert headlines["summary"]["unaffected_within_tolerance_scalar_count"] == 380
+    assert headlines["summary"]["known_discrepancy_comparison_count"] == 27
+    assert headlines["summary"]["known_discrepancy_scalar_comparison_count"] == 108
+    assert headlines["summary"]["unexpected_outside_tolerance_count"] == 0
 
     required_trackio_text = {
         ".trackio/logbook/pages/claim-1/page.md": (
@@ -668,6 +701,7 @@ def main() -> None:
             "Released OpenML CA input fingerprint audit",
             "Released source and dataset manifest audit",
             "Primary TeX table fixture audit",
+            "Paper and released-code calibrator contract audit",
             "WECA independent-tuning audit",
         ),
         ".trackio/logbook/pages/conclusion/page.md": (
@@ -692,6 +726,7 @@ def main() -> None:
         "outputs/weca_independence_audit.json",
         "outputs/claim3_independent.json",
         "outputs/paper_table_fixture_audit.json",
+        "outputs/ccp_calibrator_contract_audit.json",
         "outputs/paper_headline_comparison.json",
         "outputs/final_logbook_cells.json",
         *(f"outputs/raw/author_ca/dataset_{task}.json" for task in (361237, 361235, 361244, 361234)),

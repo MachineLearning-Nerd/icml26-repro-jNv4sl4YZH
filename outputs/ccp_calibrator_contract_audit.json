@@ -1,0 +1,138 @@
+{
+  "discrepancy_map": {
+    "ECCP(linear)": {
+      "paper_column": "F3",
+      "paper_formula": "2*(1-p)",
+      "released_column_index": 11,
+      "released_formula": "5*(1-p)**4",
+      "released_method": "ECCP(pow)"
+    },
+    "ECCP(log)": {
+      "paper_column": "F1",
+      "paper_formula": "-log(p)",
+      "released_column_index": 9,
+      "released_formula": "p**(-0.5)-1",
+      "released_method": "ECCP(sqrt)"
+    },
+    "ECCP(sqrt)": {
+      "paper_column": "F2",
+      "paper_formula": "p**(-0.5)-1",
+      "released_column_index": 10,
+      "released_formula": "-log(p)",
+      "released_method": "ECCP(log)"
+    }
+  },
+  "formula_faithful_reproduction_methods": [
+    "ECCP(log)",
+    "ECCP(sqrt)",
+    "ECCP(linear)"
+  ],
+  "numerical_witnesses": [
+    {
+      "all_witness_values_differ": true,
+      "maximum_absolute_difference": 0.47640368144558876,
+      "minimum_absolute_difference": 0.1051095625643148,
+      "p_values": [
+        0.05,
+        0.1,
+        0.2,
+        0.4,
+        0.8
+      ],
+      "paper_method": "ECCP(log)",
+      "paper_values": [
+        2.995732273553991,
+        2.3025850929940455,
+        1.6094379124341003,
+        0.916290731874155,
+        0.2231435513142097
+      ],
+      "released_values": [
+        3.4721359549995796,
+        2.162277660168379,
+        1.2360679774997898,
+        0.5811388300841895,
+        0.1180339887498949
+      ]
+    },
+    {
+      "all_witness_values_differ": true,
+      "maximum_absolute_difference": 0.47640368144558876,
+      "minimum_absolute_difference": 0.1051095625643148,
+      "p_values": [
+        0.05,
+        0.1,
+        0.2,
+        0.4,
+        0.8
+      ],
+      "paper_method": "ECCP(sqrt)",
+      "paper_values": [
+        3.4721359549995796,
+        2.162277660168379,
+        1.2360679774997898,
+        0.5811388300841895,
+        0.1180339887498949
+      ],
+      "released_values": [
+        2.995732273553991,
+        2.3025850929940455,
+        1.6094379124341003,
+        0.916290731874155,
+        0.2231435513142097
+      ]
+    },
+    {
+      "all_witness_values_differ": true,
+      "maximum_absolute_difference": 2.172531249999999,
+      "minimum_absolute_difference": 0.3919999999999999,
+      "p_values": [
+        0.05,
+        0.1,
+        0.2,
+        0.4,
+        0.8
+      ],
+      "paper_method": "ECCP(linear)",
+      "paper_values": [
+        1.9,
+        1.8,
+        1.6,
+        1.2,
+        0.3999999999999999
+      ],
+      "released_values": [
+        4.072531249999999,
+        3.2805,
+        2.0480000000000005,
+        0.6479999999999999,
+        0.007999999999999993
+      ]
+    }
+  ],
+  "paper_definitions": {
+    "F1": "-log(p)",
+    "F2": "p**(-0.5)-1",
+    "F3": "2*(1-p)"
+  },
+  "paper_main_tex_sha256": "49058ff8e986f43770936c09cc97360e5cace8802c6304a80d9e153d342ae857",
+  "paper_source_archive_sha256": "f5124c39036b9107b01439fdbeb5da82331a70b81a3211e3b36887e08109a2db",
+  "paper_source_url": "https://export.arxiv.org/e-print/2606.03600v1",
+  "released_eccp_utils_sha256": "7ef06bed7bef7c72dae5f760cf0f0c2b4cf4318af44f87763ac8cc0ab0687593",
+  "released_main_py_sha256": "4bfabc2a937a633db3d95a70f76e961a5541319b332e1452617ca6f64a8a57d6",
+  "released_result_columns": {
+    "F1_table_position": "p**(-0.5)-1",
+    "F2_table_position": "-log(p)",
+    "F3_table_position": "5*(1-p)**4"
+  },
+  "summary": {
+    "affected_paper_table_cells": 27,
+    "affected_paper_table_scalars": 108,
+    "all_numerical_witness_values_differ": true,
+    "discrepant_method_count": 3,
+    "paper_formula_contract_verified": true,
+    "paper_source_column_mismatch_verified": true,
+    "released_column_order_verified_for_all_models": true,
+    "released_formula_contract_verified": true
+  }
+}

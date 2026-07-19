@@ -30,6 +30,10 @@ from repro.src.verify_ca_p2e_domains import verify_domains
 from repro.src.render_final_logbook import build_cells
 from repro.src.run_author_ccp import EXECUTION_ADAPTER, METHOD_KEYS, PAPER_DATASETS
 from repro.src.verify_ccp_results import CALIBRATOR_BASELINES
+from repro.src.verify_ccp_calibrator_contract import (
+    DISCREPANCY_MAP,
+    numerical_witnesses,
+)
 from repro.src.verify_paper_table_fixture import (
     ALTERNATIVE_CA_METHODS,
     CA_DATASET_KEYS,
@@ -236,7 +240,7 @@ class FullProtocolTests(unittest.TestCase):
         self.assertLess(enqueue, wait_for_space)
         self.assertIn('gate["live_claims_verified"] == 6', publisher)
         self.assertIn('gate["maximum_points"] == 12', publisher)
-        self.assertIn('len(gate["artifact_paths"]) == 20', publisher)
+        self.assertIn('len(gate["artifact_paths"]) == 21', publisher)
 
         post_gate = (root / "repro/src/post_ccp_gate.sh").read_text(
             encoding="utf-8"
@@ -283,6 +287,13 @@ class FullProtocolTests(unittest.TestCase):
                 "linear": "ECCP(linear)",
             },
         )
+        self.assertEqual(
+            set(DISCREPANCY_MAP),
+            {"ECCP(log)", "ECCP(sqrt)", "ECCP(linear)"},
+        )
+        witnesses = numerical_witnesses()
+        self.assertEqual(len(witnesses), 3)
+        self.assertTrue(all(row["all_witness_values_differ"] for row in witnesses))
 
         headlines = json.loads(
             (root / "repro/configs/paper_headlines.json").read_text(encoding="utf-8")
@@ -706,10 +717,29 @@ class FullProtocolTests(unittest.TestCase):
         }
         headlines = {
             "summary": {
-                "all_within_tolerance": True,
                 "comparison_count": 122,
                 "scalar_comparison_count": 488,
-                "within_tolerance_scalar_count": 488,
+                "all_unaffected_within_tolerance": True,
+                "all_outside_tolerance_cells_accounted_for": True,
+                "unaffected_comparison_count": 95,
+                "unaffected_within_tolerance_count": 95,
+                "unaffected_scalar_comparison_count": 380,
+                "unaffected_within_tolerance_scalar_count": 380,
+                "known_discrepancy_comparison_count": 27,
+                "known_discrepancy_scalar_comparison_count": 108,
+                "unexpected_outside_tolerance_count": 0,
+            }
+        }
+        calibrator_contract = {
+            "summary": {
+                "paper_formula_contract_verified": True,
+                "released_formula_contract_verified": True,
+                "released_column_order_verified_for_all_models": True,
+                "paper_source_column_mismatch_verified": True,
+                "all_numerical_witness_values_differ": True,
+                "discrepant_method_count": 3,
+                "affected_paper_table_cells": 27,
+                "affected_paper_table_scalars": 108,
             }
         }
 
@@ -721,6 +751,7 @@ class FullProtocolTests(unittest.TestCase):
             weca_independence,
             ca_domains,
             claim3,
+            calibrator_contract,
             headlines,
         )
         self.assertIn("FULL_GATE_READY: jNv4sl4YZH", cells["conclusion"])
@@ -739,5 +770,6 @@ class FullProtocolTests(unittest.TestCase):
                 weca_independence,
                 ca_domains,
                 claim3,
+                calibrator_contract,
                 headlines,
             )

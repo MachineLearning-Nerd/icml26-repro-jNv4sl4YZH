@@ -89,6 +89,8 @@ python repro/src/compare_paper_headlines.py \
 # all 122 fixture cells / 488 scalars were transcribed exactly from its TeX.
 python repro/src/verify_paper_table_fixture.py \
   --output outputs/paper_table_fixture_audit.json
+python repro/src/verify_ccp_calibrator_contract.py \
+  --source upstream --output outputs/ccp_calibrator_contract_audit.json
 python -m unittest discover -s repro/tests -v
 ```
 
@@ -110,12 +112,14 @@ python repro/src/prepublish_gate.py \
 
 After the full source runs finish, `python repro/src/prepublish_gate.py` reruns
 all independent checks and tests, validates every raw cell, verifies the
-Trackio evidence and source pin, checks all 488 reported mean/SD scalars in the
-122 tabulated paper cells, requires all 24 CA material-efficiency comparisons
+Trackio evidence and source pin, compares all 488 reported mean/SD scalars in
+the 122 tabulated paper cells, requires all 380 unaffected scalars to pass and
+all 108 scalars in the paper/released-code F1/F2/F3 inconsistency to be
+source-hash-bound and explicitly classified, requires all 24 CA material-efficiency comparisons
 and all 36 CCP calibrator comparisons (including nine AoN cells), scans for
 secrets/local paths, and emits a SHA-256 manifest only if the complete
 publication gate passes. It also creates
-a hash-indexed JSONL bundle containing thirteen summary/report artifacts and all
+a hash-indexed JSONL bundle containing fourteen summary/report artifacts and all
 seven full raw dataset files; Trackio recognizes this format and promotes
 it to the Hugging Face artifact bucket on publication.
 
@@ -132,7 +136,11 @@ its artifact source path cannot leak into GitHub.
 
 The source and environment are pinned. The full four-dataset CA run is complete
 at 1,920/1,920 cells. The six-claim theorem/mechanism audit passes. The full
-11,700-cell CCP run is active; final verdict rendering, the fail-closed gate,
+11,700-cell CCP run is active; Boston and Abalone are complete and Parkinson is
+running. A hash-bound audit verifies that the paper defines the three
+alternative CCP columns as log/square-root/linear while the released table
+driver fills those positions with square-root/log/power; formula-faithful
+results remain honestly labeled. Final verdict rendering, the fail-closed gate,
 GitHub push, and canonical HF queue handoff are serialized behind it.
 The environment pins `pandas==2.3.3` because the unmodified released Parkinson
 loader relies on a Pandas-2-compatible in-place numeric assignment; the reason

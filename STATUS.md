@@ -514,3 +514,17 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   coverage `0.90` at nominal `0.90`). This is an early failure detector only;
   the final gate still requires the exact combined 11,700-cell set across
   Boston, Abalone, and Parkinson before any verdict, push, or queue entry.
+
+- **2026-07-19 22:54 IST queue and discrepancy audit:** the shared Hugging Face
+  drain remains the sole publisher and has resolved all 42 existing canonical
+  backlog entries. The verified publication path pushes GitHub first, then
+  atomically enqueues this paper, waits for the drain, and reads the public
+  Space and artifact bucket back; its ordering/fail-closed tests pass. This
+  paper is intentionally absent until the six-claim gate completes. Boston and
+  Abalone are now complete (7,800/11,700 cells) and Parkinson is running. A new
+  audit bound to the exact arXiv TeX and released source hashes proves that the
+  paper's CCP F1/F2/F3 definitions (log/square-root/linear) disagree with the
+  released table driver's column formulas (square-root/log/power). The final
+  gate preserves formula-faithful labels, requires all 380 unaffected paper
+  scalars to pass, classifies the 108 affected scalars, and rejects any
+  unexpected drift. The evidence bundle will contain 21 records.

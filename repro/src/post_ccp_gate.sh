@@ -100,6 +100,13 @@ trackio logbook run \
 
 trackio logbook run \
   --page "Methods & source audit" \
+  --title "Paper and released-code calibrator contract audit" \
+  -- python repro/src/verify_ccp_calibrator_contract.py \
+  --source upstream \
+  --output outputs/ccp_calibrator_contract_audit.json
+
+trackio logbook run \
+  --page "Methods & source audit" \
   --title "Paper headline comparison" \
   -- python repro/src/compare_paper_headlines.py \
   --ca outputs/claim2_independent.json \
@@ -113,11 +120,20 @@ from pathlib import Path
 result = json.loads(Path("outputs/paper_headline_comparison.json").read_text())
 summary = result["summary"]
 assert summary["comparison_count"] == 122
-assert summary["all_within_tolerance"]
-assert summary["within_tolerance_count"] == 122
 assert summary["scalar_comparison_count"] == 488
-assert summary["within_tolerance_scalar_count"] == 488
-print("All 488 reported scalars in 122 paper-table cells are within tolerance")
+assert summary["all_unaffected_within_tolerance"]
+assert summary["all_outside_tolerance_cells_accounted_for"]
+assert summary["unaffected_comparison_count"] == 95
+assert summary["unaffected_within_tolerance_count"] == 95
+assert summary["unaffected_scalar_comparison_count"] == 380
+assert summary["unaffected_within_tolerance_scalar_count"] == 380
+assert summary["known_discrepancy_comparison_count"] == 27
+assert summary["known_discrepancy_scalar_comparison_count"] == 108
+assert summary["unexpected_outside_tolerance_count"] == 0
+print(
+    "All 380 unaffected scalars pass; all 27 paper/source-discrepant cells "
+    "are classified by the hash-bound contract audit"
+)
 PY
 
 trackio logbook run \

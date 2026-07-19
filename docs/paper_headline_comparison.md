@@ -24,7 +24,25 @@ scope targeted by `docs/arbitrary_dependence_coverage.md`.
 
 Primary source: <https://arxiv.org/html/2606.03600v1>
 
-The comparison is deliberately separate from claim verification:
+The comparison is deliberately separate from claim verification. A
+hash-pinned audit found a material formula/column inconsistency in the primary
+artifacts: the paper defines CCP F1/F2/F3 as log, square-root, and linear, while
+the released `e-ccp/main.py` fills those three table positions from
+`int_cc_eval_sqrt`, `int_cc_eval_log`, and `int_cc_eval_pow`; the last computes
+`5(1-p)^4`, not the paper's `2(1-p)`. This affects 27 CCP cells (108 scalars).
+`repro/src/verify_ccp_calibrator_contract.py` binds the paper TeX, released
+driver, and released utility implementation by SHA-256 and supplies numerical
+witnesses that all three formula pairs differ.
+
+The fail-closed policy therefore requires all 95 unaffected cells (380 scalars)
+to reproduce within the predeclared tolerances, requires all 27 discrepant
+cells to be classified by that source-bound certificate, and rejects any
+outside-tolerance cell outside the certified discrepancy set. The empirical
+claim verifier keeps the actual paper-defined log/square-root/linear formulas;
+it never swaps labels or substitutes the released power calibrator merely to
+make the appendix table appear to match.
+
+More generally:
 
 - raw-row completeness, coverage, length, and negative controls determine
   whether the reproduction supports a claim;
