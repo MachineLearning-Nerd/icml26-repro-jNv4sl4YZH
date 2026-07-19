@@ -86,6 +86,22 @@ def validate_local_path_artifacts(
     return len(local_path_artifacts)
 
 
+def validate_required_local_artifact(
+    metadata: dict[str, object], relative: str, root: Path = ROOT
+) -> dict[str, object]:
+    """Require one exact Trackio path-artifact entry for the final bundle."""
+    validate_local_path_artifacts(metadata, root)
+    entries = metadata.get("local_path_artifacts", [])
+    assert isinstance(entries, list)
+    matches = [entry for entry in entries if entry.get("path") == relative]
+    assert len(matches) == 1, f"required Trackio artifact is not registered: {relative}"
+    entry = matches[0]
+    path = root / relative
+    assert entry.get("artifact_type") == "dataset"
+    assert entry.get("size") == path.stat().st_size
+    return entry
+
+
 def hygiene_gate() -> dict[str, object]:
     env_files = [
         str(path.relative_to(ROOT))

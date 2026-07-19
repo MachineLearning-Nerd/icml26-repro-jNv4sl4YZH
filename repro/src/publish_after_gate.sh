@@ -42,7 +42,10 @@ python - <<'PY'
 import json
 from pathlib import Path
 
-from repro.src.prepublish_gate import hygiene_gate
+from repro.src.prepublish_gate import (
+    hygiene_gate,
+    validate_required_local_artifact,
+)
 
 gate = json.loads(Path("outputs/prepublish_gate.json").read_text(encoding="utf-8"))
 assert gate["paper"] == "jNv4sl4YZH"
@@ -54,8 +57,16 @@ assert Path(gate["trackio_artifact_bundle"]).is_file()
 assert "FULL_GATE_READY: jNv4sl4YZH" in Path(
     ".trackio/logbook/pages/conclusion/page.md"
 ).read_text(encoding="utf-8")
-hygiene_gate()
-print("Verified fresh fail-closed gate, bundle, conclusion marker, and hygiene")
+hygiene = hygiene_gate()
+metadata = json.loads(Path(".trackio/metadata.json").read_text(encoding="utf-8"))
+validate_required_local_artifact(
+    metadata, "outputs/jNv4sl4YZH_full_evidence_bundle.jsonl"
+)
+assert hygiene["local_path_artifact_count"] >= 1
+print(
+    "Verified fresh fail-closed gate, registered bundle, conclusion marker, "
+    "and hygiene"
+)
 PY
 
 if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then

@@ -115,6 +115,12 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   and CCP. This is explicitly labeled a gross-undercoverage check rather than
   evidence of exactness; the exact rank/e-value and arbitrary-dependence LP
   certificate remains independently required.
+- Audited Trackio `0.31.5` artifact capture: the wrapped final gate detects its
+  newly written `.jsonl` bundle and registers a deduplicated local path artifact
+  after the command exits. The publisher now refuses all external writes unless
+  metadata contains exactly the required bundle path with the correct resolved
+  local source, `dataset` type, and byte size. The later Hugging Face bucket
+  readback still independently requires the public object at that exact size.
 - Ran all eighteen local mechanism/protocol/author-launcher/raw-verifier and
   paper-headline drift-control tests successfully (including positive and
   deliberately incomplete raw fixtures), including local-only Trackio artifact

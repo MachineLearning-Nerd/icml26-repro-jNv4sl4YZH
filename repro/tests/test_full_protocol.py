@@ -7,6 +7,7 @@ from repro.src.prepublish_gate import (
     hygiene_gate,
     sha256,
     validate_local_path_artifacts,
+    validate_required_local_artifact,
     write_artifact_bundle,
 )
 from repro.src.render_final_logbook import build_cells
@@ -61,6 +62,20 @@ class FullProtocolTests(unittest.TestCase):
                 ]
             }
             self.assertEqual(validate_local_path_artifacts(valid, directory), 1)
+            valid["local_path_artifacts"][0]["size"] = artifact.stat().st_size
+            valid["local_path_artifacts"][0]["artifact_type"] = "dataset"
+            self.assertEqual(
+                validate_required_local_artifact(
+                    valid, "outputs/evidence.jsonl", directory
+                )["path"],
+                "outputs/evidence.jsonl",
+            )
+            valid["local_path_artifacts"][0]["size"] += 1
+            with self.assertRaises(AssertionError):
+                validate_required_local_artifact(
+                    valid, "outputs/evidence.jsonl", directory
+                )
+            valid["local_path_artifacts"][0]["size"] = artifact.stat().st_size
             valid["local_path_artifacts"][0]["abs_path"] = str(directory / "wrong")
             with self.assertRaises(AssertionError):
                 validate_local_path_artifacts(valid, directory)
