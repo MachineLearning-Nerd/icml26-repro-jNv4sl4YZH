@@ -45,6 +45,20 @@ exact-rank-boundary inputs must be rejected. This corrects an earlier audit
 grid that included `(n=10, alpha=.05)` as a numerical extension even though it
 was outside the stated theorem domain.
 
+The released CA split/subsampling logic generates 1,680 internal P2E
+calibration contexts across ECA, WECA tuning, and WECA final calibration.
+An audit that executes that pinned logic finds 1,600 contexts inside the stated
+theorem domain and 80 exact-rank boundaries across 27 unique calibration
+sizes. At a boundary `alpha=m/(n+1)`, no positive strictly decreasing
+calibrator normalized at `F(alpha)=1/alpha` can have exact mean one: its first
+`m` rank values already sum to at least `n+1`, while later positive values add
+more. The released implementation uses its `C=1e6` upper bracket there, a
+floating-point limit that produces the same prediction set and differs from
+exact all-or-nothing values by at most `6.43e-174`. The audit verifies the
+source behavior and an exact mean-one all-or-nothing repair separately. These
+80 empirical source cells remain part of the released-protocol reproduction,
+but are not described as positive exact-P2E theorem instances.
+
 The WECA guarantee additionally requires its selected nonuniform weights not
 to depend on final inference e-values. The pinned source partitions calibration
 indices into `i1/i2/i3`, builds candidate weights from `i1` scores and `i2`

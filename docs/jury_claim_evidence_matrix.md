@@ -16,3 +16,9 @@ creating the publication manifest.
 The empirical coverage estimates check the released applications and headline
 numbers; the exact rank enumeration and adversarial-coupling LP check the
 finite-sample guarantee. Neither is presented as a substitute for the other.
+For C2 and C3, `outputs/ca_p2e_domain_audit.json` additionally accounts for
+all 1,680 internal released CA calibration contexts: 1,600 are in the stated
+P2E theorem domain and 80 are exact-rank numerical-limit contexts. The latter
+preserve the source prediction sets and admit exact mean-one AoN repairs, but
+are disclosed separately rather than labeled as positive exact-P2E theorem
+instances.

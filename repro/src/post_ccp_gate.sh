@@ -36,6 +36,13 @@ trackio logbook run \
 
 trackio logbook run \
   --page "Methods & source audit" \
+  --title "Released CA P2E theorem-domain audit" \
+  -- python repro/src/verify_ca_p2e_domains.py \
+  --source upstream \
+  --output outputs/ca_p2e_domain_audit.json
+
+trackio logbook run \
+  --page "Methods & source audit" \
   --title "Released source and dataset manifest audit" \
   -- python repro/src/verify_source_manifest.py \
   --source upstream \

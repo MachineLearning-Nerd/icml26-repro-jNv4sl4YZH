@@ -317,6 +317,7 @@ def main() -> None:
     commands = (
         [sys.executable, "repro/src/verify_source_manifest.py", "--source", "upstream", "--output", "outputs/source_manifest_audit.json"],
         [sys.executable, "repro/src/verify_ca_inputs.py", "--source", "upstream", "--output", "outputs/ca_input_audit.json"],
+        [sys.executable, "repro/src/verify_ca_p2e_domains.py", "--source", "upstream", "--output", "outputs/ca_p2e_domain_audit.json"],
         [sys.executable, "repro/src/verify_p2e_identity.py", "--output", "outputs/claim1_independent.json"],
         [sys.executable, "repro/src/crosscheck_source_p2e.py", "--source", "upstream", "--output", "outputs/claim1_source_crosscheck.json"],
         [sys.executable, "repro/src/verify_e_merge_coverage.py", "--output", "outputs/claim3_independent_e_merge.json"],
@@ -367,6 +368,32 @@ def main() -> None:
         "task_count": 4,
         "total_feature_values": 47_126,
         "total_rows": 7_776,
+    }
+
+    ca_domains = load_json("outputs/ca_p2e_domain_audit.json")
+    assert ca_domains["source"] == (
+        "Nabil-Ala/P2E_calibration@66cb1e1c76d1b1d3d133fe6cb3896c95d48b5974"
+    )
+    assert ca_domains["context_counts"] == {
+        "eca": 560, "weca_final": 560, "weca_tune": 560
+    }
+    assert ca_domains["boundary_context_counts"] == {
+        "eca": 33, "weca_final": 22, "weca_tune": 25
+    }
+    assert ca_domains["summary"] == {
+        "all_boundary_source_float_expectations_pass": True,
+        "all_boundary_source_set_identities_pass": True,
+        "all_boundary_source_uses_upper_bracket": True,
+        "all_contexts_accounted_for": True,
+        "all_exact_aon_repairs_pass": True,
+        "all_low_level_conditions_pass": True,
+        "all_theorem_contexts_in_domain": True,
+        "boundary_context_count": 80,
+        "boundary_unique_size_count": 27,
+        "context_count": 1_680,
+        "maximum_boundary_float_deviation_from_aon": 6.422607377437694e-174,
+        "positive_exact_boundary_calibrator_impossible": True,
+        "theorem_context_count": 1_600,
     }
 
     claim1 = load_json("outputs/claim1_independent.json")
@@ -559,6 +586,7 @@ def main() -> None:
             "Exchangeable and randomized e-merge coverage certificate",
         ),
         ".trackio/logbook/pages/methods-source-audit/page.md": (
+            "Released CA P2E theorem-domain audit",
             "Released OpenML CA input fingerprint audit",
             "Released source and dataset manifest audit",
             "Primary TeX table fixture audit",
@@ -575,6 +603,7 @@ def main() -> None:
 
     hygiene = hygiene_gate()
     artifacts = (
+        "outputs/ca_p2e_domain_audit.json",
         "outputs/ca_input_audit.json",
         "outputs/source_manifest_audit.json",
         "outputs/claim1_independent.json",

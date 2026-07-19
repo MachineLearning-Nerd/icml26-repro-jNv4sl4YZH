@@ -64,7 +64,7 @@ Face quota does not affect local implementation work. The fail-closed
 tests, validates the 1,920 CA and 11,700 CCP cell sets, requires all 122 tabulated paper
 headline cells within tolerance, verifies the source pin and Trackio evidence,
 scans hygiene, and hashes every final artifact. It cannot pass until the full
-source outputs and final Conclusion marker exist. On success it packages eleven
+source outputs and final Conclusion marker exist. On success it packages twelve
 summary/report artifacts plus all seven raw dataset files into one hash-indexed JSONL
 artifact that Trackio will promote to the Hugging Face bucket.
 The headline tolerances were fixed before the remaining results existed at
@@ -468,3 +468,20 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   untouched CA worker remained compute-active at `97.9%` CPU and about `193 MB`
   RSS; the handoffs and shared HF drain remained alive. The audit is committed
   at `95f579b`; refreshed post-CCP watcher PID `3571647` owns the singleton lock.
+- Every internal P2E calibration size produced by the released CA split and
+  subsampling code is now audited. Of 1,680 ECA/WECA contexts, 1,600 satisfy
+  the paper's exact theorem domain and 80 hit an exact-rank boundary. The
+  released `C=1e6` numerical limit preserves all boundary prediction sets and
+  differs from exact AoN values by at most `6.43e-174`; an exact AoN repair has
+  mean one and the same set in all 27 unique boundary sizes. The final logbook
+  and claim matrix disclose these 80 empirical contexts rather than calling
+  them positive exact-P2E theorem instances. The audit is Trackio-captured,
+  required by the gate, and raises the future evidence bundle to 19 records.
+  All 33 tests, compilation, shell syntax, publication preflight, and diff
+  checks pass. A real premature gate accepted the new audit before rejecting
+  the absent fourth CA artifact and left no manifest or bundle. At
+  `2026-07-19 21:58 IST`, the untouched CA worker remained active at `97.9%`
+  CPU with three complete 480-row artifacts; both serialized handoffs and the
+  shared HF drain remained alive. The shared drain has published all 42 current
+  backlog entries, and this paper will join it atomically only after the full
+  three-claim gate and first GitHub push succeed.

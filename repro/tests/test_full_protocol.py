@@ -19,6 +19,7 @@ from repro.src.prepublish_gate import (
     write_artifact_bundle,
 )
 from repro.src.verify_ca_inputs import verify_inputs
+from repro.src.verify_ca_p2e_domains import verify_domains
 from repro.src.render_final_logbook import build_cells
 from repro.src.run_author_ccp import EXECUTION_ADAPTER, METHOD_KEYS, PAPER_DATASETS
 from repro.src.verify_ccp_results import CALIBRATOR_BASELINES
@@ -203,7 +204,7 @@ class FullProtocolTests(unittest.TestCase):
         self.assertLess(initial_push, enqueue)
         self.assertLess(enqueue, wait_for_space)
         self.assertIn('gate["live_claims_verified"] == 3', publisher)
-        self.assertIn('len(gate["artifact_paths"]) == 18', publisher)
+        self.assertIn('len(gate["artifact_paths"]) == 19', publisher)
 
     def test_protocol_matches_released_paper_scale(self):
         root = Path(__file__).resolve().parents[2]
@@ -432,6 +433,30 @@ class FullProtocolTests(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             source_contract(source.replace("X2 = _rows(X_calib, i2)", "X2 = X_test"))
 
+    def test_ca_p2e_domain_audit_accounts_for_every_released_context(self):
+        root = Path(__file__).resolve().parents[2]
+        manifest = json.loads(
+            (root / "repro/configs/ca_input_manifest.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        audit = json.loads(
+            (root / "outputs/ca_p2e_domain_audit.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        self.assertEqual(
+            audit["boundary_context_counts"],
+            {"eca": 33, "weca_tune": 25, "weca_final": 22},
+        )
+        self.assertEqual(
+            verify_domains(root / "upstream", manifest)["summary"],
+            audit["summary"],
+        )
+        corrupted = {**manifest, "source": "wrong/source@commit"}
+        with self.assertRaises(AssertionError):
+            verify_domains(root / "upstream", corrupted)
+
     def test_trackio_evidence_bundle_is_hash_indexed_and_roundtrips_json(self):
         root = Path(__file__).resolve().parents[2]
         with tempfile.TemporaryDirectory(dir=root / "outputs") as temp:
@@ -558,6 +583,22 @@ class FullProtocolTests(unittest.TestCase):
                 "case_count": 6,
             }
         }
+        ca_domains = {
+            "summary": {
+                "all_contexts_accounted_for": True,
+                "all_low_level_conditions_pass": True,
+                "all_theorem_contexts_in_domain": True,
+                "all_boundary_source_set_identities_pass": True,
+                "all_boundary_source_float_expectations_pass": True,
+                "all_boundary_source_uses_upper_bracket": True,
+                "all_exact_aon_repairs_pass": True,
+                "positive_exact_boundary_calibrator_impossible": True,
+                "context_count": 1_680,
+                "theorem_context_count": 1_600,
+                "boundary_context_count": 80,
+                "maximum_boundary_float_deviation_from_aon": 1e-173,
+            }
+        }
         claim3 = {
             "protocol": {"execution_adapter": "vectorized-exact-postprocessing-v1"},
             "rows_seen": 11_700,
@@ -606,7 +647,13 @@ class FullProtocolTests(unittest.TestCase):
         }
 
         cells = build_cells(
-            claim1, claim2, mechanism, weca_independence, claim3, headlines
+            claim1,
+            claim2,
+            mechanism,
+            weca_independence,
+            ca_domains,
+            claim3,
+            headlines,
         )
         self.assertIn("FULL_GATE_READY: jNv4sl4YZH", cells["conclusion"])
         self.assertIn("24/24", cells["claim_2"])
@@ -615,5 +662,11 @@ class FullProtocolTests(unittest.TestCase):
         claim2["summary"]["p2e_shorter_count"] = 23
         with self.assertRaises(RuntimeError):
             build_cells(
-                claim1, claim2, mechanism, weca_independence, claim3, headlines
+                claim1,
+                claim2,
+                mechanism,
+                weca_independence,
+                ca_domains,
+                claim3,
+                headlines,
             )
