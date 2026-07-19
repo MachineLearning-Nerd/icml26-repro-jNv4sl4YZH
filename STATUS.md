@@ -258,4 +258,7 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   the eight CA P2E cells. All 392 coverage/length mean/SD scalars across 98
   cells are now fail-closed publication requirements. An independent parser
   matched all 90 CCP configuration cells field-for-field against the primary
-  arXiv TeX, preventing manual-transcription drift.
+  arXiv TeX, preventing manual-transcription drift. The live post-CCP watcher,
+  final renderer, prepublication gate, tests, documentation, and captured
+  Trackio audit now all require the same 98-cell/392-scalar totals (`a5505cd`,
+  `010fb7c`, `8adf111`).
