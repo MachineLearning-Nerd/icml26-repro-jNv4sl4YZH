@@ -325,3 +325,45 @@ Ran 1 test in 1.367s
 OK
 
 ````
+
+
+---
+<!-- trackio-cell
+{"type": "code", "id": "cell_d86aaed01837", "created_at": "2026-07-19T13:29:06+00:00", "title": "Exact-method and two-application efficiency gate suite", "command": ["python", "-m", "unittest", "discover", "-s", "repro/tests", "-v"], "exit_code": 0, "duration_s": 7.505}
+-->
+````bash
+$ python -m unittest discover -s repro/tests -v
+````
+
+exit 0 · 7.5s
+
+
+````output
+test_ca_dry_run_uses_released_full_protocol_and_portable_provenance (test_author_runner_preflight.AuthorRunnerPreflightTests.test_ca_dry_run_uses_released_full_protocol_and_portable_provenance) ... ok
+test_ccp_input_preflight_loads_author_bundles_at_paper_fold_counts (test_author_runner_preflight.AuthorRunnerPreflightTests.test_ccp_input_preflight_loads_author_bundles_at_paper_fold_counts) ... ok
+test_ccp_rng_replay_matches_real_source_power_intervals (test_author_runner_preflight.AuthorRunnerPreflightTests.test_ccp_rng_replay_matches_real_source_power_intervals) ... ok
+test_ccp_seed_checkpoint_accepts_complete_cells_and_rejects_partial_cells (test_author_runner_preflight.AuthorRunnerPreflightTests.test_ccp_seed_checkpoint_accepts_complete_cells_and_rejects_partial_cells) ... boston: completed seed 45
+ok
+test_ccp_wrapper_reconstructs_the_paper_f3_linear_calibrator (test_author_runner_preflight.AuthorRunnerPreflightTests.test_ccp_wrapper_reconstructs_the_paper_f3_linear_calibrator) ... ok
+test_exact_enumerations_pass_and_invalid_control_fails (test_e_merge_coverage.EMergeCoverageTests.test_exact_enumerations_pass_and_invalid_control_fails) ... ok
+test_lp_rejects_invalid_weight_vectors (test_e_merge_coverage.EMergeCoverageTests.test_lp_rejects_invalid_weight_vectors) ... ok
+test_two_fold_lp_matches_independent_permutation_enumeration (test_e_merge_coverage.EMergeCoverageTests.test_two_fold_lp_matches_independent_permutation_enumeration) ... ok
+test_expected_ccp_raw_cell_count (test_full_protocol.FullProtocolTests.test_expected_ccp_raw_cell_count) ... ok
+test_final_logbook_renderer_fails_closed_and_emits_gate_marker (test_full_protocol.FullProtocolTests.test_final_logbook_renderer_fails_closed_and_emits_gate_marker) ... ok
+test_official_jury_claim_snapshot_has_three_claims_and_six_points (test_full_protocol.FullProtocolTests.test_official_jury_claim_snapshot_has_three_claims_and_six_points) ... ok
+test_protocol_matches_released_paper_scale (test_full_protocol.FullProtocolTests.test_protocol_matches_released_paper_scale) ... ok
+test_publication_metadata_and_local_artifact_hygiene (test_full_protocol.FullProtocolTests.test_publication_metadata_and_local_artifact_hygiene) ... ok
+test_trackio_evidence_bundle_is_hash_indexed_and_roundtrips_json (test_full_protocol.FullProtocolTests.test_trackio_evidence_bundle_is_hash_indexed_and_roundtrips_json) ... ok
+test_classic_calibrator_controls_expand_the_set (test_p2e_identity.P2EIdentityTests.test_classic_calibrator_controls_expand_the_set) ... ok
+test_full_grid_summary_passes (test_p2e_identity.P2EIdentityTests.test_full_grid_summary_passes) ... ok
+test_p2e_exactly_preserves_each_finite_rank_set (test_p2e_identity.P2EIdentityTests.test_p2e_exactly_preserves_each_finite_rank_set) ... ok
+test_ca_verifier_requires_each_method_seed_cell (test_raw_verifiers.RawVerifierTests.test_ca_verifier_requires_each_method_seed_cell) ... ok
+test_ccp_verifier_requires_each_model_method_seed_cell (test_raw_verifiers.RawVerifierTests.test_ccp_verifier_requires_each_model_method_seed_cell) ... ok
+test_paper_headline_comparison_reports_matching_and_drifted_cells (test_raw_verifiers.RawVerifierTests.test_paper_headline_comparison_reports_matching_and_drifted_cells) ... ok
+
+----------------------------------------------------------------------
+Ran 20 tests in 6.890s
+
+OK
+
+````
