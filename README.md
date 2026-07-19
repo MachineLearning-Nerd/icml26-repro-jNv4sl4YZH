@@ -7,8 +7,10 @@ ICML 2026 paper / OpenReview `jNv4sl4YZH` / arXiv `2606.03600`.
 This reproduction evaluates all three challenge claims at the released paper
 protocol, rather than treating a small synthetic example as a substitute:
 
-1. The finite-sample P2E mapping preserves the original conformal prediction
-   set while producing an exact e-value.
+1. Inside the paper's exact main-theorem domain
+   (`alpha*(n+1) > 1` and non-integer), the finite-sample P2E mapping preserves
+   the original conformal prediction set while producing an exact e-value.
+   Five excluded-domain inputs are required to fail closed.
 2. P2E-based conformal aggregation is more efficient than the released
    comparator calibrators on the paper's four 20-seed OpenML tasks.
 3. The released cross-conformal and aggregation constructions satisfy their

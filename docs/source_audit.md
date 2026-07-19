@@ -28,6 +28,14 @@ construct the finite rank distribution and P2E threshold separately, recompute
 the e-value expectation and p/e set equality, and reconstruct coverage and
 length summaries from raw output rows.
 
+The hash-pinned primary TeX states the main P2E theorem only when
+`alpha*(n+1) > 1` and this quantity is non-integer. The Claim-1 verifier now
+enforces that contract before solving for the calibrator: its 18 positive cells
+all satisfy the theorem assumptions, and five deliberately low-level or
+exact-rank-boundary inputs must be rejected. This corrects an earlier audit
+grid that included `(n=10, alpha=.05)` as a numerical extension even though it
+was outside the stated theorem domain.
+
 The WECA guarantee additionally requires its selected nonuniform weights not
 to depend on final inference e-values. The pinned source partitions calibration
 indices into `i1/i2/i3`, builds candidate weights from `i1` scores and `i2`

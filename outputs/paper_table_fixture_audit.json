@@ -1,4 +1,11 @@
 {
+  "claim1_theorem_contract": {
+    "alpha_rank_domain": "alpha*(n+1) > 1 and non-integer",
+    "label": "main_theorem",
+    "normalized_logistic_formula_verified": true,
+    "strict_s_interval_verified": true,
+    "theorem_block_sha256": "86e98bc09083541aa2b908c96db4c460d78904929e64b6cf21bf1c435181ba71"
+  },
   "config_sha256": "8c437380b9c5569f71b1e9923f3f6d074298e92b70efa9b2fbbff3969bb48a78",
   "main_tex_sha256": "49058ff8e986f43770936c09cc97360e5cace8802c6304a80d9e153d342ae857",
   "source_archive_sha256": "f5124c39036b9107b01439fdbeb5da82331a70b81a3211e3b36887e08109a2db",

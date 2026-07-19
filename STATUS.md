@@ -24,10 +24,13 @@ but unpublished.
 ## Full-scope plan
 
 1. **C1 — complete:** the clean-room finite-rank construction passed all 18
-   `(n, alpha)` cells: zero p/e set mismatches, exact-e expectation error at
-   most `4.45e-16`, and all eligible classic-calibrator controls inflate the
-   set. A separate invocation of the pinned author implementation has the
-   same 18/18 membership identities and exact expectations. The source emits
+   theorem-domain `(n, alpha)` cells: zero p/e set or threshold mismatches,
+   exact-e expectation error at most `4.45e-16`, and all classic-calibrator
+   controls inflate the set. The theorem domain (`alpha*(n+1) > 1` and
+   non-integer) is parsed from the hash-pinned primary TeX; all five excluded
+   low-level/rank-boundary controls are rejected. A separate invocation of the
+   pinned author implementation has the same 18/18 membership identities and
+   exact expectations. The source emits
    IEEE underflowed zeros for extremely small, already-excluded e-values at
    `n>=100`; this is documented in `outputs/claim1_source_crosscheck.json` and
    does not alter the threshold decisions.
@@ -61,7 +64,7 @@ Face quota does not affect local implementation work. The fail-closed
 tests, validates the 1,920 CA and 11,700 CCP cell sets, requires all 122 tabulated paper
 headline cells within tolerance, verifies the source pin and Trackio evidence,
 scans hygiene, and hashes every final artifact. It cannot pass until the full
-source outputs and final Conclusion marker exist. On success it packages seven
+source outputs and final Conclusion marker exist. On success it packages ten
 summary/report artifacts plus all seven raw dataset files into one hash-indexed JSONL
 artifact that Trackio will promote to the Hugging Face bucket.
 The headline tolerances were fixed before the remaining results existed at
@@ -438,3 +441,17 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   and about `191 MB` RSS; both serialized handoffs and the shared HF drain
   remained alive. The implementation is committed at `a421cbd`; the refreshed
   post-CCP watcher owns its singleton lock as PID `3567976`.
+- Claim 1 now follows the main theorem's exact stated assumptions instead of
+  counting an empirical extension as theorem evidence. The primary-TeX audit
+  hash-binds the theorem block and verifies its domain, strict `s` interval,
+  and normalized logistic formula. The earlier `(n=10, alpha=.05)` cell is
+  outside the theorem because `alpha*(n+1)=.55`; it has been replaced by the
+  theorem-valid `(40,.05)` cell. All 18/18 positive cells pass source and
+  independent membership, exact-threshold, exact-expectation, and positivity
+  checks; all 18 classical-calibrator controls inflate; five out-of-domain
+  controls reject. The updated evidence is captured in Trackio, all 31 tests
+  pass, and the real premature gate accepts Claim 1 before still stopping at
+  the missing fourth CA artifact with no manifest or bundle. At
+  `2026-07-19 21:36 IST`, the untouched CA worker remained active at `97.9%`
+  CPU with about `25:05:24` CPU time and `193 MB` RSS; both handoffs and the
+  shared HF drain remained alive.

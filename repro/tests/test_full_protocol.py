@@ -29,6 +29,7 @@ from repro.src.verify_paper_table_fixture import (
     SOURCE_URL,
     mismatch_paths,
     parse_ca_alternative_table,
+    parse_claim1_theorem_contract,
 )
 from repro.src.verify_source_manifest import validate_manifest
 from repro.src.verify_weca_independence import (
@@ -311,6 +312,16 @@ class FullProtocolTests(unittest.TestCase):
         self.assertEqual(audit["source_archive_sha256"], SOURCE_ARCHIVE_SHA256)
         self.assertEqual(audit["main_tex_sha256"], MAIN_TEX_SHA256)
         self.assertEqual(
+            audit["claim1_theorem_contract"],
+            {
+                "label": "main_theorem",
+                "alpha_rank_domain": "alpha*(n+1) > 1 and non-integer",
+                "strict_s_interval_verified": True,
+                "normalized_logistic_formula_verified": True,
+                "theorem_block_sha256": "86e98bc09083541aa2b908c96db4c460d78904929e64b6cf21bf1c435181ba71",
+            },
+        )
+        self.assertEqual(
             audit["config_sha256"],
             sha256("repro/configs/paper_headlines.json"),
         )
@@ -329,6 +340,10 @@ class FullProtocolTests(unittest.TestCase):
         )
         self.assertEqual(mismatch_paths({"cell": 1.0}, {"cell": 2.0}), ["cell"])
         self.assertEqual(mismatch_paths({"cell": 1.0}, {"cell": 1.0}), [])
+        with self.assertRaises(RuntimeError):
+            parse_claim1_theorem_contract(
+                r"\begin{theorem}\label{main_theorem}wrong\end{theorem}"
+            )
 
     def test_alternative_ca_parser_rejects_dataset_and_method_drift(self):
         lines = [r"\begin{table}[t]", "& Method & Cov.  & Len."]
@@ -422,11 +437,15 @@ class FullProtocolTests(unittest.TestCase):
         claim1 = {
             "summary": {
                 "all_set_identities_pass": True,
+                "all_threshold_identities_pass": True,
                 "all_exact_e_expectations_pass": True,
                 "all_positive_pass": True,
                 "all_classic_controls_inflate_sets": True,
+                "all_theorem_domain_verified": True,
+                "all_domain_controls_rejected": True,
                 "case_count": 18,
-                "classic_control_case_count": 17,
+                "classic_control_case_count": 18,
+                "domain_control_count": 5,
             },
             "cases": [{"expectation_abs_error": 1e-15}],
         }

@@ -17,6 +17,37 @@ from pathlib import Path
 from typing import Iterable
 
 
+# Every positive case satisfies the exact domain of the paper's main theorem:
+# alpha * (n + 1) is strictly greater than one and is not an integer.  The
+# extra (40, .05) cell replaces the earlier off-domain (10, .05) cell while
+# retaining a broad 18-cell grid.
+THEOREM_CASES = (
+    (10, 0.1), (10, 0.2),
+    (20, 0.05), (20, 0.1), (20, 0.2),
+    (30, 0.05), (30, 0.1), (30, 0.2),
+    (40, 0.05),
+    (50, 0.05), (50, 0.1), (50, 0.2),
+    (100, 0.05), (100, 0.1), (100, 0.2),
+    (200, 0.05), (200, 0.1), (200, 0.2),
+)
+EXCLUDED_DOMAIN_CASES = (
+    (10, 0.05),  # alpha(n+1) < 1
+    (9, 0.1),    # alpha(n+1) = 1
+    (19, 0.05),  # remaining cases land exactly on a conformal rank
+    (19, 0.1),
+    (19, 0.2),
+)
+
+
+def in_theorem_domain(n_calibration: int, alpha: float) -> bool:
+    if n_calibration < 1 or not 0.0 < alpha < 1.0:
+        return False
+    scaled_level = alpha * (n_calibration + 1)
+    return scaled_level > 1.0 and not math.isclose(
+        scaled_level, round(scaled_level), rel_tol=0.0, abs_tol=1e-12
+    )
+
+
 def decreasing_logistic(x: float) -> float:
     """Stable ``1 / (1 + exp(x))`` independent of scipy/numpy."""
     if x >= 0.0:
@@ -45,14 +76,16 @@ def p2e_parameters(n_calibration: int, alpha: float) -> tuple[float, float]:
         raise ValueError("n_calibration must be positive")
     if not 0.0 < alpha < 1.0:
         raise ValueError("alpha must lie in (0, 1)")
+    if not in_theorem_domain(n_calibration, alpha):
+        raise ValueError(
+            "paper theorem requires alpha*(n_calibration+1) > 1 and non-integer"
+        )
 
     denominator = n_calibration + 1
-    first_above = math.floor(alpha * denominator + 1e-14) + 1
-    if first_above > denominator:
-        raise ValueError("no conformal rank exists above alpha")
+    first_above = math.ceil(alpha * denominator)
     upper_rank = first_above / denominator
     if not alpha < upper_rank:
-        raise ValueError("alpha lands on a conformal rank; excluded by theorem")
+        raise RuntimeError("the theorem-domain check admitted a rank boundary")
     s = 0.5 * (alpha + upper_rank)
     ranks = tuple(j / denominator for j in range(1, denominator + 1))
 
@@ -125,12 +158,17 @@ def evaluate_case(n_calibration: int, alpha: float) -> dict[str, float | int | b
     return {
         "n_calibration": n_calibration,
         "alpha": alpha,
+        "alpha_times_rank_count": alpha * (n_calibration + 1),
+        "theorem_domain_verified": in_theorem_domain(n_calibration, alpha),
         "C": c,
         "s": s,
         "rank_count": len(ranks),
         "p_set_count": sum(p_members),
         "p2e_set_count": sum(e_members),
         "set_mismatches": mismatches,
+        "threshold_log_error": abs(
+            p2e_log_value(alpha, alpha, c, s) + math.log(alpha)
+        ),
         "exact_e_expectation": expectation,
         "expectation_abs_error": abs(expectation - 1.0),
         "p2e_strictly_positive": all(math.isfinite(value) for value in log_p2e_values),
@@ -141,12 +179,27 @@ def evaluate_case(n_calibration: int, alpha: float) -> dict[str, float | int | b
 
 
 def run_cases(
-    n_values: Iterable[int] = (10, 20, 30, 50, 100, 200),
-    alpha_values: Iterable[float] = (0.05, 0.1, 0.2),
+    cases: Iterable[tuple[int, float]] = THEOREM_CASES,
 ) -> dict[str, object]:
-    rows = [evaluate_case(n, alpha) for n in n_values for alpha in alpha_values]
+    rows = [evaluate_case(n, alpha) for n, alpha in cases]
+    domain_controls = []
+    for n_calibration, alpha in EXCLUDED_DOMAIN_CASES:
+        rejected = False
+        try:
+            p2e_parameters(n_calibration, alpha)
+        except ValueError:
+            rejected = True
+        domain_controls.append(
+            {
+                "n_calibration": n_calibration,
+                "alpha": alpha,
+                "alpha_times_rank_count": alpha * (n_calibration + 1),
+                "rejected": rejected,
+            }
+        )
     all_identity = all(row["set_mismatches"] == 0 for row in rows)
     all_exact = all(float(row["expectation_abs_error"]) < 1e-11 for row in rows)
+    all_thresholds = all(float(row["threshold_log_error"]) < 1e-14 for row in rows)
     all_positive = all(bool(row["p2e_strictly_positive"]) for row in rows)
     control_rows = [row for row in rows if row["p_set_count"] < row["rank_count"]]
     controls_inflate = bool(control_rows) and all(
@@ -156,10 +209,20 @@ def run_cases(
     return {
         "paper": "jNv4sl4YZH / arXiv:2606.03600",
         "implementation": "independent finite-rank construction",
+        "theorem_domain": "alpha*(n+1) in (1, infinity) and non-integer",
         "cases": rows,
+        "domain_controls": domain_controls,
         "summary": {
             "case_count": len(rows),
+            "domain_control_count": len(domain_controls),
+            "all_theorem_domain_verified": all(
+                bool(row["theorem_domain_verified"]) for row in rows
+            ),
+            "all_domain_controls_rejected": all(
+                bool(row["rejected"]) for row in domain_controls
+            ),
             "all_set_identities_pass": all_identity,
+            "all_threshold_identities_pass": all_thresholds,
             "all_exact_e_expectations_pass": all_exact,
             "all_positive_pass": all_positive,
             "all_classic_controls_inflate_sets": controls_inflate,

@@ -1,28 +1,9 @@
 {
   "cases": [
     {
-      "C": 32.899219106837066,
-      "alpha": 0.05,
-      "classic_control_extra_members": {
-        "linear": 0,
-        "log": 0,
-        "sqrt": 0
-      },
-      "exact_e_expectation": 0.9999999999999997,
-      "expectation_abs_error": 3.3306690738754696e-16,
-      "min_log_p2e_value": -27.17334051675717,
-      "min_p2e_float": 1.580404140046988e-12,
-      "n_calibration": 10,
-      "p2e_set_count": 11,
-      "p2e_strictly_positive": true,
-      "p_set_count": 11,
-      "rank_count": 11,
-      "s": 0.07045454545454546,
-      "set_mismatches": 0
-    },
-    {
       "C": 65.07722023316114,
       "alpha": 0.1,
+      "alpha_times_rank_count": 1.1,
       "classic_control_extra_members": {
         "linear": 1,
         "log": 1,
@@ -38,11 +19,14 @@
       "p_set_count": 10,
       "rank_count": 11,
       "s": 0.14090909090909093,
-      "set_mismatches": 0
+      "set_mismatches": 0,
+      "theorem_domain_verified": true,
+      "threshold_log_error": 0.0
     },
     {
       "C": 71.7312565275491,
       "alpha": 0.2,
+      "alpha_times_rank_count": 2.2,
       "classic_control_extra_members": {
         "linear": 2,
         "log": 2,
@@ -58,11 +42,14 @@
       "p_set_count": 9,
       "rank_count": 11,
       "s": 0.23636363636363636,
-      "set_mismatches": 0
+      "set_mismatches": 0,
+      "theorem_domain_verified": true,
+      "threshold_log_error": 0.0
     },
     {
       "C": 143.44819268231788,
       "alpha": 0.05,
+      "alpha_times_rank_count": 1.05,
       "classic_control_extra_members": {
         "linear": 1,
         "log": 1,
@@ -78,11 +65,14 @@
       "p_set_count": 20,
       "rank_count": 21,
       "s": 0.07261904761904761,
-      "set_mismatches": 0
+      "set_mismatches": 0,
+      "theorem_domain_verified": true,
+      "threshold_log_error": 0.0
     },
     {
       "C": 150.24495454452904,
       "alpha": 0.1,
+      "alpha_times_rank_count": 2.1,
       "classic_control_extra_members": {
         "linear": 2,
         "log": 2,
@@ -98,11 +88,14 @@
       "p_set_count": 19,
       "rank_count": 21,
       "s": 0.12142857142857143,
-      "set_mismatches": 0
+      "set_mismatches": 0,
+      "theorem_domain_verified": true,
+      "threshold_log_error": 0.0
     },
     {
       "C": 166.72966641514466,
       "alpha": 0.2,
+      "alpha_times_rank_count": 4.2,
       "classic_control_extra_members": {
         "linear": 4,
         "log": 4,
@@ -118,11 +111,14 @@
       "p_set_count": 17,
       "rank_count": 21,
       "s": 0.21904761904761905,
-      "set_mismatches": 0
+      "set_mismatches": 0,
+      "theorem_domain_verified": true,
+      "threshold_log_error": 0.0
     },
     {
       "C": 174.17299719890627,
       "alpha": 0.05,
+      "alpha_times_rank_count": 1.55,
       "classic_control_extra_members": {
         "linear": 1,
         "log": 1,
@@ -138,11 +134,14 @@
       "p_set_count": 30,
       "rank_count": 31,
       "s": 0.05725806451612903,
-      "set_mismatches": 0
+      "set_mismatches": 0,
+      "theorem_domain_verified": true,
+      "threshold_log_error": 0.0
     },
     {
       "C": 245.7194104724462,
       "alpha": 0.1,
+      "alpha_times_rank_count": 3.1,
       "classic_control_extra_members": {
         "linear": 3,
         "log": 3,
@@ -158,11 +157,14 @@
       "p_set_count": 28,
       "rank_count": 31,
       "s": 0.11451612903225807,
-      "set_mismatches": 0
+      "set_mismatches": 0,
+      "theorem_domain_verified": true,
+      "threshold_log_error": 0.0
     },
     {
       "C": 273.57509255601883,
       "alpha": 0.2,
+      "alpha_times_rank_count": 6.2,
       "classic_control_extra_members": {
         "linear": 6,
         "log": 6,
@@ -178,11 +180,37 @@
       "p_set_count": 25,
       "rank_count": 31,
       "s": 0.2129032258064516,
-      "set_mismatches": 0
+      "set_mismatches": 0,
+      "theorem_domain_verified": true,
+      "threshold_log_error": 0.0
+    },
+    {
+      "C": 331.51487676742806,
+      "alpha": 0.05,
+      "alpha_times_rank_count": 2.0500000000000003,
+      "classic_control_extra_members": {
+        "linear": 2,
+        "log": 2,
+        "sqrt": 2
+      },
+      "exact_e_expectation": 1.0000000000000002,
+      "expectation_abs_error": 2.220446049250313e-16,
+      "min_log_p2e_value": -308.0814288192058,
+      "min_p2e_float": 1.5919722271242303e-134,
+      "n_calibration": 40,
+      "p2e_set_count": 39,
+      "p2e_strictly_positive": true,
+      "p_set_count": 39,
+      "rank_count": 41,
+      "s": 0.061585365853658536,
+      "set_mismatches": 0,
+      "theorem_domain_verified": true,
+      "threshold_log_error": 0.0
     },
     {
       "C": 383.14005814359837,
       "alpha": 0.05,
+      "alpha_times_rank_count": 2.5500000000000003,
       "classic_control_extra_members": {
         "linear": 2,
         "log": 2,
@@ -198,11 +226,14 @@
       "p_set_count": 49,
       "rank_count": 51,
       "s": 0.054411764705882354,
-      "set_mismatches": 0
+      "set_mismatches": 0,
+      "theorem_domain_verified": true,
+      "threshold_log_error": 0.0
     },
     {
       "C": 455.93837460449174,
       "alpha": 0.1,
+      "alpha_times_rank_count": 5.1000000000000005,
       "classic_control_extra_members": {
         "linear": 5,
         "log": 5,
@@ -218,11 +249,14 @@
       "p_set_count": 46,
       "rank_count": 51,
       "s": 0.10882352941176471,
-      "set_mismatches": 0
+      "set_mismatches": 0,
+      "theorem_domain_verified": true,
+      "threshold_log_error": 0.0
     },
     {
       "C": 509.3275927243293,
       "alpha": 0.2,
+      "alpha_times_rank_count": 10.200000000000001,
       "classic_control_extra_members": {
         "linear": 10,
         "log": 10,
@@ -238,11 +272,14 @@
       "p_set_count": 41,
       "rank_count": 51,
       "s": 0.20784313725490197,
-      "set_mismatches": 0
+      "set_mismatches": 0,
+      "theorem_domain_verified": true,
+      "threshold_log_error": 0.0
     },
     {
       "C": 995.0481689379562,
       "alpha": 0.05,
+      "alpha_times_rank_count": 5.050000000000001,
       "classic_control_extra_members": {
         "linear": 5,
         "log": 5,
@@ -258,11 +295,14 @@
       "p_set_count": 96,
       "rank_count": 101,
       "s": 0.0547029702970297,
-      "set_mismatches": 0
+      "set_mismatches": 0,
+      "theorem_domain_verified": true,
+      "threshold_log_error": 0.0
     },
     {
       "C": 1047.6009614158088,
       "alpha": 0.1,
+      "alpha_times_rank_count": 10.100000000000001,
       "classic_control_extra_members": {
         "linear": 10,
         "log": 10,
@@ -278,11 +318,14 @@
       "p_set_count": 91,
       "rank_count": 101,
       "s": 0.10445544554455446,
-      "set_mismatches": 0
+      "set_mismatches": 0,
+      "theorem_domain_verified": true,
+      "threshold_log_error": 0.0
     },
     {
       "C": 1173.9359776490273,
       "alpha": 0.2,
+      "alpha_times_rank_count": 20.200000000000003,
       "classic_control_extra_members": {
         "linear": 20,
         "log": 20,
@@ -298,11 +341,14 @@
       "p_set_count": 81,
       "rank_count": 101,
       "s": 0.20396039603960398,
-      "set_mismatches": 0
+      "set_mismatches": 0,
+      "theorem_domain_verified": true,
+      "threshold_log_error": 0.0
     },
     {
       "C": 2259.7933820517146,
       "alpha": 0.05,
+      "alpha_times_rank_count": 10.05,
       "classic_control_extra_members": {
         "linear": 10,
         "log": 10,
@@ -318,11 +364,14 @@
       "p_set_count": 191,
       "rank_count": 201,
       "s": 0.05236318407960199,
-      "set_mismatches": 0
+      "set_mismatches": 0,
+      "theorem_domain_verified": true,
+      "threshold_log_error": 0.0
     },
     {
       "C": 2381.8015587265536,
       "alpha": 0.1,
+      "alpha_times_rank_count": 20.1,
       "classic_control_extra_members": {
         "linear": 20,
         "log": 20,
@@ -338,11 +387,14 @@
       "p_set_count": 181,
       "rank_count": 201,
       "s": 0.10223880597014925,
-      "set_mismatches": 0
+      "set_mismatches": 0,
+      "theorem_domain_verified": true,
+      "threshold_log_error": 0.0
     },
     {
       "C": 2673.951166476484,
       "alpha": 0.2,
+      "alpha_times_rank_count": 40.2,
       "classic_control_extra_members": {
         "linear": 40,
         "log": 39,
@@ -358,17 +410,56 @@
       "p_set_count": 161,
       "rank_count": 201,
       "s": 0.2019900497512438,
-      "set_mismatches": 0
+      "set_mismatches": 0,
+      "theorem_domain_verified": true,
+      "threshold_log_error": 0.0
+    }
+  ],
+  "domain_controls": [
+    {
+      "alpha": 0.05,
+      "alpha_times_rank_count": 0.55,
+      "n_calibration": 10,
+      "rejected": true
+    },
+    {
+      "alpha": 0.1,
+      "alpha_times_rank_count": 1.0,
+      "n_calibration": 9,
+      "rejected": true
+    },
+    {
+      "alpha": 0.05,
+      "alpha_times_rank_count": 1.0,
+      "n_calibration": 19,
+      "rejected": true
+    },
+    {
+      "alpha": 0.1,
+      "alpha_times_rank_count": 2.0,
+      "n_calibration": 19,
+      "rejected": true
+    },
+    {
+      "alpha": 0.2,
+      "alpha_times_rank_count": 4.0,
+      "n_calibration": 19,
+      "rejected": true
     }
   ],
   "implementation": "independent finite-rank construction",
   "paper": "jNv4sl4YZH / arXiv:2606.03600",
   "summary": {
     "all_classic_controls_inflate_sets": true,
+    "all_domain_controls_rejected": true,
     "all_exact_e_expectations_pass": true,
     "all_positive_pass": true,
     "all_set_identities_pass": true,
+    "all_theorem_domain_verified": true,
+    "all_threshold_identities_pass": true,
     "case_count": 18,
-    "classic_control_case_count": 17
-  }
+    "classic_control_case_count": 18,
+    "domain_control_count": 5
+  },
+  "theorem_domain": "alpha*(n+1) in (1, infinity) and non-integer"
 }

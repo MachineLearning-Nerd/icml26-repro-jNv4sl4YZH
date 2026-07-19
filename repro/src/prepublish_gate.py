@@ -353,11 +353,17 @@ def main() -> None:
         claim1,
         (
             "all_classic_controls_inflate_sets",
+            "all_domain_controls_rejected",
             "all_exact_e_expectations_pass",
             "all_positive_pass",
             "all_set_identities_pass",
+            "all_theorem_domain_verified",
+            "all_threshold_identities_pass",
         ),
     )
+    assert claim1["summary"]["case_count"] == 18
+    assert claim1["summary"]["classic_control_case_count"] == 18
+    assert claim1["summary"]["domain_control_count"] == 5
     claim1_source = load_json("outputs/claim1_source_crosscheck.json")
     assert_summary(
         claim1_source,
@@ -365,9 +371,11 @@ def main() -> None:
             "all_cleanroom_membership_pass",
             "all_source_expectations_pass",
             "all_source_membership_pass",
+            "all_theorem_domain_verified",
             "underflow_is_documented",
         ),
     )
+    assert claim1_source["summary"]["rows"] == 18
     mechanism = load_json("outputs/claim3_independent_e_merge.json")
     assert_summary(
         mechanism,
@@ -491,6 +499,15 @@ def main() -> None:
     assert fixture_audit["config_sha256"] == sha256(
         "repro/configs/paper_headlines.json"
     )
+    assert fixture_audit["claim1_theorem_contract"] == {
+        "label": "main_theorem",
+        "alpha_rank_domain": "alpha*(n+1) > 1 and non-integer",
+        "strict_s_interval_verified": True,
+        "normalized_logistic_formula_verified": True,
+        "theorem_block_sha256": (
+            "86e98bc09083541aa2b908c96db4c460d78904929e64b6cf21bf1c435181ba71"
+        ),
+    }
     fixture_summary = fixture_audit["summary"]
     assert fixture_summary["all_fields_match"] is True
     assert fixture_summary["mismatch_count"] == 0

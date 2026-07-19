@@ -283,6 +283,37 @@ def mismatch_paths(expected: object, observed: object, prefix: str = "") -> list
     return [] if expected == observed else [prefix]
 
 
+def parse_claim1_theorem_contract(tex: str) -> dict[str, object]:
+    """Bind the numerical Claim-1 grid to the main theorem's exact domain."""
+    marker = re.search(
+        r"\\begin\{theorem\}\s*\\label\{main_theorem\}", tex
+    )
+    if marker is None:
+        raise RuntimeError("Claim-1 main theorem is missing")
+    start = marker.start()
+    end = tex.index(r"\end{theorem}", start)
+    block = tex[start:end]
+    normalized = " ".join(block.split())
+    domain = r"\alpha(n+1) \in (1,\infty)\setminus \mathbb{N}"
+    s_interval = (
+        r"s \in \left(\alpha, \frac{\lceil \alpha(n+1)\rceil}{n+1}\right)"
+    )
+    exact_formula = r"F_{n,\alpha}(p) : = \frac{1}{\alpha}"
+    if (
+        domain not in normalized
+        or s_interval not in normalized
+        or exact_formula not in normalized
+    ):
+        raise RuntimeError("Claim-1 main-theorem contract drift")
+    return {
+        "label": "main_theorem",
+        "alpha_rank_domain": "alpha*(n+1) > 1 and non-integer",
+        "strict_s_interval_verified": True,
+        "normalized_logistic_formula_verified": True,
+        "theorem_block_sha256": sha256_bytes(block.encode("utf-8")),
+    }
+
+
 def audit_fixture(tex: str, config: dict[str, object]) -> dict[str, object]:
     parsed_ca = parse_ca_table(tex)
     parsed_ccp = parse_ccp_tables(tex)
@@ -319,11 +350,13 @@ def main() -> None:
     config_bytes = args.config.read_bytes()
     config = json.loads(config_bytes)
     audit = audit_fixture(tex_bytes.decode("utf-8"), config)
+    theorem_contract = parse_claim1_theorem_contract(tex_bytes.decode("utf-8"))
     result = {
         "source_url": SOURCE_URL,
         "source_archive_sha256": sha256_bytes(archive),
         "main_tex_sha256": sha256_bytes(tex_bytes),
         "config_sha256": sha256_bytes(config_bytes),
+        "claim1_theorem_contract": theorem_contract,
         "summary": audit,
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
