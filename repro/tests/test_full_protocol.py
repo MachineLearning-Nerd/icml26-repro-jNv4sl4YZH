@@ -238,6 +238,17 @@ class FullProtocolTests(unittest.TestCase):
         self.assertIn('gate["maximum_points"] == 12', publisher)
         self.assertIn('len(gate["artifact_paths"]) == 20', publisher)
 
+        post_gate = (root / "repro/src/post_ccp_gate.sh").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            'sed -i "s|${paper_root}/outputs/|outputs/|g"', post_gate
+        )
+        self.assertLess(
+            post_gate.index('sed -i "s|${paper_root}/outputs/|outputs/|g"'),
+            post_gate.index("source .venv/bin/activate"),
+        )
+
     def test_protocol_matches_released_paper_scale(self):
         root = Path(__file__).resolve().parents[2]
         protocol = json.loads((root / "repro/configs/full_protocol.json").read_text())

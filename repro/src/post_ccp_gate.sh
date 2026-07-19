@@ -25,6 +25,14 @@ while true; do
   sleep 30
 done
 
+# This long-running worker may have started from the pre-hardening runner whose
+# progress messages rendered the resolved output path.  Trackio captures that
+# stdout only after the run exits, so normalize just those output links before
+# any publication hygiene check.  The command/source provenance stays intact.
+paper_root="$(pwd -P)"
+sed -i "s|${paper_root}/outputs/|outputs/|g" \
+  .trackio/logbook/pages/claim-3/page.md
+
 source .venv/bin/activate
 
 trackio logbook run \

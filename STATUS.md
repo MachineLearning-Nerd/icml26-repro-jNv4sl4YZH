@@ -500,7 +500,7 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   budgets, 18 sigmoid cases, and four CCP-bound cases all pass. The future
   evidence bundle now has 20 records and all 34 tests pass. The CA run finished
   all 1,920 cells and launched the active 11,700-cell CCP run without a restart.
-  Refreshed post-CCP watcher PID `3618461` owns the singleton and will append
+  Refreshed post-CCP watcher PID `3623510` owns the singleton and will append
   six evidence-derived verdicts, run the gate, push GitHub, and atomically
   enqueue the paper for the already-active shared HF drain. The paper remains
   intentionally absent from the queue until that complete gate passes.
