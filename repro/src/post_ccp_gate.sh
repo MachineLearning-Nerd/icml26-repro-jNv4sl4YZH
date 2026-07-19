@@ -93,7 +93,7 @@ PY
 
 trackio logbook run \
   --page "Claim 3" \
-  --title "Deterministic and randomized arbitrary-dependence coupling LP" \
+  --title "Exchangeable and randomized e-merge coverage certificate" \
   -- python repro/src/verify_e_merge_coverage.py \
   --output outputs/claim3_independent_e_merge.json
 

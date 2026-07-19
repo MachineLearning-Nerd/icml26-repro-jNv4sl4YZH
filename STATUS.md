@@ -113,7 +113,8 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   rejected. The refreshed result is captured in Trackio and closes the
   previously implicit ECCP mechanism scope.
 - Added a pre-final-result empirical coverage sanity gate for both applications
-  named by C3. All eight CA P2E and all nine CCP ECCP coverage means must be no
+  named by C3. All eight CA P2E and all 27 CCP P2E-method coverage means
+  (ECCP, ECCP-Exch, and UR-ECCP-Exch) must be no
   more than two percentage points below nominal; the full gate checks exact
   cell counts before applying it. Dedicated undercoverage fixtures fail for CA
   and CCP. This is explicitly labeled a gross-undercoverage check rather than
@@ -409,3 +410,16 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   emitting neither manifest nor bundle. At `2026-07-19 21:03 IST`, the
   untouched CA worker remained compute-active at `97.9%` CPU with `24:33:01`
   CPU time and about `193 MB` RSS; both serialized handoffs remained alive.
+- Claim 3 now independently covers the two released exchangeable variants, not
+  only the equal-weight ECCP merge. Five orbit LPs assign probability to
+  unordered rank multisets and average uniformly over every distinct ordering,
+  enforcing fold exchangeability exactly. ECCP-Exch and randomized-first
+  UR-ECCP-Exch pass 5/5 worst-case LPs (maximum failure/alpha ratios `0.9524`
+  and `0.9727`); invalid 2x scaling fails 5/5 for both. A separate two-rank
+  closed-form oracle matches the implementation. The future full CCP gate now
+  also requires the empirical shortfall check for all 27 P2E-method cells
+  (ECCP, ECCP-Exch, and UR-ECCP-Exch), rather than only nine ECCP cells. The
+  expanded certificate is captured in Trackio; all 29 tests and preflights
+  pass, and a real premature gate still emits no manifest/bundle. At
+  `2026-07-19 21:11 IST`, the untouched CA worker remained active at `97.9%`
+  CPU with `24:40:49` CPU time and about `191 MB` RSS.

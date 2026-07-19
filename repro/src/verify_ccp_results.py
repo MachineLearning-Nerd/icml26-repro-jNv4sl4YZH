@@ -14,6 +14,7 @@ from pathlib import Path
 EMPIRICAL_COVERAGE_SHORTFALL_TOLERANCE = 0.02
 MIN_SUBSTANTIAL_RELATIVE_REDUCTION = 0.10
 P2E_METHOD = "ECCP"
+P2E_COVERAGE_METHODS = ("ECCP", "ECCP_exch", "UR-ECCP_exch")
 CALIBRATOR_BASELINES = {
     "AoN": "ECCP(ind)",
     "sqrt": "ECCP(sqrt)",
@@ -132,6 +133,17 @@ def main() -> None:
         coverage >= nominal_coverage - EMPIRICAL_COVERAGE_SHORTFALL_TOLERANCE
         for coverage in eccp_coverage_means
     )
+    p2e_coverage_means = [
+        float(methods[method]["coverage_mean"])
+        for models in summaries.values()
+        for methods in models.values()
+        for method in P2E_COVERAGE_METHODS
+        if method in methods and methods[method]["coverage_mean"] is not None
+    ]
+    p2e_coverage_pass_count = sum(
+        coverage >= nominal_coverage - EMPIRICAL_COVERAGE_SHORTFALL_TOLERANCE
+        for coverage in p2e_coverage_means
+    )
     efficiency_comparisons = []
     for dataset_key, models in summaries.items():
         for model, methods in models.items():
@@ -223,6 +235,15 @@ def main() -> None:
             "empirical_coverage_shortfall_tolerance": EMPIRICAL_COVERAGE_SHORTFALL_TOLERANCE,
             "minimum_eccp_empirical_coverage": (
                 min(eccp_coverage_means) if eccp_coverage_means else None
+            ),
+            "p2e_empirical_coverage_cell_count": len(p2e_coverage_means),
+            "p2e_empirical_coverage_pass_count": p2e_coverage_pass_count,
+            "all_p2e_empirical_coverage_within_tolerance": (
+                bool(p2e_coverage_means)
+                and p2e_coverage_pass_count == len(p2e_coverage_means)
+            ),
+            "minimum_p2e_empirical_coverage": (
+                min(p2e_coverage_means) if p2e_coverage_means else None
             ),
             "nominal_coverage": nominal_coverage,
             "calibrator_efficiency_comparison_count": len(efficiency_comparisons),

@@ -83,6 +83,110 @@ def worst_case_tail_probability(
     return float(-solution.fun), len(rank_tuples)
 
 
+def worst_case_exchangeable_prefix_failure_probability(
+    values: list[float],
+    folds: int,
+    threshold: float,
+    *,
+    randomized_first: bool = False,
+) -> tuple[float, int]:
+    """Maximize ECCP-Exch failure over exchangeable rank couplings.
+
+    One LP variable is the total probability of an unordered rank multiset.
+    Conditional on that orbit, every distinct ordering has equal probability,
+    which enforces fold exchangeability exactly. ``randomized_first`` adds the
+    paper's independent-uniform ``E_1 / U`` rejection rule used by
+    UR-ECCP-Exch whenever the prefix maximum has not already rejected.
+    """
+    if folds < 1:
+        raise ValueError("folds must be positive")
+    rank_count = len(values)
+    if rank_count < 1:
+        raise ValueError("values must be nonempty")
+    orbits = list(itertools.combinations_with_replacement(range(rank_count), folds))
+    costs = []
+    constraints = lil_matrix((rank_count, len(orbits)), dtype=float)
+    value_array = np.asarray(values, dtype=float)
+    for column, orbit in enumerate(orbits):
+        for rank in set(orbit):
+            constraints[rank, column] = orbit.count(rank) / folds
+        orderings = set(itertools.permutations(orbit))
+        ordering_costs = []
+        for ordering in orderings:
+            ordered_values = value_array[list(ordering)]
+            prefix_maximum = float(
+                np.max(
+                    np.cumsum(ordered_values)
+                    / np.arange(1, folds + 1, dtype=float)
+                )
+            )
+            if prefix_maximum >= threshold:
+                ordering_costs.append(1.0)
+            elif randomized_first:
+                ordering_costs.append(min(float(ordered_values[0]) / threshold, 1.0))
+            else:
+                ordering_costs.append(0.0)
+        costs.append(sum(ordering_costs) / len(ordering_costs))
+    solution = linprog(
+        -np.asarray(costs),
+        A_eq=constraints.tocsr(),
+        b_eq=np.full(rank_count, 1.0 / rank_count),
+        bounds=(0.0, None),
+        method="highs",
+    )
+    if not solution.success:
+        raise RuntimeError(f"exchangeable coupling LP failed: {solution.message}")
+    return float(-solution.fun), len(orbits)
+
+
+def evaluate_exchangeable_case(
+    n_calibration: int,
+    alpha: float,
+    folds: int,
+) -> dict[str, float | int | bool]:
+    c, s = p2e_parameters(n_calibration, alpha)
+    ranks = [j / (n_calibration + 1) for j in range(1, n_calibration + 2)]
+    values = [p2e_value(rank, alpha, c, s) for rank in ranks]
+    threshold = 1.0 / alpha
+    prefix_failure, orbit_count = worst_case_exchangeable_prefix_failure_probability(
+        values, folds, threshold
+    )
+    randomized_prefix_failure, randomized_orbit_count = (
+        worst_case_exchangeable_prefix_failure_probability(
+            values, folds, threshold, randomized_first=True
+        )
+    )
+    invalid_values = [2.0 * value for value in values]
+    invalid_prefix_failure, _ = worst_case_exchangeable_prefix_failure_probability(
+        invalid_values, folds, threshold
+    )
+    invalid_randomized_prefix_failure, _ = (
+        worst_case_exchangeable_prefix_failure_probability(
+            invalid_values, folds, threshold, randomized_first=True
+        )
+    )
+    if randomized_orbit_count != orbit_count:
+        raise RuntimeError("exchangeable LP orbit count drift")
+    return {
+        "n_calibration": n_calibration,
+        "alpha": alpha,
+        "folds": folds,
+        "exchangeable_orbit_count": orbit_count,
+        "eccp_exch_worst_case_failure_probability": prefix_failure,
+        "eccp_exch_coverage_pass": prefix_failure <= alpha + 1e-10,
+        "ur_eccp_exch_worst_case_failure_probability": randomized_prefix_failure,
+        "ur_eccp_exch_coverage_pass": randomized_prefix_failure <= alpha + 1e-10,
+        "invalid_eccp_exch_worst_case_failure_probability": invalid_prefix_failure,
+        "invalid_eccp_exch_control_rejected": invalid_prefix_failure > alpha + 1e-10,
+        "invalid_ur_eccp_exch_worst_case_failure_probability": (
+            invalid_randomized_prefix_failure
+        ),
+        "invalid_ur_eccp_exch_control_rejected": (
+            invalid_randomized_prefix_failure > alpha + 1e-10
+        ),
+    }
+
+
 def evaluate_case(
     n_calibration: int,
     alpha: float,
@@ -200,6 +304,13 @@ def run_cases() -> dict[str, object]:
         evaluate_case(20, 0.1, (0.10, 0.20, 0.70)),
         evaluate_case(20, 0.2, (0.15, 0.35, 0.50)),
     ]
+    exchangeable_prefix_cases = [
+        evaluate_exchangeable_case(10, 0.1, 2),
+        evaluate_exchangeable_case(10, 0.1, 3),
+        evaluate_exchangeable_case(10, 0.1, 4),
+        evaluate_exchangeable_case(20, 0.1, 3),
+        evaluate_exchangeable_case(20, 0.2, 3),
+    ]
     return {
         "implementation": (
             "independent exact enumeration and coupling LP for deterministic "
@@ -210,6 +321,7 @@ def run_cases() -> dict[str, object]:
             "adaptive inference-dependent weights are an invalid control"
         ),
         "cases": cases,
+        "exchangeable_prefix_cases": exchangeable_prefix_cases,
         "summary": {
             "case_count": len(cases),
             "equal_weight_case_count": sum(
@@ -217,6 +329,30 @@ def run_cases() -> dict[str, object]:
             ),
             "nonuniform_weight_case_count": sum(
                 max(row["weights"]) - min(row["weights"]) >= 1e-12 for row in cases
+            ),
+            "exchangeable_prefix_case_count": len(exchangeable_prefix_cases),
+            "all_exchangeable_prefix_coverage_pass": all(
+                row["eccp_exch_coverage_pass"] for row in exchangeable_prefix_cases
+            ),
+            "all_exchangeable_randomized_prefix_coverage_pass": all(
+                row["ur_eccp_exch_coverage_pass"]
+                for row in exchangeable_prefix_cases
+            ),
+            "maximum_exchangeable_prefix_tail_to_alpha_ratio": max(
+                row["eccp_exch_worst_case_failure_probability"] / row["alpha"]
+                for row in exchangeable_prefix_cases
+            ),
+            "maximum_exchangeable_randomized_prefix_tail_to_alpha_ratio": max(
+                row["ur_eccp_exch_worst_case_failure_probability"] / row["alpha"]
+                for row in exchangeable_prefix_cases
+            ),
+            "invalid_exchangeable_prefix_rejection_count": sum(
+                row["invalid_eccp_exch_control_rejected"]
+                for row in exchangeable_prefix_cases
+            ),
+            "invalid_exchangeable_randomized_prefix_rejection_count": sum(
+                row["invalid_ur_eccp_exch_control_rejected"]
+                for row in exchangeable_prefix_cases
             ),
             "all_merged_expectations_exact": all(row["mean_merged_e_abs_error"] < 1e-11 for row in cases),
             "all_markov_coverage_events_pass": all(row["coverage_pass"] for row in cases),

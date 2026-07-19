@@ -435,6 +435,8 @@ class FullProtocolTests(unittest.TestCase):
                 "all_merged_expectations_exact": True,
                 "all_markov_coverage_events_pass": True,
                 "all_arbitrary_dependence_coverage_pass": True,
+                "all_exchangeable_prefix_coverage_pass": True,
+                "all_exchangeable_randomized_prefix_coverage_pass": True,
                 "all_randomized_uniform_coverage_events_pass": True,
                 "all_randomized_arbitrary_dependence_coverage_pass": True,
                 "invalid_scaling_control_detected": True,
@@ -447,8 +449,13 @@ class FullProtocolTests(unittest.TestCase):
                 "invalid_randomized_arbitrary_dependence_rejection_count": 8,
                 "adaptive_weight_rejection_count": 8,
                 "adaptive_randomized_weight_rejection_count": 8,
+                "exchangeable_prefix_case_count": 5,
+                "invalid_exchangeable_prefix_rejection_count": 5,
+                "invalid_exchangeable_randomized_prefix_rejection_count": 5,
                 "maximum_valid_tail_to_alpha_ratio": 0.95,
                 "maximum_valid_randomized_tail_to_alpha_ratio": 1.0,
+                "maximum_exchangeable_prefix_tail_to_alpha_ratio": 0.95,
+                "maximum_exchangeable_randomized_prefix_tail_to_alpha_ratio": 0.97,
             }
         }
         weca_independence = {
@@ -468,11 +475,14 @@ class FullProtocolTests(unittest.TestCase):
                 "all_full_seed_cells_present": True,
                 "exact_cell_set": True,
                 "all_eccp_empirical_coverage_within_tolerance": True,
+                "all_p2e_empirical_coverage_within_tolerance": True,
                 "all_p2e_not_longer_than_existing_calibrators": True,
                 "all_p2e_strictly_shorter_than_aon": True,
                 "all_classical_efficiency_gains_substantial": True,
                 "eccp_empirical_coverage_cell_count": 9,
                 "eccp_empirical_coverage_pass_count": 9,
+                "p2e_empirical_coverage_cell_count": 27,
+                "p2e_empirical_coverage_pass_count": 27,
                 "empirical_coverage_shortfall_tolerance": 0.02,
                 "expected_rows": 11_700,
                 "calibrator_efficiency_comparison_count": 36,
@@ -487,7 +497,10 @@ class FullProtocolTests(unittest.TestCase):
             },
             "summaries": {
                 dataset: {
-                    model: {"ECCP": {"coverage_mean": 0.9}}
+                    model: {
+                        method: {"coverage_mean": 0.9}
+                        for method in ("ECCP", "ECCP_exch", "UR-ECCP_exch")
+                    }
                     for model in ("OLS", "RF", "Lasso")
                 }
                 for dataset in ("boston", "abalone", "parkinson")

@@ -54,3 +54,25 @@ row or every test covariate/outcome leaves each selected weight bit-identical;
 a deliberately forbidden test-outcome-adaptive rule changes in all six cases.
 This is a finite mechanism audit; the separate full
 Boston/Abalone/Parkinson source run remains required for the empirical claim.
+
+## Exchangeable prefix variants
+
+The released protocol also contains `ECCP_exch` and `UR-ECCP_exch`. Their
+paper formulas use the maximum of successive prefix-average e-values; the
+randomized variant additionally rejects when `E_1 / U >= 1 / alpha`. A second
+LP represents each unordered rank multiset as one probability variable and
+averages the failure cost uniformly across its distinct orderings. This
+enforces fold exchangeability exactly while retaining the uniform rank
+marginals.
+
+| Calibration n | alpha | Folds | Exchangeable orbits | ECCP-Exch failure | UR-ECCP-Exch failure | Invalid 2x failures |
+|---:|---:|---:|---:|---:|---:|---:|
+| 10 | .1 | 2 | 66 | .090909 | .097272 | .181818 / .194544 |
+| 10 | .1 | 3 | 286 | .090909 | .097272 | .181818 / .194544 |
+| 10 | .1 | 4 | 1,001 | .090909 | .097272 | .181818 / .194544 |
+| 20 | .1 | 3 | 1,771 | .095238 | .097143 | .190476 / .194286 |
+| 20 | .2 | 3 | 1,771 | .190476 | .192466 | .380952 / .384931 |
+
+All 5/5 valid ECCP-Exch and 5/5 valid UR-ECCP-Exch optima remain below
+`alpha`; invalid 2x scaling fails all 5/5 under each rule. A two-rank closed-form
+fixture independently checks the orbit LP implementation.

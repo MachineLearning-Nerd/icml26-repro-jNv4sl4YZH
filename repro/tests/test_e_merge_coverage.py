@@ -1,7 +1,11 @@
 import itertools
 import unittest
 
-from repro.src.verify_e_merge_coverage import run_cases, worst_case_tail_probability
+from repro.src.verify_e_merge_coverage import (
+    run_cases,
+    worst_case_exchangeable_prefix_failure_probability,
+    worst_case_tail_probability,
+)
 
 
 class EMergeCoverageTests(unittest.TestCase):
@@ -12,11 +16,14 @@ class EMergeCoverageTests(unittest.TestCase):
         self.assertTrue(summary["all_arbitrary_dependence_coverage_pass"])
         self.assertTrue(summary["all_randomized_uniform_coverage_events_pass"])
         self.assertTrue(summary["all_randomized_arbitrary_dependence_coverage_pass"])
+        self.assertTrue(summary["all_exchangeable_prefix_coverage_pass"])
+        self.assertTrue(summary["all_exchangeable_randomized_prefix_coverage_pass"])
         self.assertTrue(summary["invalid_scaling_control_detected"])
         self.assertTrue(summary["invalid_arbitrary_dependence_detected"])
         self.assertEqual(summary["case_count"], 8)
         self.assertEqual(summary["equal_weight_case_count"], 2)
         self.assertEqual(summary["nonuniform_weight_case_count"], 6)
+        self.assertEqual(summary["exchangeable_prefix_case_count"], 5)
         self.assertEqual(summary["invalid_arbitrary_dependence_rejection_count"], 4)
         self.assertEqual(
             summary["invalid_randomized_arbitrary_dependence_rejection_count"], 8
@@ -25,10 +32,21 @@ class EMergeCoverageTests(unittest.TestCase):
         self.assertTrue(summary["adaptive_weight_control_detected"])
         self.assertEqual(summary["adaptive_weight_rejection_count"], 8)
         self.assertEqual(summary["adaptive_randomized_weight_rejection_count"], 8)
+        self.assertEqual(summary["invalid_exchangeable_prefix_rejection_count"], 5)
+        self.assertEqual(
+            summary["invalid_exchangeable_randomized_prefix_rejection_count"], 5
+        )
         self.assertGreater(summary["minimum_adaptive_tail_to_alpha_ratio"], 1.0)
         self.assertLessEqual(summary["maximum_valid_tail_to_alpha_ratio"], 1.0)
         self.assertLessEqual(
             summary["maximum_valid_randomized_tail_to_alpha_ratio"], 1.0
+        )
+        self.assertLessEqual(
+            summary["maximum_exchangeable_prefix_tail_to_alpha_ratio"], 1.0
+        )
+        self.assertLessEqual(
+            summary["maximum_exchangeable_randomized_prefix_tail_to_alpha_ratio"],
+            1.0,
         )
 
     def test_two_fold_lp_matches_independent_permutation_enumeration(self):
@@ -73,3 +91,19 @@ class EMergeCoverageTests(unittest.TestCase):
             worst_case_tail_probability([0.0, 1.0], 2, 1.0, weights=(-0.1, 1.1))
         with self.assertRaises(ValueError):
             worst_case_tail_probability([0.0, 1.0], 2, 1.0, weights=(0.4, 0.4))
+
+    def test_exchangeable_orbit_lp_matches_two_rank_closed_form(self):
+        deterministic, orbit_count = (
+            worst_case_exchangeable_prefix_failure_probability(
+                [0.0, 4.0], 2, 3.0
+            )
+        )
+        randomized, randomized_orbit_count = (
+            worst_case_exchangeable_prefix_failure_probability(
+                [0.0, 2.0], 2, 3.0, randomized_first=True
+            )
+        )
+        self.assertEqual(orbit_count, 3)
+        self.assertEqual(randomized_orbit_count, 3)
+        self.assertAlmostEqual(deterministic, 0.5, places=12)
+        self.assertAlmostEqual(randomized, 1.0 / 3.0, places=12)

@@ -54,7 +54,7 @@ or any CCP result existed.
 
 Separately, the raw CA/CCP verifiers apply a fixed two-percentage-point
 gross-undercoverage sanity threshold to all eight P2E aggregation cells and all
-nine ECCP cells. This empirical tolerance was fixed before the final CA task
+27 ECCP/ECCP-Exch/UR-ECCP-Exch cells. This empirical tolerance was fixed before the final CA task
 and every CCP result existed. It does not establish the word "exact"; the
 finite-rank enumeration and arbitrary-dependence LP provide that mechanism
 certificate.

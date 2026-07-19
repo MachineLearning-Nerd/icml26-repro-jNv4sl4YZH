@@ -352,6 +352,8 @@ def main() -> None:
         mechanism,
         (
             "all_arbitrary_dependence_coverage_pass",
+            "all_exchangeable_prefix_coverage_pass",
+            "all_exchangeable_randomized_prefix_coverage_pass",
             "all_markov_coverage_events_pass",
             "all_merged_expectations_exact",
             "all_randomized_arbitrary_dependence_coverage_pass",
@@ -366,11 +368,14 @@ def main() -> None:
     assert mechanism["summary"]["case_count"] == 8
     assert mechanism["summary"]["equal_weight_case_count"] == 2
     assert mechanism["summary"]["nonuniform_weight_case_count"] == 6
+    assert mechanism["summary"]["exchangeable_prefix_case_count"] == 5
     assert mechanism["summary"]["invalid_arbitrary_dependence_rejection_count"] == 4
     assert mechanism["summary"]["invalid_randomized_arbitrary_dependence_rejection_count"] == 8
     assert mechanism["summary"]["invalid_scaling_control_rejection_count"] == 2
     assert mechanism["summary"]["adaptive_weight_rejection_count"] == 8
     assert mechanism["summary"]["adaptive_randomized_weight_rejection_count"] == 8
+    assert mechanism["summary"]["invalid_exchangeable_prefix_rejection_count"] == 5
+    assert mechanism["summary"]["invalid_exchangeable_randomized_prefix_rejection_count"] == 5
 
     weca_independence = load_json("outputs/weca_independence_audit.json")
     assert weca_independence["source"] == (
@@ -425,6 +430,7 @@ def main() -> None:
             "all_full_seed_cells_present",
             "exact_cell_set",
             "all_eccp_empirical_coverage_within_tolerance",
+            "all_p2e_empirical_coverage_within_tolerance",
             "all_p2e_not_longer_than_existing_calibrators",
             "all_p2e_strictly_shorter_than_aon",
             "all_classical_efficiency_gains_substantial",
@@ -440,6 +446,8 @@ def main() -> None:
     assert claim3_summary["invalid_metric_row_count"] == 0
     assert claim3_summary["eccp_empirical_coverage_cell_count"] == 9
     assert claim3_summary["eccp_empirical_coverage_pass_count"] == 9
+    assert claim3_summary["p2e_empirical_coverage_cell_count"] == 27
+    assert claim3_summary["p2e_empirical_coverage_pass_count"] == 27
     assert claim3_summary["empirical_coverage_shortfall_tolerance"] == 0.02
     assert claim3_summary["calibrator_efficiency_comparison_count"] == 36
     assert claim3_summary["p2e_not_longer_count"] == 36
@@ -489,7 +497,7 @@ def main() -> None:
         ),
         ".trackio/logbook/pages/claim-3/page.md": (
             "Independent full CCP raw verification",
-            "Deterministic and randomized arbitrary-dependence coupling LP",
+            "Exchangeable and randomized e-merge coverage certificate",
         ),
         ".trackio/logbook/pages/methods-source-audit/page.md": (
             "Primary TeX table fixture audit",

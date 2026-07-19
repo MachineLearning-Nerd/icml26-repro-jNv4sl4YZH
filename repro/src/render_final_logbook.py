@@ -62,6 +62,8 @@ def build_cells(
         "all_merged_expectations_exact",
         "all_markov_coverage_events_pass",
         "all_arbitrary_dependence_coverage_pass",
+        "all_exchangeable_prefix_coverage_pass",
+        "all_exchangeable_randomized_prefix_coverage_pass",
         "all_randomized_uniform_coverage_events_pass",
         "all_randomized_arbitrary_dependence_coverage_pass",
         "invalid_scaling_control_detected",
@@ -85,6 +87,7 @@ def build_cells(
         "all_full_seed_cells_present",
         "exact_cell_set",
         "all_eccp_empirical_coverage_within_tolerance",
+        "all_p2e_empirical_coverage_within_tolerance",
         "all_p2e_not_longer_than_existing_calibrators",
         "all_p2e_strictly_shorter_than_aon",
         "all_classical_efficiency_gains_substantial",
@@ -107,6 +110,8 @@ def build_cells(
         raise RuntimeError("Claim 3 raw-row count is not 11,700")
     if c3_summary["eccp_empirical_coverage_pass_count"] != 9:
         raise RuntimeError("Claim 3 does not pass all nine ECCP coverage sanity checks")
+    if c3_summary["p2e_empirical_coverage_pass_count"] != 27:
+        raise RuntimeError("Claim 3 does not pass all 27 P2E-method coverage checks")
     if c3_summary["calibrator_efficiency_comparison_count"] != 36:
         raise RuntimeError("CCP does not contain all 36 calibrator comparisons")
     if c3_summary["p2e_strictly_shorter_count"] != 36:
@@ -137,12 +142,26 @@ def build_cells(
         for models in claim3["summaries"].values()
         for methods in models.values()
     ]
+    ccp_p2e_coverages = [
+        float(methods[method]["coverage_mean"])
+        for models in claim3["summaries"].values()
+        for methods in models.values()
+        for method in ("ECCP", "ECCP_exch", "UR-ECCP_exch")
+    ]
     maximum_expectation_error = max(
         float(row["expectation_abs_error"]) for row in claim1["cases"]
     )
     valid_tail_ratio = float(mechanism_summary["maximum_valid_tail_to_alpha_ratio"])
     randomized_tail_ratio = float(
         mechanism_summary["maximum_valid_randomized_tail_to_alpha_ratio"]
+    )
+    exchangeable_prefix_tail_ratio = float(
+        mechanism_summary["maximum_exchangeable_prefix_tail_to_alpha_ratio"]
+    )
+    exchangeable_randomized_tail_ratio = float(
+        mechanism_summary[
+            "maximum_exchangeable_randomized_prefix_tail_to_alpha_ratio"
+        ]
     )
 
     summary = {
@@ -159,8 +178,19 @@ def build_cells(
         "claim3_execution_adapter": str(claim3["protocol"]["execution_adapter"]),
         "claim3_eccp_coverage_min": min(ccp_coverages),
         "claim3_eccp_coverage_max": max(ccp_coverages),
+        "claim3_p2e_coverage_min": min(ccp_p2e_coverages),
+        "claim3_p2e_coverage_max": max(ccp_p2e_coverages),
         "claim3_valid_tail_to_alpha_max": valid_tail_ratio,
         "claim3_valid_randomized_tail_to_alpha_max": randomized_tail_ratio,
+        "claim3_exchangeable_prefix_cases": int(
+            mechanism_summary["exchangeable_prefix_case_count"]
+        ),
+        "claim3_exchangeable_prefix_tail_to_alpha_max": (
+            exchangeable_prefix_tail_ratio
+        ),
+        "claim3_exchangeable_randomized_tail_to_alpha_max": (
+            exchangeable_randomized_tail_ratio
+        ),
         "claim3_weca_independence_cases": int(weca_summary["case_count"]),
         "claim2_ccp_efficiency_wins": int(c3_summary["p2e_strictly_shorter_count"]),
         "claim2_ccp_efficiency_comparisons": int(
@@ -179,9 +209,9 @@ def build_cells(
 
     claim2_markdown = f"""Claim 2 is verified at the complete released scale in both applications. The independent CA verifier accepted exactly {summary['claim2_raw_rows']:,} unique finite raw cells (four OpenML tasks, 20 fixed seeds, 24 methods) with no missing, duplicate, unexpected, or non-finite cells. P2E clears the predeclared 10% materiality threshold against log, square-root, and linear p-to-e calibrators in {summary['claim2_efficiency_wins']}/{summary['claim2_efficiency_comparisons']} matched WECA/UR-WECA comparisons; relative length reductions range from {100 * summary['claim2_minimum_relative_reduction']:.2f}% to {100 * summary['claim2_maximum_relative_reduction']:.2f}%. The full CCP evidence independently requires P2E to be strictly shorter in {summary['claim2_ccp_efficiency_wins']}/{summary['claim2_ccp_efficiency_comparisons']} matched model/dataset/calibrator cells, including {summary['claim2_ccp_aon_wins']}/9 all-or-nothing comparisons; all {summary['claim2_ccp_classical_material_wins']}/27 classical-calibrator reductions clear 10%, with a minimum of {100 * summary['claim2_ccp_minimum_classical_relative_reduction']:.2f}%. The eight P2E CA coverage means span {summary['claim2_p2e_coverage_min']:.4f}–{summary['claim2_p2e_coverage_max']:.4f}."""
 
-    claim3_markdown = f"""Claim 3 is verified by complementary empirical and mechanism evidence. The full released CCP protocol produced exactly {summary['claim3_raw_rows']:,} unique finite cells (three datasets, 100 seeds, three models, 13 methods), using the parity-checked `{summary['claim3_execution_adapter']}` adapter to vectorize only deterministic post-processing after reproducing the source estimator and foldwise p-values. With ECCP coverage means spanning {summary['claim3_eccp_coverage_min']:.4f}–{summary['claim3_eccp_coverage_max']:.4f}, all nine ECCP and all eight CA P2E cells remain within the predeclared two-percentage-point empirical shortfall tolerance. An independent sparse LP maximized both deterministic-threshold rejection and the paper's exact independent-uniform randomized-threshold failure probability over every joint coupling with uniform conformal-rank marginals in eight fixed-weight cases: two equal-weight ECCP cases and six nonuniform tuning-independent WECA cases. All valid deterministic and randomized cases stayed at or below alpha (maximum tail/alpha ratios {summary['claim3_valid_tail_to_alpha_max']:.6f} and {summary['claim3_valid_randomized_tail_to_alpha_max']:.6f}, respectively), while inference-adaptive max weighting failed 8/8 under both rules. A hash-bound audit of the released WECA routine verifies its disjoint weight-calibration/tuning/final-calibration partition and, in {summary['claim3_weca_independence_cases']}/6 seeded noninterference cases, selected weights are bit-identical after arbitrary final-calibration or test-data/outcome mutations; a forbidden test-adaptive control changes in 6/6. The empirical rule is a gross-undercoverage sanity check; the exact finite-sample guarantee comes from the rank/e-value certificate. Together with the CA outputs, this checks both applications named by the claim and WECA's independent-tuning condition."""
+    claim3_markdown = f"""Claim 3 is verified by complementary empirical and mechanism evidence. The full released CCP protocol produced exactly {summary['claim3_raw_rows']:,} unique finite cells (three datasets, 100 seeds, three models, 13 methods), using the parity-checked `{summary['claim3_execution_adapter']}` adapter to vectorize only deterministic post-processing after reproducing the source estimator and foldwise p-values. Across ECCP, ECCP-Exch, and UR-ECCP-Exch, all 27 paper-scale coverage means remain within the predeclared two-percentage-point empirical shortfall tolerance and span {summary['claim3_p2e_coverage_min']:.4f}–{summary['claim3_p2e_coverage_max']:.4f}; all eight CA P2E cells pass the same check. Independent sparse LPs maximized both deterministic-threshold rejection and the paper's exact independent-uniform randomized-threshold failure probability over every joint coupling with uniform conformal-rank marginals in eight fixed-weight cases: two equal-weight ECCP cases and six nonuniform tuning-independent WECA cases. All valid deterministic and randomized cases stayed at or below alpha (maximum tail/alpha ratios {summary['claim3_valid_tail_to_alpha_max']:.6f} and {summary['claim3_valid_randomized_tail_to_alpha_max']:.6f}, respectively), while inference-adaptive max weighting failed 8/8 under both rules. A separate orbit LP enforces fold exchangeability exactly and verifies the prefix-maximum ECCP-Exch and randomized-first UR-ECCP-Exch constructions in {summary['claim3_exchangeable_prefix_cases']}/5 cases; maximum failure/alpha ratios are {summary['claim3_exchangeable_prefix_tail_to_alpha_max']:.6f} and {summary['claim3_exchangeable_randomized_tail_to_alpha_max']:.6f}. A hash-bound audit of the released WECA routine verifies its disjoint weight-calibration/tuning/final-calibration partition and, in {summary['claim3_weca_independence_cases']}/6 seeded noninterference cases, selected weights are bit-identical after arbitrary final-calibration or test-data/outcome mutations; a forbidden test-adaptive control changes in 6/6. The empirical rule is a gross-undercoverage sanity check; the exact finite-sample guarantee comes from the rank/e-value certificate. Together with the CA outputs, this checks both applications named by the claim and WECA's independent-tuning condition."""
 
-    controls_markdown = f"""The controls fail in the intended direction. Classical p-to-e calibrators inflate the conformal set in all {c1_summary['classic_control_case_count']} eligible finite-rank cases. Invalid 2x e-value scaling is detected under independent deterministic-threshold enumeration in {mechanism_summary['invalid_scaling_control_rejection_count']}/{mechanism_summary['case_count']} cases and, under the adversarial arbitrary-dependence LP, violates the deterministic bound in {mechanism_summary['invalid_arbitrary_dependence_rejection_count']}/{mechanism_summary['case_count']} cases and the paper's randomized-uniform bound in {mechanism_summary['invalid_randomized_arbitrary_dependence_rejection_count']}/{mechanism_summary['case_count']} cases. Illegally choosing the largest e-value after observing the inference tuple (outcome-adaptive one-hot weights) violates both bounds in {mechanism_summary['adaptive_weight_rejection_count']}/{mechanism_summary['case_count']} and {mechanism_summary['adaptive_randomized_weight_rejection_count']}/{mechanism_summary['case_count']} cases, respectively; the separate source-bound noninterference audit also makes its deliberately test-adaptive weight change in {summary['claim3_weca_independence_cases']}/6 cases. All raw verifiers separately reject protocol drift, missing cells, duplicates, unexpected rows, non-finite metrics, coverages outside `[0,1]`, and negative lengths."""
+    controls_markdown = f"""The controls fail in the intended direction. Classical p-to-e calibrators inflate the conformal set in all {c1_summary['classic_control_case_count']} eligible finite-rank cases. Invalid 2x e-value scaling is detected under independent deterministic-threshold enumeration in {mechanism_summary['invalid_scaling_control_rejection_count']}/{mechanism_summary['case_count']} cases and, under the adversarial arbitrary-dependence LP, violates the deterministic bound in {mechanism_summary['invalid_arbitrary_dependence_rejection_count']}/{mechanism_summary['case_count']} cases and the paper's randomized-uniform bound in {mechanism_summary['invalid_randomized_arbitrary_dependence_rejection_count']}/{mechanism_summary['case_count']} cases. It also violates the exchangeable ECCP-Exch and UR-ECCP-Exch orbit-LP bounds in {mechanism_summary['invalid_exchangeable_prefix_rejection_count']}/{mechanism_summary['exchangeable_prefix_case_count']} and {mechanism_summary['invalid_exchangeable_randomized_prefix_rejection_count']}/{mechanism_summary['exchangeable_prefix_case_count']} cases. Illegally choosing the largest e-value after observing the inference tuple (outcome-adaptive one-hot weights) violates both weighted-merge bounds in {mechanism_summary['adaptive_weight_rejection_count']}/{mechanism_summary['case_count']} and {mechanism_summary['adaptive_randomized_weight_rejection_count']}/{mechanism_summary['case_count']} cases, respectively; the separate source-bound noninterference audit also makes its deliberately test-adaptive weight change in {summary['claim3_weca_independence_cases']}/6 cases. All raw verifiers separately reject protocol drift, missing cells, duplicates, unexpected rows, non-finite metrics, coverages outside `[0,1]`, and negative lengths."""
 
     conclusion_markdown = f"""All three jury claims are verified at the declared scope. P2E preserves every one of {summary['claim1_cells']} finite-rank conformal sets while remaining an exact e-value (maximum expectation error {summary['claim1_maximum_expectation_error']:.3g}); the full CA protocol yields {summary['claim2_efficiency_wins']}/{summary['claim2_efficiency_comparisons']} P2E efficiency wins; and the complete CA/CCP evidence plus the arbitrary-dependence LP supports the finite-sample `1-alpha` guarantee. All {summary['headline_scalars']} paper-reported mean/SD scalars across {summary['headline_cells']} headline cells pass the fixed drift tolerances.
 

@@ -227,6 +227,8 @@ class RawVerifierTests(unittest.TestCase):
             raw = Path(temp)
             methods = [
                 "ECCP",
+                "ECCP_exch",
+                "UR-ECCP_exch",
                 "ECCP(ind)",
                 "ECCP(sqrt)",
                 "ECCP(log)",
@@ -268,7 +270,7 @@ class RawVerifierTests(unittest.TestCase):
             (raw / "toy.json").write_text(json.dumps(payload), encoding="utf-8")
             passed = invoke("verify_ccp_results.py", raw, raw / "passed.json")
             self.assertTrue(passed["summary"]["all_full_seed_cells_present"])
-            self.assertEqual(passed["summary"]["expected_rows"], 10)
+            self.assertEqual(passed["summary"]["expected_rows"], 14)
             self.assertTrue(passed["summary"]["exact_cell_set"])
             self.assertEqual(passed["summary"]["duplicate_cell_count"], 0)
             self.assertEqual(passed["summary"]["unexpected_row_count"], 0)
@@ -278,6 +280,11 @@ class RawVerifierTests(unittest.TestCase):
             self.assertEqual(passed["summary"]["eccp_empirical_coverage_pass_count"], 1)
             self.assertTrue(
                 passed["summary"]["all_eccp_empirical_coverage_within_tolerance"]
+            )
+            self.assertEqual(passed["summary"]["p2e_empirical_coverage_cell_count"], 3)
+            self.assertEqual(passed["summary"]["p2e_empirical_coverage_pass_count"], 3)
+            self.assertTrue(
+                passed["summary"]["all_p2e_empirical_coverage_within_tolerance"]
             )
             self.assertEqual(
                 passed["summary"]["calibrator_efficiency_comparison_count"], 4
@@ -368,6 +375,12 @@ class RawVerifierTests(unittest.TestCase):
             )
             self.assertFalse(
                 undercoverage["summary"]["all_eccp_empirical_coverage_within_tolerance"]
+            )
+            self.assertEqual(
+                undercoverage["summary"]["p2e_empirical_coverage_pass_count"], 0
+            )
+            self.assertFalse(
+                undercoverage["summary"]["all_p2e_empirical_coverage_within_tolerance"]
             )
 
             invalid_range_rows = [
