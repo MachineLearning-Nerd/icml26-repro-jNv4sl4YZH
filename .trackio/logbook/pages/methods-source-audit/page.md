@@ -303,3 +303,25 @@ Ran 19 tests in 6.333s
 OK
 
 ````
+
+
+---
+<!-- trackio-cell
+{"type": "code", "id": "cell_616ea8d9b7db", "created_at": "2026-07-19T13:26:45+00:00", "title": "Pinned-source CCP randomization replay", "command": ["python", "-m", "unittest", "-v", "repro.tests.test_author_runner_preflight.AuthorRunnerPreflightTests.test_ccp_rng_replay_matches_real_source_power_intervals"], "exit_code": 0, "duration_s": 1.59}
+-->
+````bash
+$ python -m unittest -v repro.tests.test_author_runner_preflight.AuthorRunnerPreflightTests.test_ccp_rng_replay_matches_real_source_power_intervals
+````
+
+exit 0 · 1.6s
+
+
+````output
+test_ccp_rng_replay_matches_real_source_power_intervals (repro.tests.test_author_runner_preflight.AuthorRunnerPreflightTests.test_ccp_rng_replay_matches_real_source_power_intervals) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 1.367s
+
+OK
+
+````

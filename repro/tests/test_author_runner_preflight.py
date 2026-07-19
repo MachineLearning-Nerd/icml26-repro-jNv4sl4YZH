@@ -53,6 +53,67 @@ def load_ca_runner():
 
 
 class AuthorRunnerPreflightTests(unittest.TestCase):
+    def test_ccp_rng_replay_matches_real_source_power_intervals(self):
+        import numpy as np
+
+        runner = load_ccp_runner()
+        source_path = ROOT / "upstream/e-ccp/eccp_utils.py"
+        spec = importlib.util.spec_from_file_location("pinned_eccp_utils", source_path)
+        assert spec and spec.loader
+        functions = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(functions)
+
+        rng = np.random.default_rng(2026)
+        x_train = rng.normal(size=(30, 3))
+        y_train = 0.7 * x_train[:, 0] - 0.2 * x_train[:, 1] + rng.normal(
+            scale=0.1, size=30
+        )
+        x_test = rng.normal(size=(4, 3))
+        seed = 45
+        alpha = 0.1
+        folds = 3
+        result = functions.cc_ols(
+            y=y_train,
+            X=x_train,
+            x_test=x_test,
+            K=folds,
+            alpha=alpha,
+            n_grid=31,
+            grid_factor=1.0,
+            random_state=seed,
+        )
+
+        replay = np.random.default_rng(seed)
+        replay.permutation(len(y_train))
+        u_values = replay.random(len(x_test))
+        p_values = np.asarray(result["p_vals"])
+        source_power_merged = (5.0 * (1.0 - p_values) ** 4).mean(axis=1) / u_values[None, :]
+        expected_power_intervals = [
+            functions.set_cc_eval(source_power_merged[:, index], result["ys"], alpha)
+            for index in range(len(x_test))
+        ]
+
+        def normalized(intervals):
+            return [None if value is None else np.asarray(value).tolist() for value in intervals]
+
+        self.assertEqual(
+            normalized(result["int_cc_eval_pow"]),
+            normalized(expected_power_intervals),
+        )
+        corrected = runner.attach_paper_linear_calibrator(
+            result,
+            functions,
+            n_train=len(y_train),
+            k=folds,
+            alpha=alpha,
+            seed=seed,
+        )
+        self.assertEqual(len(corrected["int_cc_eval_linear"]), len(x_test))
+        paper_linear_merged = (2.0 * (1.0 - p_values)).mean(axis=1) / u_values[None, :]
+        self.assertGreater(
+            float(np.max(np.abs(source_power_merged - paper_linear_merged))), 0.1
+        )
+
     def test_ccp_wrapper_reconstructs_the_paper_f3_linear_calibrator(self):
         import numpy as np
 
