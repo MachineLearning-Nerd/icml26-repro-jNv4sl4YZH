@@ -32,12 +32,16 @@ while true; do
   fi
   printf '%s missing CA output after worker exit; starting resumable recovery\n' \
     "$(date --iso-8601=seconds)"
-  trackio logbook run \
-    --page "Claim 2" \
-    --title "Full released conformal-aggregation protocol" \
-    -- python repro/src/run_author_ca.py \
-    --source upstream \
-    --output-dir outputs/raw/author_ca
+  if ! trackio logbook run \
+      --page "Claim 2" \
+      --title "Full released conformal-aggregation protocol" \
+      -- python repro/src/run_author_ca.py \
+      --source upstream \
+      --output-dir outputs/raw/author_ca; then
+    printf '%s resumable CA recovery exited nonzero; retrying in 60 seconds\n' \
+      "$(date --iso-8601=seconds)" >&2
+    sleep 60
+  fi
 done
 
 trackio logbook run \
