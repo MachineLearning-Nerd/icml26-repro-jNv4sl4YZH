@@ -74,6 +74,13 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   `66cb1e1c76d1b1d3d133fe6cb3896c95d48b5974`.
 - Confirmed the checked-in protocol retains the paper-scale CA and CCP
   configurations described above.
+- Initialized the local publication repository and committed the current
+  implementation at `3143c6c` without pushing it. The complete `upstream/`
+  checkout is now ignored, and the publisher preflight requires that rule, so
+  Git cannot accidentally publish an unusable embedded-repository gitlink.
+  `README.md` now gives the exact official clone/commit verification,
+  environment installation, 1,920-cell CA, 11,700-cell CCP, independent
+  verification, test, and final-gate commands for a fresh public clone.
 - Ran all fifteen local mechanism/protocol/author-launcher/raw-verifier and
   paper-headline drift-control tests successfully (including positive and
   deliberately incomplete raw fixtures), including local-only Trackio artifact
@@ -111,9 +118,10 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   Conclusion marker, and an exact-size evidence bundle in the Trackio bucket.
   Trackio's required local `abs_path` mapping is validated but its metadata
   file is gitignored, preventing that local-only path from entering GitHub.
-- At `2026-07-19 10:31 IST`, the legacy (pre-checkpoint-patch) active process
-  for final task `361234` remained healthy at about `96.8%` CPU, `188 MB` RSS,
+- At `2026-07-19 12:28 IST`, the legacy (pre-checkpoint-patch) active process
+  for final task `361234` remained healthy at about `97.1%` CPU, `190 MB` RSS,
   and zero swap. Its larger `4,177 x 7` retained input explains why it is much
   slower than the three completed `1,030`- to `1,503`-row tasks. The exact-PID
   continuation guard and both serialized handoffs remain alive. The required
-  Python 3.12 environment was re-entered and all `15/15` tests passed again.
+  Python 3.12 environment was re-entered, the publication shell scripts passed
+  syntax/preflight checks, and all `15/15` tests passed again.
