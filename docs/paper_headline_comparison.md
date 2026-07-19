@@ -1,14 +1,15 @@
 # Paper headline comparison
 
-This project preserves a machine-readable transcription of the P2E rows needed
-to cross-check the full source runs against the paper. The values are
+This project preserves a machine-readable transcription of every CA P2E row
+and every tabulated CCP row needed to cross-check the full source runs against the paper. The values are
 transcribed from arXiv `2606.03600`, Table 2 and Appendix Tables 6–8, into
 `repro/configs/paper_headlines.json`.
 
 The transcription was rechecked against the primary arXiv v1 HTML on
 2026-07-19. Table 2 reports the four WECA(P2E) and four UR-WECA(P2E) CA cells;
-Appendix Tables 6, 7, and 8 report the Boston, Abalone, and Parkinson ECCP
-length/coverage cells for OLS, RF, and Lasso. The paper also states that ECCP
+Appendix Tables 6, 7, and 8 report the Boston, Abalone, and Parkinson
+length/coverage cells for OLS, RF, and Lasso. Both panels are transcribed:
+CCP/e-mod/u-mod/eu-mod/ECCP(2alpha), plus P2E ECCP/AoN/F1/F2/F3. The paper also states that ECCP
 is valid under arbitrary dependence among fold-wise p-values, which is the
 scope targeted by `docs/arbitrary_dependence_coverage.md`.
 
@@ -33,11 +34,12 @@ deviations: absolute coverage-SD drift must be at most `0.01`, and relative
 length-SD drift must be at most `10%`.
 
 The CA comparison covers the paper's reported WECA(P2E) and UR-WECA(P2E)
-rows across all four OpenML task IDs. The CCP comparison covers the ECCP rows
-for OLS, RF, and Lasso on Boston, Abalone, and Parkinson at the reported
-15/15/20 fold counts. In total, the fail-closed comparison checks all four
-reported scalars (coverage mean/SD and length mean/SD) in each of 17 headline
-cells: 68 scalar comparisons.
+rows across all four OpenML task IDs. The CCP comparison covers all ten methods
+tabulated for OLS, RF, and Lasso on Boston, Abalone, and Parkinson at the
+reported 15/15/20 fold counts. In total, the fail-closed comparison checks all
+four reported scalars (coverage mean/SD and length mean/SD) in 98 cells:
+392 scalar comparisons. The 90 CCP cells were parsed back from the primary
+arXiv TeX and matched field-for-field before any CCP result existed.
 
 Separately, the raw CA/CCP verifiers apply a fixed two-percentage-point
 gross-undercoverage sanity threshold to all eight P2E aggregation cells and all

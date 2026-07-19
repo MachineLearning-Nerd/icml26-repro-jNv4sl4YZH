@@ -151,7 +151,7 @@ class FullProtocolTests(unittest.TestCase):
                 for models in headlines["cross_conformal"].values()
                 for methods in models.values()
             ),
-            9,
+            90,
         )
 
     def test_expected_ccp_raw_cell_count(self):
@@ -289,16 +289,16 @@ class FullProtocolTests(unittest.TestCase):
         headlines = {
             "summary": {
                 "all_within_tolerance": True,
-                "comparison_count": 17,
-                "scalar_comparison_count": 68,
-                "within_tolerance_scalar_count": 68,
+                "comparison_count": 98,
+                "scalar_comparison_count": 392,
+                "within_tolerance_scalar_count": 392,
             }
         }
 
         cells = build_cells(claim1, claim2, mechanism, claim3, headlines)
         self.assertIn("FULL_GATE_READY: jNv4sl4YZH", cells["conclusion"])
         self.assertIn("24/24", cells["claim_2"])
-        self.assertEqual(cells["summary"]["headline_scalars"], 68)
+        self.assertEqual(cells["summary"]["headline_scalars"], 392)
 
         claim2["summary"]["p2e_shorter_count"] = 23
         with self.assertRaises(RuntimeError):

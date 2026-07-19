@@ -230,7 +230,7 @@ def main() -> None:
         len(methods)
         for models in headline_config["cross_conformal"].values()
         for methods in models.values()
-    ) == 9
+    ) == 90
 
     commands = (
         [sys.executable, "repro/src/verify_p2e_identity.py", "--output", "outputs/claim1_independent.json"],
@@ -345,10 +345,10 @@ def main() -> None:
         headlines["comparison_policy"].get(key) == value
         for key, value in HEADLINE_TOLERANCES.items()
     )
-    assert headlines["summary"]["comparison_count"] == 17
-    assert headlines["summary"]["within_tolerance_count"] == 17
-    assert headlines["summary"]["scalar_comparison_count"] == 68
-    assert headlines["summary"]["within_tolerance_scalar_count"] == 68
+    assert headlines["summary"]["comparison_count"] == 98
+    assert headlines["summary"]["within_tolerance_count"] == 98
+    assert headlines["summary"]["scalar_comparison_count"] == 392
+    assert headlines["summary"]["within_tolerance_scalar_count"] == 392
 
     required_trackio_text = {
         ".trackio/logbook/pages/claim-2/page.md": "Independent full CA raw verification",

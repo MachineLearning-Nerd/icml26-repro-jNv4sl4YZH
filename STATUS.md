@@ -55,7 +55,7 @@ Do not publish until all source runs, independent verifiers, negative controls,
 tests, headline-number comparison, and secret scan pass. The current Hugging
 Face quota does not affect local implementation work. The fail-closed
 `repro/src/prepublish_gate.py` now reruns every independent checker and all
-tests, validates the 1,920 CA and 11,700 CCP cell sets, requires all 17 paper
+tests, validates the 1,920 CA and 11,700 CCP cell sets, requires all 98 tabulated paper
 headline cells within tolerance, verifies the source pin and Trackio evidence,
 scans hygiene, and hashes every final artifact. It cannot pass until the full
 source outputs and final Conclusion marker exist. On success it packages seven
@@ -64,7 +64,7 @@ artifact that Trackio will promote to the Hugging Face bucket.
 The headline tolerances were fixed before the remaining results existed at
 `0.01` absolute coverage and `5%` relative length; larger drift halts the gate.
 The comparison now covers all four reported scalars in each headline cell:
-coverage mean/SD and length mean/SD, for 68 checks across 17 cells. The added
+coverage mean/SD and length mean/SD, for 392 checks across 98 cells. The added
 SD tolerances (`0.01` absolute coverage SD and `10%` relative length SD) were
 fixed after three CA tasks but before the final CA task and all CCP outputs.
 
@@ -166,14 +166,14 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   pinned environment (1,030×8; 1,503×5; 1,066×2; and 4,177×7 retained numeric
   rows respectively). It is therefore ready for the actual 4×20-seed sweep.
 - `repro/src/compare_paper_headlines.py` will compare the independently
-  summarized raw results to the 8 reported CA P2E cells and 9 reported CCP
-  ECCP cells transcribed from the paper, checking all 68 mean/SD scalars and
-  explicitly reporting any drift.
+  summarized raw results to the 8 reported CA P2E cells and all 90 tabulated
+  CCP cells transcribed from both panels of Appendix Tables 6–8, checking all
+  392 mean/SD scalars and explicitly reporting any drift.
 - The serialized handoff launched Claim 2 after the unrelated shared sweep
   completed. Three of four CA tasks are now complete; do not start the CCP
   sweep until the final CA task and its independent verifier finish. A second
   durable one-shot handoff waits for all three CCP final artifacts, then runs
-  the strict 11,700-cell verifier, all 68 scalar paper-headline checks, the
+  the strict 11,700-cell verifier, all 392 scalar paper-table checks, the
   arbitrary-dependence LP, evidence-derived final Trackio cells, and the
   fail-closed publication gate. After—and only after—that gate succeeds, the
   final step creates/pushes the public GitHub repository and publishes the
@@ -252,3 +252,10 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   strict/materiality gates. The renderer and prepublication gate enforce these
   counts before writing the final claim verdict. The complete `20/20` suite is
   captured in Trackio. Commits: `5719dc8` and `3f4c511`.
+- Before any CCP result existed, the paper-number gate was expanded from the
+  nine winning ECCP cells to every method in both tabulated panels of Appendix
+  Tables 6–8: 90 CCP cells (three datasets x three models x ten methods), plus
+  the eight CA P2E cells. All 392 coverage/length mean/SD scalars across 98
+  cells are now fail-closed publication requirements. An independent parser
+  matched all 90 CCP configuration cells field-for-field against the primary
+  arXiv TeX, preventing manual-transcription drift.

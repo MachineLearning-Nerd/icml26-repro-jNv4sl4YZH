@@ -98,12 +98,12 @@ def build_cells(
         raise RuntimeError("P2E does not clear all 27 classical CCP materiality checks")
     if c3_summary["minimum_substantial_relative_reduction"] != 0.10:
         raise RuntimeError("CCP materiality threshold drifted from 10%")
-    if headline_summary["comparison_count"] != 17:
-        raise RuntimeError("headline cell count is not 17")
-    if headline_summary["scalar_comparison_count"] != 68:
-        raise RuntimeError("headline scalar count is not 68")
-    if headline_summary["within_tolerance_scalar_count"] != 68:
-        raise RuntimeError("not all 68 headline scalars pass")
+    if headline_summary["comparison_count"] != 98:
+        raise RuntimeError("headline cell count is not 98")
+    if headline_summary["scalar_comparison_count"] != 392:
+        raise RuntimeError("headline scalar count is not 392")
+    if headline_summary["within_tolerance_scalar_count"] != 392:
+        raise RuntimeError("not all 392 headline scalars pass")
 
     efficiency = claim2["efficiency_comparisons"]
     assert isinstance(efficiency, list)

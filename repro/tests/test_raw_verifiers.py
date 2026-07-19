@@ -71,17 +71,17 @@ class RawVerifierTests(unittest.TestCase):
             subprocess.run(command, cwd=ROOT, check=True, capture_output=True, text=True)
             matching = json.loads(output.read_text(encoding="utf-8"))
             self.assertTrue(matching["summary"]["all_within_tolerance"])
-            self.assertEqual(matching["summary"]["comparison_count"], 17)
-            self.assertEqual(matching["summary"]["scalar_comparison_count"], 68)
-            self.assertEqual(matching["summary"]["within_tolerance_scalar_count"], 68)
+            self.assertEqual(matching["summary"]["comparison_count"], 98)
+            self.assertEqual(matching["summary"]["scalar_comparison_count"], 392)
+            self.assertEqual(matching["summary"]["within_tolerance_scalar_count"], 392)
 
             ca["summaries"]["dataset_361234"]["WECA(P2E)"]["length_mean"] = 99.0
             ca_path.write_text(json.dumps(ca), encoding="utf-8")
             subprocess.run(command, cwd=ROOT, check=True, capture_output=True, text=True)
             drifted = json.loads(output.read_text(encoding="utf-8"))
             self.assertFalse(drifted["summary"]["all_within_tolerance"])
-            self.assertEqual(drifted["summary"]["within_tolerance_count"], 16)
-            self.assertEqual(drifted["summary"]["within_tolerance_scalar_count"], 67)
+            self.assertEqual(drifted["summary"]["within_tolerance_count"], 97)
+            self.assertEqual(drifted["summary"]["within_tolerance_scalar_count"], 391)
 
             ca["summaries"]["dataset_361234"]["WECA(P2E)"] = dict(
                 headlines["conformal_aggregation"]["dataset_361234"]["WECA(P2E)"]
@@ -91,8 +91,8 @@ class RawVerifierTests(unittest.TestCase):
             subprocess.run(command, cwd=ROOT, check=True, capture_output=True, text=True)
             drifted_sd = json.loads(output.read_text(encoding="utf-8"))
             self.assertFalse(drifted_sd["summary"]["all_within_tolerance"])
-            self.assertEqual(drifted_sd["summary"]["within_tolerance_count"], 16)
-            self.assertEqual(drifted_sd["summary"]["within_tolerance_scalar_count"], 67)
+            self.assertEqual(drifted_sd["summary"]["within_tolerance_count"], 97)
+            self.assertEqual(drifted_sd["summary"]["within_tolerance_scalar_count"], 391)
 
             ca["summaries"]["dataset_361234"]["WECA(P2E)"] = dict(
                 headlines["conformal_aggregation"]["dataset_361234"]["WECA(P2E)"]

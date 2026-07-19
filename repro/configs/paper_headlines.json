@@ -27,19 +27,118 @@
   },
   "cross_conformal": {
     "boston": {
-      "OLS": {"ECCP": {"coverage_mean": 0.905, "coverage_sd": 0.033, "length_mean": 15.458, "length_sd": 0.850}},
-      "RF": {"ECCP": {"coverage_mean": 0.899, "coverage_sd": 0.032, "length_mean": 10.126, "length_sd": 0.616}},
-      "Lasso": {"ECCP": {"coverage_mean": 0.903, "coverage_sd": 0.031, "length_mean": 15.479, "length_sd": 0.839}}
+      "OLS": {
+        "cross": {"coverage_mean": 0.897, "coverage_sd": 0.032, "length_mean": 13.970, "length_sd": 0.456},
+        "e-mod-cross": {"coverage_mean": 0.895, "coverage_sd": 0.055, "length_mean": 14.100, "length_sd": 1.720},
+        "u-mod-cross": {"coverage_mean": 0.880, "coverage_sd": 0.034, "length_mean": 13.288, "length_sd": 0.439},
+        "eu-mod-cross": {"coverage_mean": 0.854, "coverage_sd": 0.067, "length_mean": 12.569, "length_sd": 1.955},
+        "ECCP (2α)": {"coverage_mean": 0.793, "coverage_sd": 0.042, "length_mean": 10.665, "length_sd": 0.473},
+        "ECCP": {"coverage_mean": 0.905, "coverage_sd": 0.033, "length_mean": 15.458, "length_sd": 0.850},
+        "ECCP(ind)": {"coverage_mean": 0.926, "coverage_sd": 0.029, "length_mean": 18.727, "length_sd": 1.300},
+        "ECCP(log)": {"coverage_mean": 0.926, "coverage_sd": 0.029, "length_mean": 65.724, "length_sd": 3.768},
+        "ECCP(sqrt)": {"coverage_mean": 0.907, "coverage_sd": 0.031, "length_mean": 71.783, "length_sd": 3.746},
+        "ECCP(linear)": {"coverage_mean": 0.908, "coverage_sd": 0.031, "length_mean": 63.206, "length_sd": 3.979}
+      },
+      "RF": {
+        "cross": {"coverage_mean": 0.902, "coverage_sd": 0.035, "length_mean": 9.140, "length_sd": 0.357},
+        "e-mod-cross": {"coverage_mean": 0.894, "coverage_sd": 0.049, "length_mean": 9.208, "length_sd": 1.450},
+        "u-mod-cross": {"coverage_mean": 0.882, "coverage_sd": 0.034, "length_mean": 8.615, "length_sd": 0.323},
+        "eu-mod-cross": {"coverage_mean": 0.849, "coverage_sd": 0.070, "length_mean": 7.994, "length_sd": 1.618},
+        "ECCP (2α)": {"coverage_mean": 0.784, "coverage_sd": 0.046, "length_mean": 6.549, "length_sd": 0.317},
+        "ECCP": {"coverage_mean": 0.899, "coverage_sd": 0.032, "length_mean": 10.126, "length_sd": 0.616},
+        "ECCP(ind)": {"coverage_mean": 0.922, "coverage_sd": 0.027, "length_mean": 12.662, "length_sd": 1.153},
+        "ECCP(log)": {"coverage_mean": 0.921, "coverage_sd": 0.024, "length_mean": 63.487, "length_sd": 4.036},
+        "ECCP(sqrt)": {"coverage_mean": 0.907, "coverage_sd": 0.028, "length_mean": 70.362, "length_sd": 3.932},
+        "ECCP(linear)": {"coverage_mean": 0.903, "coverage_sd": 0.026, "length_mean": 61.264, "length_sd": 4.204}
+      },
+      "Lasso": {
+        "cross": {"coverage_mean": 0.898, "coverage_sd": 0.032, "length_mean": 13.926, "length_sd": 0.463},
+        "e-mod-cross": {"coverage_mean": 0.895, "coverage_sd": 0.053, "length_mean": 14.109, "length_sd": 1.736},
+        "u-mod-cross": {"coverage_mean": 0.881, "coverage_sd": 0.032, "length_mean": 13.268, "length_sd": 0.447},
+        "eu-mod-cross": {"coverage_mean": 0.854, "coverage_sd": 0.066, "length_mean": 12.548, "length_sd": 2.006},
+        "ECCP (2α)": {"coverage_mean": 0.792, "coverage_sd": 0.043, "length_mean": 10.632, "length_sd": 0.480},
+        "ECCP": {"coverage_mean": 0.903, "coverage_sd": 0.031, "length_mean": 15.479, "length_sd": 0.839},
+        "ECCP(ind)": {"coverage_mean": 0.926, "coverage_sd": 0.028, "length_mean": 18.786, "length_sd": 1.309},
+        "ECCP(log)": {"coverage_mean": 0.926, "coverage_sd": 0.029, "length_mean": 65.746, "length_sd": 3.768},
+        "ECCP(sqrt)": {"coverage_mean": 0.907, "coverage_sd": 0.032, "length_mean": 71.786, "length_sd": 3.745},
+        "ECCP(linear)": {"coverage_mean": 0.908, "coverage_sd": 0.030, "length_mean": 63.204, "length_sd": 3.984}
+      }
     },
     "abalone": {
-      "OLS": {"ECCP": {"coverage_mean": 0.898, "coverage_sd": 0.021, "length_mean": 6.716, "length_sd": 0.076}},
-      "RF": {"ECCP": {"coverage_mean": 0.897, "coverage_sd": 0.024, "length_mean": 6.747, "length_sd": 0.087}},
-      "Lasso": {"ECCP": {"coverage_mean": 0.899, "coverage_sd": 0.022, "length_mean": 6.665, "length_sd": 0.082}}
+      "OLS": {
+        "cross": {"coverage_mean": 0.898, "coverage_sd": 0.022, "length_mean": 6.603, "length_sd": 0.034},
+        "e-mod-cross": {"coverage_mean": 0.888, "coverage_sd": 0.027, "length_mean": 6.365, "length_sd": 0.300},
+        "u-mod-cross": {"coverage_mean": 0.844, "coverage_sd": 0.027, "length_mean": 5.477, "length_sd": 0.050},
+        "eu-mod-cross": {"coverage_mean": 0.840, "coverage_sd": 0.034, "length_mean": 5.444, "length_sd": 0.324},
+        "ECCP (2α)": {"coverage_mean": 0.787, "coverage_sd": 0.033, "length_mean": 4.600, "length_sd": 0.036},
+        "ECCP": {"coverage_mean": 0.898, "coverage_sd": 0.021, "length_mean": 6.716, "length_sd": 0.076},
+        "ECCP(ind)": {"coverage_mean": 0.899, "coverage_sd": 0.021, "length_mean": 6.755, "length_sd": 0.080},
+        "ECCP(log)": {"coverage_mean": 0.901, "coverage_sd": 0.022, "length_mean": 10.350, "length_sd": 0.327},
+        "ECCP(sqrt)": {"coverage_mean": 0.891, "coverage_sd": 0.024, "length_mean": 30.647, "length_sd": 1.956},
+        "ECCP(linear)": {"coverage_mean": 0.891, "coverage_sd": 0.023, "length_mean": 32.181, "length_sd": 1.975}
+      },
+      "RF": {
+        "cross": {"coverage_mean": 0.901, "coverage_sd": 0.024, "length_mean": 6.696, "length_sd": 0.057},
+        "e-mod-cross": {"coverage_mean": 0.884, "coverage_sd": 0.029, "length_mean": 6.358, "length_sd": 0.282},
+        "u-mod-cross": {"coverage_mean": 0.848, "coverage_sd": 0.029, "length_mean": 5.547, "length_sd": 0.064},
+        "eu-mod-cross": {"coverage_mean": 0.838, "coverage_sd": 0.038, "length_mean": 5.441, "length_sd": 0.399},
+        "ECCP (2α)": {"coverage_mean": 0.783, "coverage_sd": 0.036, "length_mean": 4.557, "length_sd": 0.063},
+        "ECCP": {"coverage_mean": 0.897, "coverage_sd": 0.024, "length_mean": 6.747, "length_sd": 0.087},
+        "ECCP(ind)": {"coverage_mean": 0.899, "coverage_sd": 0.024, "length_mean": 6.788, "length_sd": 0.086},
+        "ECCP(log)": {"coverage_mean": 0.904, "coverage_sd": 0.025, "length_mean": 10.294, "length_sd": 0.329},
+        "ECCP(sqrt)": {"coverage_mean": 0.893, "coverage_sd": 0.026, "length_mean": 30.578, "length_sd": 1.958},
+        "ECCP(linear)": {"coverage_mean": 0.893, "coverage_sd": 0.024, "length_mean": 32.133, "length_sd": 1.976}
+      },
+      "Lasso": {
+        "cross": {"coverage_mean": 0.900, "coverage_sd": 0.022, "length_mean": 6.513, "length_sd": 0.035},
+        "e-mod-cross": {"coverage_mean": 0.891, "coverage_sd": 0.025, "length_mean": 6.302, "length_sd": 0.255},
+        "u-mod-cross": {"coverage_mean": 0.846, "coverage_sd": 0.029, "length_mean": 5.497, "length_sd": 0.046},
+        "eu-mod-cross": {"coverage_mean": 0.844, "coverage_sd": 0.034, "length_mean": 5.472, "length_sd": 0.309},
+        "ECCP (2α)": {"coverage_mean": 0.790, "coverage_sd": 0.032, "length_mean": 4.659, "length_sd": 0.036},
+        "ECCP": {"coverage_mean": 0.899, "coverage_sd": 0.022, "length_mean": 6.665, "length_sd": 0.082},
+        "ECCP(ind)": {"coverage_mean": 0.900, "coverage_sd": 0.022, "length_mean": 6.704, "length_sd": 0.083},
+        "ECCP(log)": {"coverage_mean": 0.902, "coverage_sd": 0.024, "length_mean": 10.670, "length_sd": 0.340},
+        "ECCP(sqrt)": {"coverage_mean": 0.892, "coverage_sd": 0.024, "length_mean": 30.772, "length_sd": 1.946},
+        "ECCP(linear)": {"coverage_mean": 0.891, "coverage_sd": 0.024, "length_mean": 32.233, "length_sd": 1.971}
+      }
     },
     "parkinson": {
-      "OLS": {"ECCP": {"coverage_mean": 0.897, "coverage_sd": 0.008, "length_mean": 30.100, "length_sd": 0.528}},
-      "RF": {"ECCP": {"coverage_mean": 0.890, "coverage_sd": 0.009, "length_mean": 5.627, "length_sd": 0.422}},
-      "Lasso": {"ECCP": {"coverage_mean": 0.898, "coverage_sd": 0.008, "length_mean": 30.093, "length_sd": 0.524}}
+      "OLS": {
+        "cross": {"coverage_mean": 0.897, "coverage_sd": 0.008, "length_mean": 29.342, "length_sd": 0.429},
+        "e-mod-cross": {"coverage_mean": 0.886, "coverage_sd": 0.019, "length_mean": 28.462, "length_sd": 1.244},
+        "u-mod-cross": {"coverage_mean": 0.850, "coverage_sd": 0.009, "length_mean": 26.239, "length_sd": 0.256},
+        "eu-mod-cross": {"coverage_mean": 0.846, "coverage_sd": 0.027, "length_mean": 26.087, "length_sd": 1.418},
+        "ECCP (2α)": {"coverage_mean": 0.792, "coverage_sd": 0.010, "length_mean": 23.462, "length_sd": 0.236},
+        "ECCP": {"coverage_mean": 0.897, "coverage_sd": 0.008, "length_mean": 30.100, "length_sd": 0.528},
+        "ECCP(ind)": {"coverage_mean": 0.898, "coverage_sd": 0.008, "length_mean": 30.154, "length_sd": 0.532},
+        "ECCP(log)": {"coverage_mean": 0.910, "coverage_sd": 0.005, "length_mean": 39.431, "length_sd": 0.335},
+        "ECCP(sqrt)": {"coverage_mean": 0.900, "coverage_sd": 0.005, "length_mean": 70.983, "length_sd": 0.667},
+        "ECCP(linear)": {"coverage_mean": 0.899, "coverage_sd": 0.005, "length_mean": 70.004, "length_sd": 0.688}
+      },
+      "RF": {
+        "cross": {"coverage_mean": 0.898, "coverage_sd": 0.008, "length_mean": 5.537, "length_sd": 0.426},
+        "e-mod-cross": {"coverage_mean": 0.877, "coverage_sd": 0.018, "length_mean": 5.014, "length_sd": 0.600},
+        "u-mod-cross": {"coverage_mean": 0.851, "coverage_sd": 0.008, "length_mean": 4.226, "length_sd": 0.348},
+        "eu-mod-cross": {"coverage_mean": 0.830, "coverage_sd": 0.030, "length_mean": 3.996, "length_sd": 0.663},
+        "ECCP (2α)": {"coverage_mean": 0.772, "coverage_sd": 0.010, "length_mean": 2.978, "length_sd": 0.282},
+        "ECCP": {"coverage_mean": 0.890, "coverage_sd": 0.009, "length_mean": 5.627, "length_sd": 0.422},
+        "ECCP(ind)": {"coverage_mean": 0.891, "coverage_sd": 0.009, "length_mean": 5.648, "length_sd": 0.423},
+        "ECCP(log)": {"coverage_mean": 0.898, "coverage_sd": 0.007, "length_mean": 13.145, "length_sd": 0.748},
+        "ECCP(sqrt)": {"coverage_mean": 0.885, "coverage_sd": 0.007, "length_mean": 59.823, "length_sd": 0.853},
+        "ECCP(linear)": {"coverage_mean": 0.884, "coverage_sd": 0.006, "length_mean": 59.351, "length_sd": 0.880}
+      },
+      "Lasso": {
+        "cross": {"coverage_mean": 0.897, "coverage_sd": 0.008, "length_mean": 29.330, "length_sd": 0.417},
+        "e-mod-cross": {"coverage_mean": 0.886, "coverage_sd": 0.018, "length_mean": 28.492, "length_sd": 1.213},
+        "u-mod-cross": {"coverage_mean": 0.850, "coverage_sd": 0.009, "length_mean": 26.243, "length_sd": 0.254},
+        "eu-mod-cross": {"coverage_mean": 0.846, "coverage_sd": 0.027, "length_mean": 26.088, "length_sd": 1.415},
+        "ECCP (2α)": {"coverage_mean": 0.793, "coverage_sd": 0.010, "length_mean": 23.468, "length_sd": 0.237},
+        "ECCP": {"coverage_mean": 0.898, "coverage_sd": 0.008, "length_mean": 30.093, "length_sd": 0.524},
+        "ECCP(ind)": {"coverage_mean": 0.898, "coverage_sd": 0.008, "length_mean": 30.147, "length_sd": 0.527},
+        "ECCP(log)": {"coverage_mean": 0.910, "coverage_sd": 0.005, "length_mean": 39.438, "length_sd": 0.338},
+        "ECCP(sqrt)": {"coverage_mean": 0.900, "coverage_sd": 0.005, "length_mean": 70.983, "length_sd": 0.667},
+        "ECCP(linear)": {"coverage_mean": 0.899, "coverage_sd": 0.005, "length_mean": 70.006, "length_sd": 0.688}
+      }
     }
   }
 }
