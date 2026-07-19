@@ -165,6 +165,23 @@ def write_artifact_bundle(relative: str, artifacts: tuple[str, ...]) -> str:
             }
             handle.write(json.dumps(record, sort_keys=True) + "\n")
     temporary.replace(output)
+    return validate_artifact_bundle(relative, artifacts)
+
+
+def validate_artifact_bundle(relative: str, artifacts: tuple[str, ...]) -> str:
+    """Re-parse every JSONL record and bind it to the current source artifact."""
+    bundle = ROOT / relative
+    lines = bundle.read_text(encoding="utf-8").splitlines()
+    assert len(lines) == len(artifacts), (
+        f"bundle record count mismatch: {len(lines)} != {len(artifacts)}"
+    )
+    for line, artifact in zip(lines, artifacts, strict=True):
+        record = json.loads(line)
+        assert set(record) == {"path", "sha256", "payload"}
+        assert record["path"] == artifact
+        source = ROOT / artifact
+        assert record["sha256"] == sha256(artifact)
+        assert record["payload"] == json.loads(source.read_text(encoding="utf-8"))
     return sha256(relative)
 
 
@@ -328,6 +345,7 @@ def main() -> None:
         "command_count": len(command_outputs),
         "hygiene": hygiene,
         "artifact_sha256": artifact_hashes,
+        "artifact_paths": list(artifacts),
         "trackio_artifact_bundle": bundle,
         "trackio_artifact_bundle_sha256": bundle_hash,
         "publication_gate_passed": True,

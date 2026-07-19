@@ -121,6 +121,12 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   metadata contains exactly the required bundle path with the correct resolved
   local source, `dataset` type, and byte size. The later Hugging Face bucket
   readback still independently requires the public object at that exact size.
+- The bundle is no longer trusted by size/hash alone. Its ordered 14-record
+  manifest (seven summaries/reports plus seven full raw dataset files) is
+  persisted in the gate result; every JSONL line is re-parsed and required to
+  match its current source path, source SHA-256, and decoded payload immediately
+  before publication. Unit controls reject both post-gate source mutation and
+  an altered embedded payload.
 - Ran all eighteen local mechanism/protocol/author-launcher/raw-verifier and
   paper-headline drift-control tests successfully (including positive and
   deliberately incomplete raw fixtures), including local-only Trackio artifact

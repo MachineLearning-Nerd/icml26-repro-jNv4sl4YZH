@@ -44,6 +44,7 @@ from pathlib import Path
 
 from repro.src.prepublish_gate import (
     hygiene_gate,
+    validate_artifact_bundle,
     validate_required_local_artifact,
 )
 
@@ -54,6 +55,11 @@ assert gate["maximum_points"] == 6
 assert gate["tests_passed"] is True
 assert gate["publication_gate_passed"] is True
 assert Path(gate["trackio_artifact_bundle"]).is_file()
+assert len(gate["artifact_paths"]) == 14
+assert set(gate["artifact_paths"]) == set(gate["artifact_sha256"])
+assert validate_artifact_bundle(
+    gate["trackio_artifact_bundle"], tuple(gate["artifact_paths"])
+) == gate["trackio_artifact_bundle_sha256"]
 assert "FULL_GATE_READY: jNv4sl4YZH" in Path(
     ".trackio/logbook/pages/conclusion/page.md"
 ).read_text(encoding="utf-8")
@@ -64,8 +70,8 @@ validate_required_local_artifact(
 )
 assert hygiene["local_path_artifact_count"] >= 1
 print(
-    "Verified fresh fail-closed gate, registered bundle, conclusion marker, "
-    "and hygiene"
+    "Verified fresh fail-closed gate, all 14 bundle records, registered bundle, "
+    "conclusion marker, and hygiene"
 )
 PY
 

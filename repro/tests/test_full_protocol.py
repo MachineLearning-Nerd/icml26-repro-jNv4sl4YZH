@@ -6,6 +6,7 @@ from pathlib import Path
 from repro.src.prepublish_gate import (
     hygiene_gate,
     sha256,
+    validate_artifact_bundle,
     validate_local_path_artifacts,
     validate_required_local_artifact,
     write_artifact_bundle,
@@ -107,6 +108,25 @@ class FullProtocolTests(unittest.TestCase):
             self.assertEqual(record["sha256"], sha256(source_relative))
             self.assertEqual(record["payload"], {"claim": 3, "passed": True})
             self.assertEqual(bundle_hash, sha256(bundle_relative))
+            self.assertEqual(
+                validate_artifact_bundle(bundle_relative, (source_relative,)),
+                bundle_hash,
+            )
+
+            source.write_text(
+                json.dumps({"claim": 3, "passed": False}), encoding="utf-8"
+            )
+            with self.assertRaises(AssertionError):
+                validate_artifact_bundle(bundle_relative, (source_relative,))
+
+            source.write_text(
+                json.dumps({"claim": 3, "passed": True}), encoding="utf-8"
+            )
+            tampered = json.loads(bundle.read_text(encoding="utf-8"))
+            tampered["payload"]["passed"] = False
+            bundle.write_text(json.dumps(tampered) + "\n", encoding="utf-8")
+            with self.assertRaises(AssertionError):
+                validate_artifact_bundle(bundle_relative, (source_relative,))
 
     def test_final_logbook_renderer_fails_closed_and_emits_gate_marker(self):
         claim1 = {
