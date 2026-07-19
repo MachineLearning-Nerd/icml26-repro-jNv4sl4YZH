@@ -11,3 +11,6 @@
 | [Negative controls](#/negative-controls) |
 | [Conclusion](#/conclusion) |
 | [Overview](#/overview) |
+| [Claim 4](#/claim-4) |
+| [Claim 5](#/claim-5) |
+| [Claim 6](#/claim-6) |

@@ -1,23 +1,39 @@
 {
-  "source_url": "https://huggingface.co/spaces/ICML-2026-agent-repro/challenge/resolve/main/claims.json",
-  "retrieved_at": "2026-07-19T07:02:00Z",
+  "source_url": "https://huggingface.co/spaces/ICML-2026-agent-repro/challenge/resolve/main/claims_anchored.json",
+  "fallback_source_url": "https://huggingface.co/spaces/ICML-2026-agent-repro/challenge/resolve/main/claims.json",
+  "retrieved_at": "2026-07-19T22:19:20+05:30",
   "openreview_id": "jNv4sl4YZH",
-  "maximum_points": 6,
+  "maximum_points": 12,
   "claims": [
     {
       "claim": 1,
       "possible_points": 2,
-      "text": "P2E calibrator converts conformal p-values to e-values without altering the induced prediction set"
+      "text": "A calibrator is defined as set-preserving when converting conformal p-values at level alpha into e-values yields prediction sets identical to thresholding the e-values directly at 1/alpha (Section 2.1, Definition 2.2)"
     },
     {
       "claim": 2,
       "possible_points": 2,
-      "text": "Yields substantial efficiency gains over existing p-to-e methods in conformal inference"
+      "text": "Among left-continuous p-to-e calibrators, only the all-or-nothing calibrator can be exactly set-preserving, which motivates a new sigmoid-based P2E construction (Proposition 2.3, Theorem 2.6, Equation 9)"
     },
     {
       "claim": 3,
       "possible_points": 2,
-      "text": "Enables exact 1-α coverage in cross-conformal prediction and conformal aggregation"
+      "text": "The proposed sigmoid-based P2E calibrator is exact (expectation equal to 1), smooth, invertible, strictly positive, and strictly dominates the all-or-nothing calibrator in aggregation settings (Theorem 2.6)"
+    },
+    {
+      "claim": 4,
+      "possible_points": 2,
+      "text": "Applied to e-Cross-Conformal Prediction (ECCP), the P2E calibrator preserves exact 1-alpha coverage, whereas standard cross-conformal-prediction variants only guarantee approximate 1-2alpha coverage (Proposition 4.1)"
+    },
+    {
+      "claim": 5,
+      "possible_points": 2,
+      "text": "Applied to Weighted Conformal Aggregation (WECA), data-dependent weighted merging of e-values across multiple models retains valid coverage (Proposition 4.2)"
+    },
+    {
+      "claim": 6,
+      "possible_points": 2,
+      "text": "Empirically, ECCP using the proposed P2E calibrator produces smaller prediction sets than baseline p-to-e conversion methods while maintaining valid coverage (Section 5)"
     }
   ]
 }

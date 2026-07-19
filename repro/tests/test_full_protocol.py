@@ -4,7 +4,9 @@ import unittest
 from pathlib import Path
 
 from repro.src.prepublish_gate import (
+    ANCHORED_CLAIMS_URL,
     CLAIMS_URL,
+    DEFAULT_CLAIMS_URL,
     EXPECTED_CA_PROTOCOL,
     EXPECTED_CCP_PROTOCOL,
     JURY_CLAIM_TEXTS,
@@ -17,6 +19,11 @@ from repro.src.prepublish_gate import (
     validate_local_path_artifacts,
     validate_required_local_artifact,
     write_artifact_bundle,
+)
+from repro.src.verify_anchored_claims import (
+    ccp_bound_certificates,
+    sigmoid_certificates,
+    uniqueness_certificates,
 )
 from repro.src.verify_ca_inputs import verify_inputs
 from repro.src.verify_ca_p2e_domains import verify_domains
@@ -42,28 +49,52 @@ from repro.src.verify_weca_independence import (
 
 
 class FullProtocolTests(unittest.TestCase):
-    def test_official_jury_claim_snapshot_has_three_claims_and_six_points(self):
+    def test_official_jury_claim_snapshot_has_six_claims_and_twelve_points(self):
         root = Path(__file__).resolve().parents[2]
         jury = json.loads(
             (root / "repro/configs/jury_claims.json").read_text(encoding="utf-8")
         )
         self.assertEqual(jury["openreview_id"], "jNv4sl4YZH")
-        self.assertEqual(jury["maximum_points"], 6)
-        self.assertEqual([claim["claim"] for claim in jury["claims"]], [1, 2, 3])
+        self.assertEqual(jury["maximum_points"], 12)
         self.assertEqual(
-            [claim["possible_points"] for claim in jury["claims"]], [2, 2, 2]
+            [claim["claim"] for claim in jury["claims"]], [1, 2, 3, 4, 5, 6]
+        )
+        self.assertEqual(
+            [claim["possible_points"] for claim in jury["claims"]], [2] * 6
         )
         self.assertEqual(
             [claim["text"] for claim in jury["claims"]],
-            [
-                "P2E calibrator converts conformal p-values to e-values without altering the induced prediction set",
-                "Yields substantial efficiency gains over existing p-to-e methods in conformal inference",
-                "Enables exact 1-α coverage in cross-conformal prediction and conformal aggregation",
-            ],
+            list(JURY_CLAIM_TEXTS),
         )
-        self.assertEqual(
-            jury["source_url"],
-            CLAIMS_URL,
+        self.assertEqual(jury["source_url"], ANCHORED_CLAIMS_URL)
+        self.assertEqual(jury["fallback_source_url"], DEFAULT_CLAIMS_URL)
+        self.assertEqual(CLAIMS_URL, ANCHORED_CLAIMS_URL)
+
+    def test_anchored_claim_mechanism_controls_cover_new_scopes(self):
+        uniqueness = uniqueness_certificates()
+        self.assertEqual(len(uniqueness), 4)
+        self.assertTrue(all(row["aon_forced"] for row in uniqueness))
+        self.assertTrue(
+            all(row["witness_in_left_neighborhood"] for row in uniqueness)
+        )
+
+        sigmoid = sigmoid_certificates()
+        self.assertEqual(len(sigmoid), 18)
+        self.assertTrue(
+            all(row["expectation_abs_error"] < 1e-11 for row in sigmoid)
+        )
+        self.assertTrue(
+            all(row["maximum_inverse_roundtrip_error"] < 1e-10 for row in sigmoid)
+        )
+        self.assertTrue(
+            all(row["all_pointwise_dominance_margins_nonnegative"] for row in sigmoid)
+        )
+        self.assertTrue(all(row["strict_dominance_probe_count"] > 0 for row in sigmoid))
+
+        ccp_bounds = ccp_bound_certificates()
+        self.assertEqual(len(ccp_bounds), 4)
+        self.assertTrue(
+            all(row["standard_guarantee_below_one_minus_alpha"] for row in ccp_bounds)
         )
 
     def test_live_jury_contract_rejects_count_and_wording_drift(self):
@@ -203,8 +234,9 @@ class FullProtocolTests(unittest.TestCase):
         wait_for_space = publisher.index('until hf spaces info "$hf_space"')
         self.assertLess(initial_push, enqueue)
         self.assertLess(enqueue, wait_for_space)
-        self.assertIn('gate["live_claims_verified"] == 3', publisher)
-        self.assertIn('len(gate["artifact_paths"]) == 19', publisher)
+        self.assertIn('gate["live_claims_verified"] == 6', publisher)
+        self.assertIn('gate["maximum_points"] == 12', publisher)
+        self.assertIn('len(gate["artifact_paths"]) == 20', publisher)
 
     def test_protocol_matches_released_paper_scale(self):
         root = Path(__file__).resolve().parents[2]
@@ -508,6 +540,30 @@ class FullProtocolTests(unittest.TestCase):
             },
             "cases": [{"expectation_abs_error": 1e-15}],
         }
+        anchored = {
+            "summary": {
+                "all_source_anchors_verified": True,
+                "c1_definition_verified": True,
+                "c2_aon_uniqueness_source_verified": True,
+                "c2_aon_uniqueness_certificate_pass": True,
+                "c2_left_continuity_witnesses_pass": True,
+                "c2_uniqueness_level_count": 4,
+                "c3_all_exact_expectations_pass": True,
+                "c3_all_smoothness_certificates_pass": True,
+                "c3_all_inverse_roundtrips_pass": True,
+                "c3_all_strict_positivity_pass": True,
+                "c3_all_pointwise_aon_dominance_pass": True,
+                "c3_all_aggregation_dominance_pass": True,
+                "c3_case_count": 18,
+                "c4_eccp_proposition_verified": True,
+                "c4_standard_ccp_bound_verified": True,
+                "c4_standard_ccp_bound_case_count": 4,
+                "c5_weca_proposition_verified": True,
+                "c5_weighted_expectation_identity_verified": True,
+                "c6_section5_scope_verified": True,
+                "source_anchor_count": 10,
+            }
+        }
         claim2 = {
             "rows_seen": 1_920,
             "summary": {
@@ -648,6 +704,7 @@ class FullProtocolTests(unittest.TestCase):
 
         cells = build_cells(
             claim1,
+            anchored,
             claim2,
             mechanism,
             weca_independence,
@@ -656,13 +713,16 @@ class FullProtocolTests(unittest.TestCase):
             headlines,
         )
         self.assertIn("FULL_GATE_READY: jNv4sl4YZH", cells["conclusion"])
-        self.assertIn("24/24", cells["claim_2"])
+        self.assertIn("4 distinct alpha levels", cells["claim_2"])
+        self.assertIn("36/36", cells["claim_6"])
+        self.assertEqual(cells["summary"]["anchored_claims"], 6)
         self.assertEqual(cells["summary"]["headline_scalars"], 488)
 
         claim2["summary"]["p2e_shorter_count"] = 23
         with self.assertRaises(RuntimeError):
             build_cells(
                 claim1,
+                anchored,
                 claim2,
                 mechanism,
                 weca_independence,

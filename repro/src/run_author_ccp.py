@@ -570,7 +570,8 @@ def main() -> None:
         if completed != set(SEEDS) or len(rows) != len(SEEDS) * len(MODELS) * len(METHOD_KEYS):
             raise RuntimeError(f"full raw-row integrity failed for {dataset_key}")
         write_completed_output(output, protocol, dataset_key, k, rows)
-        print(f"completed {dataset_key}: {len(rows)} raw rows -> {output}")
+        display_output = args.output_dir / output.name
+        print(f"completed {dataset_key}: {len(rows)} raw rows -> {display_output}")
 
 
 if __name__ == "__main__":

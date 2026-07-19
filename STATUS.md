@@ -487,3 +487,20 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   three-claim gate and first GitHub push succeed. The audit implementation is
   committed at `9f23d62`; refreshed post-CCP watcher PID `3575557` owns its
   singleton lock and the active CA worker was not interrupted.
+
+- **2026-07-19 22:31 IST anchored-claim correction:** the challenge frontend
+  merges `claims.json` with `claims_anchored.json` and gives the anchored entry
+  priority. The effective live contract for `jNv4sl4YZH` is therefore six
+  claims / 12 possible points, not the historical three broad fallback claims.
+  `repro/configs/jury_claims.json`, the renderer, publisher, tests, evidence
+  matrix, and final gate now fail closed on all six exact texts and both live
+  source files. A new hash-pinned primary-TeX audit certifies Definition 2.2,
+  AoN uniqueness, the sigmoid's analytic properties/dominance, the standard
+  CCP bound, and the ECCP/WECA proposition assumptions: four exact uniqueness
+  budgets, 18 sigmoid cases, and four CCP-bound cases all pass. The future
+  evidence bundle now has 20 records and all 34 tests pass. The CA run finished
+  all 1,920 cells and launched the active 11,700-cell CCP run without a restart.
+  Refreshed post-CCP watcher PID `3618461` owns the singleton and will append
+  six evidence-derived verdicts, run the gate, push GitHub, and atomically
+  enqueue the paper for the already-active shared HF drain. The paper remains
+  intentionally absent from the queue until that complete gate passes.

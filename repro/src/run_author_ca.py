@@ -247,7 +247,8 @@ def main() -> None:
             write_checkpoint(checkpoint, metadata, dataset_name, rows)
             print(f"{dataset_name}: completed seed {seed}", flush=True)
         write_completed_output(output, metadata, dataset_name, rows)
-        print(f"completed {dataset_name}: {len(rows)} raw rows -> {output}")
+        display_output = args.output_dir / output.name
+        print(f"completed {dataset_name}: {len(rows)} raw rows -> {display_output}")
 
 
 if __name__ == "__main__":

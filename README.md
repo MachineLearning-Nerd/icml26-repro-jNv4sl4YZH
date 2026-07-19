@@ -4,18 +4,18 @@ ICML 2026 paper / OpenReview `jNv4sl4YZH` / arXiv `2606.03600`.
 
 ## Scope
 
-This reproduction evaluates all three challenge claims at the released paper
+This reproduction evaluates all six anchored challenge claims at the released paper
 protocol, rather than treating a small synthetic example as a substitute:
 
-1. Inside the paper's exact main-theorem domain
-   (`alpha*(n+1) > 1` and non-integer), the finite-sample P2E mapping preserves
-   the original conformal prediction set while producing an exact e-value.
-   Five excluded-domain inputs are required to fail closed.
-2. P2E-based conformal aggregation is more efficient than the released
-   comparator calibrators on the paper's four 20-seed OpenML tasks.
-3. The released cross-conformal and aggregation constructions satisfy their
-   advertised `1 - alpha` guarantee; the paper-scale CCP runs cover Boston,
-   Abalone, and Parkinson data with 100 seeds each.
+1. Definition 2.2 set preservation across the exact finite-rank domain.
+2. Proposition 2.3 uniqueness of the left-continuous AoN calibrator and the
+   resulting sigmoid motivation.
+3. Theorem 2.6 exactness, smoothness, invertibility, positivity, and AoN
+   dominance of the proposed P2E sigmoid.
+4. Proposition 4.1 exact `1-alpha` ECCP validity versus the weaker standard
+   CCP guarantee.
+5. Proposition 4.2 tuning-independent data-dependent WECA validity.
+6. Section 5 paper-scale ECCP efficiency with valid empirical coverage.
 
 The mechanism audit includes exact rank-tuple enumeration and sparse linear
 programs over every joint coupling with the prescribed rank marginals, for
@@ -57,6 +57,8 @@ python repro/src/verify_p2e_identity.py \
   --output outputs/claim1_independent.json
 python repro/src/crosscheck_source_p2e.py \
   --source upstream --output outputs/claim1_source_crosscheck.json
+python repro/src/verify_anchored_claims.py \
+  --output outputs/anchored_claims_mechanism.json
 python repro/src/verify_source_manifest.py \
   --source upstream --output outputs/source_manifest_audit.json
 python repro/src/verify_ca_inputs.py \
@@ -113,12 +115,12 @@ Trackio evidence and source pin, checks all 488 reported mean/SD scalars in the
 and all 36 CCP calibrator comparisons (including nine AoN cells), scans for
 secrets/local paths, and emits a SHA-256 manifest only if the complete
 publication gate passes. It also creates
-a hash-indexed JSONL bundle containing twelve summary/report artifacts and all
+a hash-indexed JSONL bundle containing thirteen summary/report artifacts and all
 seven full raw dataset files; Trackio recognizes this format and promotes
 it to the Hugging Face artifact bucket on publication.
 
 `repro/src/publish_after_gate.sh` is the final idempotent publication step. It
-accepts only a passing three-claim gate, pushes the public GitHub repository,
+accepts only a passing six-claim/12-point gate, pushes the public GitHub repository,
 atomically joins the single shared Hugging Face publication queue, and reads
 both services back after the shared drain publishes the Trackio Space. Success requires
 the public challenge tags, a nonempty Space commit SHA, the final Conclusion
@@ -128,9 +130,10 @@ its artifact source path cannot leak into GitHub.
 
 ## Current status
 
-The source and environment are pinned. Claim 1 is complete. Claim 2's full
-four-dataset run is active; three datasets (1,440/1,920 cells) are complete.
-Claim 3's full 11,700-cell run is serialized behind the final Claim 2 dataset.
+The source and environment are pinned. The full four-dataset CA run is complete
+at 1,920/1,920 cells. The six-claim theorem/mechanism audit passes. The full
+11,700-cell CCP run is active; final verdict rendering, the fail-closed gate,
+GitHub push, and canonical HF queue handoff are serialized behind it.
 The environment pins `pandas==2.3.3` because the unmodified released Parkinson
 loader relies on a Pandas-2-compatible in-place numeric assignment; the reason
 and exact wrapper boundary are documented in `docs/source_audit.md`.

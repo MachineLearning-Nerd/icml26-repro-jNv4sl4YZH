@@ -113,10 +113,16 @@ print("All 488 reported scalars in 122 paper-table cells are within tolerance")
 PY
 
 trackio logbook run \
-  --page "Claim 3" \
+  --page "Claim 4" \
   --title "Exchangeable and randomized e-merge coverage certificate" \
   -- python repro/src/verify_e_merge_coverage.py \
   --output outputs/claim3_independent_e_merge.json
+
+trackio logbook run \
+  --page "Methods & source audit" \
+  --title "Six anchored-claim theorem and mechanism audit" \
+  -- python repro/src/verify_anchored_claims.py \
+  --output outputs/anchored_claims_mechanism.json
 
 trackio logbook run \
   --page "Conclusion" \
@@ -124,15 +130,12 @@ trackio logbook run \
   -- python repro/src/render_final_logbook.py \
   --output outputs/final_logbook_cells.json
 
-trackio logbook cell markdown \
-  --page "Claim 2" \
-  --title "Claim 2 verdict" \
-  "$(jq -r '.claim_2' outputs/final_logbook_cells.json)"
-
-trackio logbook cell markdown \
-  --page "Claim 3" \
-  --title "Claim 3 verdict" \
-  "$(jq -r '.claim_3' outputs/final_logbook_cells.json)"
+for claim in 1 2 3 4 5 6; do
+  trackio logbook cell markdown \
+    --page "Claim $claim" \
+    --title "Claim $claim verdict" \
+    "$(jq -r --arg key "claim_$claim" '.[$key]' outputs/final_logbook_cells.json)"
+done
 
 trackio logbook cell markdown \
   --page "Negative controls" \

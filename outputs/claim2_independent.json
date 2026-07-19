@@ -1,0 +1,1021 @@
+{
+  "efficiency_comparisons": [
+    {
+      "absolute_reduction": 30.40031723604204,
+      "baseline": "WECA(log)",
+      "baseline_length": 32.05393088427127,
+      "dataset": "dataset_361237",
+      "method_family": "WECA",
+      "p2e_is_shorter": true,
+      "p2e_length": 1.653613648229228,
+      "relative_reduction": 0.9484115176325956,
+      "substantial_efficiency_gain": true
+    },
+    {
+      "absolute_reduction": 30.40031723604204,
+      "baseline": "WECA(sqrt)",
+      "baseline_length": 32.05393088427127,
+      "dataset": "dataset_361237",
+      "method_family": "WECA",
+      "p2e_is_shorter": true,
+      "p2e_length": 1.653613648229228,
+      "relative_reduction": 0.9484115176325956,
+      "substantial_efficiency_gain": true
+    },
+    {
+      "absolute_reduction": 30.40031723604204,
+      "baseline": "WECA(linear)",
+      "baseline_length": 32.05393088427127,
+      "dataset": "dataset_361237",
+      "method_family": "WECA",
+      "p2e_is_shorter": true,
+      "p2e_length": 1.653613648229228,
+      "relative_reduction": 0.9484115176325956,
+      "substantial_efficiency_gain": true
+    },
+    {
+      "absolute_reduction": 23.008708487927443,
+      "baseline": "UR-WECA(log)",
+      "baseline_length": 24.65046103927993,
+      "dataset": "dataset_361237",
+      "method_family": "UR-WECA",
+      "p2e_is_shorter": true,
+      "p2e_length": 1.6417525513524853,
+      "relative_reduction": 0.9333987080916503,
+      "substantial_efficiency_gain": true
+    },
+    {
+      "absolute_reduction": 13.99669632934502,
+      "baseline": "UR-WECA(sqrt)",
+      "baseline_length": 15.638448880697506,
+      "dataset": "dataset_361237",
+      "method_family": "UR-WECA",
+      "p2e_is_shorter": true,
+      "p2e_length": 1.6417525513524853,
+      "relative_reduction": 0.8950181975285991,
+      "substantial_efficiency_gain": true
+    },
+    {
+      "absolute_reduction": 27.249693479452187,
+      "baseline": "UR-WECA(linear)",
+      "baseline_length": 28.891446030804673,
+      "dataset": "dataset_361237",
+      "method_family": "UR-WECA",
+      "p2e_is_shorter": true,
+      "p2e_length": 1.6417525513524853,
+      "relative_reduction": 0.9431751339271142,
+      "substantial_efficiency_gain": true
+    },
+    {
+      "absolute_reduction": 36.72261452142698,
+      "baseline": "WECA(log)",
+      "baseline_length": 38.429431022518365,
+      "dataset": "dataset_361235",
+      "method_family": "WECA",
+      "p2e_is_shorter": true,
+      "p2e_length": 1.7068165010913816,
+      "relative_reduction": 0.955585694201633,
+      "substantial_efficiency_gain": true
+    },
+    {
+      "absolute_reduction": 36.72261452142698,
+      "baseline": "WECA(sqrt)",
+      "baseline_length": 38.429431022518365,
+      "dataset": "dataset_361235",
+      "method_family": "WECA",
+      "p2e_is_shorter": true,
+      "p2e_length": 1.7068165010913816,
+      "relative_reduction": 0.955585694201633,
+      "substantial_efficiency_gain": true
+    },
+    {
+      "absolute_reduction": 36.72261452142698,
+      "baseline": "WECA(linear)",
+      "baseline_length": 38.429431022518365,
+      "dataset": "dataset_361235",
+      "method_family": "WECA",
+      "p2e_is_shorter": true,
+      "p2e_length": 1.7068165010913816,
+      "relative_reduction": 0.955585694201633,
+      "substantial_efficiency_gain": true
+    },
+    {
+      "absolute_reduction": 27.023601102145562,
+      "baseline": "UR-WECA(log)",
+      "baseline_length": 28.726888478720262,
+      "dataset": "dataset_361235",
+      "method_family": "UR-WECA",
+      "p2e_is_shorter": true,
+      "p2e_length": 1.703287376574701,
+      "relative_reduction": 0.9407075577351015,
+      "substantial_efficiency_gain": true
+    },
+    {
+      "absolute_reduction": 12.27536452105602,
+      "baseline": "UR-WECA(sqrt)",
+      "baseline_length": 13.978651897630721,
+      "dataset": "dataset_361235",
+      "method_family": "UR-WECA",
+      "p2e_is_shorter": true,
+      "p2e_length": 1.703287376574701,
+      "relative_reduction": 0.8781508124640119,
+      "substantial_efficiency_gain": true
+    },
+    {
+      "absolute_reduction": 33.06068106490737,
+      "baseline": "UR-WECA(linear)",
+      "baseline_length": 34.76396844148207,
+      "dataset": "dataset_361235",
+      "method_family": "UR-WECA",
+      "p2e_is_shorter": true,
+      "p2e_length": 1.703287376574701,
+      "relative_reduction": 0.9510042307326958,
+      "substantial_efficiency_gain": true
+    },
+    {
+      "absolute_reduction": 110.39539722390533,
+      "baseline": "WECA(log)",
+      "baseline_length": 115.48534270977491,
+      "dataset": "dataset_361244",
+      "method_family": "WECA",
+      "p2e_is_shorter": true,
+      "p2e_length": 5.089945485869572,
+      "relative_reduction": 0.9559256147452316,
+      "substantial_efficiency_gain": true
+    },
+    {
+      "absolute_reduction": 110.39539722390533,
+      "baseline": "WECA(sqrt)",
+      "baseline_length": 115.48534270977491,
+      "dataset": "dataset_361244",
+      "method_family": "WECA",
+      "p2e_is_shorter": true,
+      "p2e_length": 5.089945485869572,
+      "relative_reduction": 0.9559256147452316,
+      "substantial_efficiency_gain": true
+    },
+    {
+      "absolute_reduction": 110.39539722390533,
+      "baseline": "WECA(linear)",
+      "baseline_length": 115.48534270977491,
+      "dataset": "dataset_361244",
+      "method_family": "WECA",
+      "p2e_is_shorter": true,
+      "p2e_length": 5.089945485869572,
+      "relative_reduction": 0.9559256147452316,
+      "substantial_efficiency_gain": true
+    },
+    {
+      "absolute_reduction": 83.0295058902423,
+      "baseline": "UR-WECA(log)",
+      "baseline_length": 87.96035687169837,
+      "dataset": "dataset_361244",
+      "method_family": "UR-WECA",
+      "p2e_is_shorter": true,
+      "p2e_length": 4.9308509814560635,
+      "relative_reduction": 0.9439423490669967,
+      "substantial_efficiency_gain": true
+    },
+    {
+      "absolute_reduction": 49.72737068636025,
+      "baseline": "UR-WECA(sqrt)",
+      "baseline_length": 54.65822166781631,
+      "dataset": "dataset_361244",
+      "method_family": "UR-WECA",
+      "p2e_is_shorter": true,
+      "p2e_length": 4.9308509814560635,
+      "relative_reduction": 0.9097875702685104,
+      "substantial_efficiency_gain": true
+    },
+    {
+      "absolute_reduction": 98.95688106985084,
+      "baseline": "UR-WECA(linear)",
+      "baseline_length": 103.8877320513069,
+      "dataset": "dataset_361244",
+      "method_family": "UR-WECA",
+      "p2e_is_shorter": true,
+      "p2e_length": 4.9308509814560635,
+      "relative_reduction": 0.9525367347607429,
+      "substantial_efficiency_gain": true
+    },
+    {
+      "absolute_reduction": 69.2177734168222,
+      "baseline": "WECA(log)",
+      "baseline_length": 72.13121011610046,
+      "dataset": "dataset_361234",
+      "method_family": "WECA",
+      "p2e_is_shorter": true,
+      "p2e_length": 2.913436699278268,
+      "relative_reduction": 0.959609208072499,
+      "substantial_efficiency_gain": true
+    },
+    {
+      "absolute_reduction": 4.839787598732753,
+      "baseline": "WECA(sqrt)",
+      "baseline_length": 7.7532242980110215,
+      "dataset": "dataset_361234",
+      "method_family": "WECA",
+      "p2e_is_shorter": true,
+      "p2e_length": 2.913436699278268,
+      "relative_reduction": 0.6242290191416662,
+      "substantial_efficiency_gain": true
+    },
+    {
+      "absolute_reduction": 69.2177734168222,
+      "baseline": "WECA(linear)",
+      "baseline_length": 72.13121011610046,
+      "dataset": "dataset_361234",
+      "method_family": "WECA",
+      "p2e_is_shorter": true,
+      "p2e_length": 2.913436699278268,
+      "relative_reduction": 0.959609208072499,
+      "substantial_efficiency_gain": true
+    },
+    {
+      "absolute_reduction": 47.441928349272196,
+      "baseline": "UR-WECA(log)",
+      "baseline_length": 50.353678009776836,
+      "dataset": "dataset_361234",
+      "method_family": "UR-WECA",
+      "p2e_is_shorter": true,
+      "p2e_length": 2.9117496605046425,
+      "relative_reduction": 0.9421740421833876,
+      "substantial_efficiency_gain": true
+    },
+    {
+      "absolute_reduction": 1.9657208935166954,
+      "baseline": "UR-WECA(sqrt)",
+      "baseline_length": 4.877470554021338,
+      "dataset": "dataset_361234",
+      "method_family": "UR-WECA",
+      "p2e_is_shorter": true,
+      "p2e_length": 2.9117496605046425,
+      "relative_reduction": 0.40302055578705925,
+      "substantial_efficiency_gain": true
+    },
+    {
+      "absolute_reduction": 62.42121048661424,
+      "baseline": "UR-WECA(linear)",
+      "baseline_length": 65.33296014711888,
+      "dataset": "dataset_361234",
+      "method_family": "UR-WECA",
+      "p2e_is_shorter": true,
+      "p2e_length": 2.9117496605046425,
+      "relative_reduction": 0.9554321485824633,
+      "substantial_efficiency_gain": true
+    }
+  ],
+  "protocol": {
+    "B": 500,
+    "M": 512,
+    "alpha": 0.05,
+    "seeds": [
+      42,
+      0,
+      1,
+      7,
+      10,
+      13,
+      17,
+      19,
+      23,
+      29,
+      31,
+      37,
+      41,
+      43,
+      47,
+      53,
+      59,
+      61,
+      67,
+      71
+    ],
+    "source": "Nabil-Ala/P2E_calibration@66cb1e1c76d1b1d3d133fe6cb3896c95d48b5974",
+    "task_ids": [
+      361237,
+      361235,
+      361244,
+      361234
+    ],
+    "tasks": [
+      "dataset_361237",
+      "dataset_361235",
+      "dataset_361244",
+      "dataset_361234"
+    ]
+  },
+  "rows_seen": 1920,
+  "summaries": {
+    "dataset_361234": {
+      "CM": {
+        "coverage_mean": 0.9775119617224881,
+        "coverage_sd": 0.0074610147950924235,
+        "length_mean": 3.850424634128,
+        "length_sd": 0.19594135556356143,
+        "seed_count": 20
+      },
+      "COLA-S": {
+        "coverage_mean": 0.952153110047847,
+        "coverage_sd": 0.011230035007376531,
+        "length_mean": 2.9023628395711576,
+        "length_sd": 0.19443812884960684,
+        "seed_count": 20
+      },
+      "CR": {
+        "coverage_mean": 0.9690590111642743,
+        "coverage_sd": 0.008711051463324515,
+        "length_mean": 3.5567713527015363,
+        "length_sd": 0.19707168265423824,
+        "seed_count": 20
+      },
+      "ECA(AoN)": {
+        "coverage_mean": 0.9724082934609249,
+        "coverage_sd": 0.008566929131656924,
+        "length_mean": 3.5546948531827915,
+        "length_sd": 0.15697275531364285,
+        "seed_count": 20
+      },
+      "ECA(P2E)": {
+        "coverage_mean": 0.9724082934609249,
+        "coverage_sd": 0.008566929131656924,
+        "length_mean": 3.5546948531827915,
+        "length_sd": 0.15697275531364285,
+        "seed_count": 20
+      },
+      "ECA(linear)": {
+        "coverage_mean": 1.0,
+        "coverage_sd": 0.0,
+        "length_mean": 86.29013944125947,
+        "length_sd": 26.556163229351302,
+        "seed_count": 20
+      },
+      "ECA(log)": {
+        "coverage_mean": 1.0,
+        "coverage_sd": 0.0,
+        "length_mean": 86.29013944125947,
+        "length_sd": 26.556163229351302,
+        "seed_count": 20
+      },
+      "ECA(sqrt)": {
+        "coverage_mean": 0.999043062200957,
+        "coverage_sd": 0.0014997204018552719,
+        "length_mean": 6.798064504576905,
+        "length_sd": 0.6492129880428258,
+        "seed_count": 20
+      },
+      "P-value Aggregation": {
+        "coverage_mean": 0.9800637958532695,
+        "coverage_sd": 0.006596253523672327,
+        "length_mean": 3.911189075752758,
+        "length_sd": 0.1969775322934042,
+        "seed_count": 20
+      },
+      "UR-ECA(AoN)": {
+        "coverage_mean": 0.9516746411483255,
+        "coverage_sd": 0.01051715450332601,
+        "length_mean": 2.9720368080684407,
+        "length_sd": 0.138226251008552,
+        "seed_count": 20
+      },
+      "UR-ECA(P2E)": {
+        "coverage_mean": 0.9515151515151515,
+        "coverage_sd": 0.010559078459912401,
+        "length_mean": 2.9669362294558037,
+        "length_sd": 0.13842956527219633,
+        "seed_count": 20
+      },
+      "UR-ECA(linear)": {
+        "coverage_mean": 0.9523923444976077,
+        "coverage_sd": 0.00808742316211247,
+        "length_mean": 78.12721052120645,
+        "length_sd": 24.060980992146682,
+        "seed_count": 20
+      },
+      "UR-ECA(log)": {
+        "coverage_mean": 0.9518341307814993,
+        "coverage_sd": 0.00830507551850404,
+        "length_mean": 57.253639074018544,
+        "length_sd": 16.632318821014376,
+        "seed_count": 20
+      },
+      "UR-ECA(sqrt)": {
+        "coverage_mean": 0.9548644338118022,
+        "coverage_sd": 0.007209139414115703,
+        "length_mean": 4.657207029784708,
+        "length_sd": 0.2733387519514467,
+        "seed_count": 20
+      },
+      "UR-WECA(AoN)": {
+        "coverage_mean": 0.9518341307814993,
+        "coverage_sd": 0.012628390448076097,
+        "length_mean": 2.913436699278268,
+        "length_sd": 0.20241786019024383,
+        "seed_count": 20
+      },
+      "UR-WECA(P2E)": {
+        "coverage_mean": 0.9518341307814993,
+        "coverage_sd": 0.012628390448076097,
+        "length_mean": 2.9117496605046425,
+        "length_sd": 0.201898618094345,
+        "seed_count": 20
+      },
+      "UR-WECA(linear)": {
+        "coverage_mean": 0.9535087719298245,
+        "coverage_sd": 0.008153370014037578,
+        "length_mean": 65.33296014711888,
+        "length_sd": 13.906247002211936,
+        "seed_count": 20
+      },
+      "UR-WECA(log)": {
+        "coverage_mean": 0.95311004784689,
+        "coverage_sd": 0.007699445776438367,
+        "length_mean": 50.353678009776836,
+        "length_sd": 10.749025329847397,
+        "seed_count": 20
+      },
+      "UR-WECA(sqrt)": {
+        "coverage_mean": 0.9549441786283891,
+        "coverage_sd": 0.008244809484859825,
+        "length_mean": 4.877470554021338,
+        "length_sd": 0.43277219333954847,
+        "seed_count": 20
+      },
+      "WECA(AoN)": {
+        "coverage_mean": 0.9518341307814993,
+        "coverage_sd": 0.012628390448076097,
+        "length_mean": 2.913436699278268,
+        "length_sd": 0.20241786019024383,
+        "seed_count": 20
+      },
+      "WECA(P2E)": {
+        "coverage_mean": 0.9518341307814993,
+        "coverage_sd": 0.012628390448076097,
+        "length_mean": 2.913436699278268,
+        "length_sd": 0.20241786019024383,
+        "seed_count": 20
+      },
+      "WECA(linear)": {
+        "coverage_mean": 1.0,
+        "coverage_sd": 0.0,
+        "length_mean": 72.13121011610046,
+        "length_sd": 15.313581651405876,
+        "seed_count": 20
+      },
+      "WECA(log)": {
+        "coverage_mean": 1.0,
+        "coverage_sd": 0.0,
+        "length_mean": 72.13121011610046,
+        "length_sd": 15.313581651405876,
+        "seed_count": 20
+      },
+      "WECA(sqrt)": {
+        "coverage_mean": 0.9996012759170654,
+        "coverage_sd": 0.0007085512891855374,
+        "length_mean": 7.7532242980110215,
+        "length_sd": 1.407621326520397,
+        "seed_count": 20
+      }
+    },
+    "dataset_361235": {
+      "CM": {
+        "coverage_mean": 0.9842920353982301,
+        "coverage_sd": 0.012798086067962669,
+        "length_mean": 3.265822589883148,
+        "length_sd": 0.1536212386489201,
+        "seed_count": 20
+      },
+      "COLA-S": {
+        "coverage_mean": 0.9586283185840708,
+        "coverage_sd": 0.016758604567329447,
+        "length_mean": 1.7105815358036125,
+        "length_sd": 0.31519113234878254,
+        "seed_count": 20
+      },
+      "CR": {
+        "coverage_mean": 0.9712389380530974,
+        "coverage_sd": 0.014604945244783556,
+        "length_mean": 2.4373337757556395,
+        "length_sd": 0.16802725023586682,
+        "seed_count": 20
+      },
+      "ECA(AoN)": {
+        "coverage_mean": 0.9915929203539824,
+        "coverage_sd": 0.005352259458666375,
+        "length_mean": 3.330556936065347,
+        "length_sd": 0.11328616041781787,
+        "seed_count": 20
+      },
+      "ECA(P2E)": {
+        "coverage_mean": 0.9915929203539824,
+        "coverage_sd": 0.005352259458666375,
+        "length_mean": 3.330556936065347,
+        "length_sd": 0.11328616041781787,
+        "seed_count": 20
+      },
+      "ECA(linear)": {
+        "coverage_mean": 1.0,
+        "coverage_sd": 0.0,
+        "length_mean": 39.51076361292807,
+        "length_sd": 2.2824420778590873,
+        "seed_count": 20
+      },
+      "ECA(log)": {
+        "coverage_mean": 1.0,
+        "coverage_sd": 0.0,
+        "length_mean": 39.51076361292807,
+        "length_sd": 2.2824420778590873,
+        "seed_count": 20
+      },
+      "ECA(sqrt)": {
+        "coverage_mean": 1.0,
+        "coverage_sd": 0.0,
+        "length_mean": 30.73280708875323,
+        "length_sd": 15.142473331517134,
+        "seed_count": 20
+      },
+      "P-value Aggregation": {
+        "coverage_mean": 0.9898230088495575,
+        "coverage_sd": 0.007192280538825224,
+        "length_mean": 3.325265266855916,
+        "length_sd": 0.12060472051617632,
+        "seed_count": 20
+      },
+      "UR-ECA(AoN)": {
+        "coverage_mean": 0.95929203539823,
+        "coverage_sd": 0.014036495938739449,
+        "length_mean": 2.539553502160406,
+        "length_sd": 0.11250981688735724,
+        "seed_count": 20
+      },
+      "UR-ECA(P2E)": {
+        "coverage_mean": 0.9586283185840708,
+        "coverage_sd": 0.01479944111458533,
+        "length_mean": 2.520423405042119,
+        "length_sd": 0.11365221079923783,
+        "seed_count": 20
+      },
+      "UR-ECA(linear)": {
+        "coverage_mean": 0.9473451327433627,
+        "coverage_sd": 0.01299187128131662,
+        "length_mean": 35.72791213782421,
+        "length_sd": 2.3270314513707393,
+        "seed_count": 20
+      },
+      "UR-ECA(log)": {
+        "coverage_mean": 0.9497787610619468,
+        "coverage_sd": 0.01486890613423688,
+        "length_mean": 28.331543160240688,
+        "length_sd": 2.087119766642703,
+        "seed_count": 20
+      },
+      "UR-ECA(sqrt)": {
+        "coverage_mean": 0.9550884955752214,
+        "coverage_sd": 0.012619706806764976,
+        "length_mean": 4.293191895548689,
+        "length_sd": 0.9221454110038694,
+        "seed_count": 20
+      },
+      "UR-WECA(AoN)": {
+        "coverage_mean": 0.9539823008849557,
+        "coverage_sd": 0.013497579394122517,
+        "length_mean": 1.7068165010913816,
+        "length_sd": 0.2936690761719836,
+        "seed_count": 20
+      },
+      "UR-WECA(P2E)": {
+        "coverage_mean": 0.9535398230088497,
+        "coverage_sd": 0.013274336283185839,
+        "length_mean": 1.703287376574701,
+        "length_sd": 0.29501325093986364,
+        "seed_count": 20
+      },
+      "UR-WECA(linear)": {
+        "coverage_mean": 0.9475663716814159,
+        "coverage_sd": 0.012204607255678943,
+        "length_mean": 34.76396844148207,
+        "length_sd": 2.9322508573072184,
+        "seed_count": 20
+      },
+      "UR-WECA(log)": {
+        "coverage_mean": 0.9504424778761063,
+        "coverage_sd": 0.013359453855462753,
+        "length_mean": 28.726888478720262,
+        "length_sd": 2.475316957213413,
+        "seed_count": 20
+      },
+      "UR-WECA(sqrt)": {
+        "coverage_mean": 0.9555309734513274,
+        "coverage_sd": 0.016016618295165628,
+        "length_mean": 13.978651897630721,
+        "length_sd": 1.678245131798348,
+        "seed_count": 20
+      },
+      "WECA(AoN)": {
+        "coverage_mean": 0.9539823008849557,
+        "coverage_sd": 0.013497579394122517,
+        "length_mean": 1.7068165010913816,
+        "length_sd": 0.2936690761719836,
+        "seed_count": 20
+      },
+      "WECA(P2E)": {
+        "coverage_mean": 0.9539823008849557,
+        "coverage_sd": 0.013497579394122517,
+        "length_mean": 1.7068165010913816,
+        "length_sd": 0.2936690761719836,
+        "seed_count": 20
+      },
+      "WECA(linear)": {
+        "coverage_mean": 1.0,
+        "coverage_sd": 0.0,
+        "length_mean": 38.429431022518365,
+        "length_sd": 2.9877605785942736,
+        "seed_count": 20
+      },
+      "WECA(log)": {
+        "coverage_mean": 1.0,
+        "coverage_sd": 0.0,
+        "length_mean": 38.429431022518365,
+        "length_sd": 2.9877605785942736,
+        "seed_count": 20
+      },
+      "WECA(sqrt)": {
+        "coverage_mean": 1.0,
+        "coverage_sd": 0.0,
+        "length_mean": 38.429431022518365,
+        "length_sd": 2.9877605785942736,
+        "seed_count": 20
+      }
+    },
+    "dataset_361237": {
+      "CM": {
+        "coverage_mean": 0.9864516129032259,
+        "coverage_sd": 0.010444945367428786,
+        "length_mean": 2.876410167956901,
+        "length_sd": 0.12436309661247257,
+        "seed_count": 20
+      },
+      "COLA-S": {
+        "coverage_mean": 0.9519354838709677,
+        "coverage_sd": 0.028660131605684987,
+        "length_mean": 1.64131962081752,
+        "length_sd": 0.24970939539477374,
+        "seed_count": 20
+      },
+      "CR": {
+        "coverage_mean": 0.9551612903225806,
+        "coverage_sd": 0.019688688359377017,
+        "length_mean": 1.9841960721872631,
+        "length_sd": 0.15370778475653946,
+        "seed_count": 20
+      },
+      "ECA(AoN)": {
+        "coverage_mean": 0.9916129032258064,
+        "coverage_sd": 0.009384357151898556,
+        "length_mean": 3.0556345915182224,
+        "length_sd": 0.10236446350886344,
+        "seed_count": 20
+      },
+      "ECA(P2E)": {
+        "coverage_mean": 0.9916129032258064,
+        "coverage_sd": 0.009384357151898556,
+        "length_mean": 3.0556345915182224,
+        "length_sd": 0.10236446350886344,
+        "seed_count": 20
+      },
+      "ECA(linear)": {
+        "coverage_mean": 1.0,
+        "coverage_sd": 0.0,
+        "length_mean": 33.749543968069574,
+        "length_sd": 2.9937729641145454,
+        "seed_count": 20
+      },
+      "ECA(log)": {
+        "coverage_mean": 1.0,
+        "coverage_sd": 0.0,
+        "length_mean": 33.749543968069574,
+        "length_sd": 2.9937729641145454,
+        "seed_count": 20
+      },
+      "ECA(sqrt)": {
+        "coverage_mean": 1.0,
+        "coverage_sd": 0.0,
+        "length_mean": 33.749543968069574,
+        "length_sd": 2.9937729641145454,
+        "seed_count": 20
+      },
+      "P-value Aggregation": {
+        "coverage_mean": 0.9919354838709677,
+        "coverage_sd": 0.00933168494645928,
+        "length_mean": 2.9705398595382304,
+        "length_sd": 0.10403019977510657,
+        "seed_count": 20
+      },
+      "UR-ECA(AoN)": {
+        "coverage_mean": 0.9487096774193547,
+        "coverage_sd": 0.02066584278197383,
+        "length_mean": 2.217437217265307,
+        "length_sd": 0.09818068747037971,
+        "seed_count": 20
+      },
+      "UR-ECA(P2E)": {
+        "coverage_mean": 0.9470967741935483,
+        "coverage_sd": 0.021407814920702723,
+        "length_mean": 2.1887085222642857,
+        "length_sd": 0.10122538809588129,
+        "seed_count": 20
+      },
+      "UR-ECA(linear)": {
+        "coverage_mean": 0.9487096774193547,
+        "coverage_sd": 0.015306711467825248,
+        "length_mean": 30.399592642806414,
+        "length_sd": 2.7238152798169946,
+        "seed_count": 20
+      },
+      "UR-ECA(log)": {
+        "coverage_mean": 0.9483870967741936,
+        "coverage_sd": 0.016481712868606592,
+        "length_mean": 24.82699460987509,
+        "length_sd": 2.3858420924552983,
+        "seed_count": 20
+      },
+      "UR-ECA(sqrt)": {
+        "coverage_mean": 0.9516129032258064,
+        "coverage_sd": 0.016810721622392628,
+        "length_mean": 8.935818351650834,
+        "length_sd": 0.9259776428542136,
+        "seed_count": 20
+      },
+      "UR-WECA(AoN)": {
+        "coverage_mean": 0.9496774193548386,
+        "coverage_sd": 0.025257315351204783,
+        "length_mean": 1.653613648229228,
+        "length_sd": 0.2509464664977415,
+        "seed_count": 20
+      },
+      "UR-WECA(P2E)": {
+        "coverage_mean": 0.9490322580645161,
+        "coverage_sd": 0.025627563341993908,
+        "length_mean": 1.6417525513524853,
+        "length_sd": 0.2458260103142207,
+        "seed_count": 20
+      },
+      "UR-WECA(linear)": {
+        "coverage_mean": 0.9516129032258064,
+        "coverage_sd": 0.015021389718570241,
+        "length_mean": 28.891446030804673,
+        "length_sd": 2.908445943882827,
+        "seed_count": 20
+      },
+      "UR-WECA(log)": {
+        "coverage_mean": 0.9522580645161292,
+        "coverage_sd": 0.016267655564292736,
+        "length_mean": 24.65046103927993,
+        "length_sd": 2.7117268397182794,
+        "seed_count": 20
+      },
+      "UR-WECA(sqrt)": {
+        "coverage_mean": 0.9567741935483871,
+        "coverage_sd": 0.014815808710395506,
+        "length_mean": 15.638448880697506,
+        "length_sd": 2.0699556375083072,
+        "seed_count": 20
+      },
+      "WECA(AoN)": {
+        "coverage_mean": 0.9496774193548386,
+        "coverage_sd": 0.025257315351204783,
+        "length_mean": 1.653613648229228,
+        "length_sd": 0.2509464664977415,
+        "seed_count": 20
+      },
+      "WECA(P2E)": {
+        "coverage_mean": 0.9496774193548386,
+        "coverage_sd": 0.025257315351204783,
+        "length_mean": 1.653613648229228,
+        "length_sd": 0.2509464664977415,
+        "seed_count": 20
+      },
+      "WECA(linear)": {
+        "coverage_mean": 1.0,
+        "coverage_sd": 0.0,
+        "length_mean": 32.05393088427127,
+        "length_sd": 3.239198110218128,
+        "seed_count": 20
+      },
+      "WECA(log)": {
+        "coverage_mean": 1.0,
+        "coverage_sd": 0.0,
+        "length_mean": 32.05393088427127,
+        "length_sd": 3.239198110218128,
+        "seed_count": 20
+      },
+      "WECA(sqrt)": {
+        "coverage_mean": 1.0,
+        "coverage_sd": 0.0,
+        "length_mean": 32.05393088427127,
+        "length_sd": 3.239198110218128,
+        "seed_count": 20
+      }
+    },
+    "dataset_361244": {
+      "CM": {
+        "coverage_mean": 0.97875,
+        "coverage_sd": 0.012234012123239822,
+        "length_mean": 6.901244087078313,
+        "length_sd": 1.3350858054630361,
+        "seed_count": 20
+      },
+      "COLA-S": {
+        "coverage_mean": 0.9662499999999999,
+        "coverage_sd": 0.017607750984632933,
+        "length_mean": 5.226199692245126,
+        "length_sd": 1.4831527041484955,
+        "seed_count": 20
+      },
+      "CR": {
+        "coverage_mean": 0.9771875,
+        "coverage_sd": 0.012380182327966097,
+        "length_mean": 6.577269779871005,
+        "length_sd": 1.2815634525139106,
+        "seed_count": 20
+      },
+      "ECA(AoN)": {
+        "coverage_mean": 0.9653124999999999,
+        "coverage_sd": 0.016656726750854486,
+        "length_mean": 4.965948289743439,
+        "length_sd": 1.3023559285148223,
+        "seed_count": 20
+      },
+      "ECA(P2E)": {
+        "coverage_mean": 0.9653124999999999,
+        "coverage_sd": 0.016656726750854486,
+        "length_mean": 4.965948289743439,
+        "length_sd": 1.3023559285148223,
+        "seed_count": 20
+      },
+      "ECA(linear)": {
+        "coverage_mean": 1.0,
+        "coverage_sd": 0.0,
+        "length_mean": 122.71791164437275,
+        "length_sd": 28.284881889509467,
+        "seed_count": 20
+      },
+      "ECA(log)": {
+        "coverage_mean": 1.0,
+        "coverage_sd": 0.0,
+        "length_mean": 122.71791164437275,
+        "length_sd": 28.284881889509467,
+        "seed_count": 20
+      },
+      "ECA(sqrt)": {
+        "coverage_mean": 1.0,
+        "coverage_sd": 0.0,
+        "length_mean": 122.71791164437275,
+        "length_sd": 28.284881889509467,
+        "seed_count": 20
+      },
+      "P-value Aggregation": {
+        "coverage_mean": 0.97875,
+        "coverage_sd": 0.012234012123239822,
+        "length_mean": 6.90617253560111,
+        "length_sd": 1.3216684885491117,
+        "seed_count": 20
+      },
+      "UR-ECA(AoN)": {
+        "coverage_mean": 0.9590624999999999,
+        "coverage_sd": 0.019709548013456247,
+        "length_mean": 4.283551554638441,
+        "length_sd": 0.8859055922787437,
+        "seed_count": 20
+      },
+      "UR-ECA(P2E)": {
+        "coverage_mean": 0.9590624999999999,
+        "coverage_sd": 0.019709548013456247,
+        "length_mean": 4.2548724524079535,
+        "length_sd": 0.875720206170473,
+        "seed_count": 20
+      },
+      "UR-ECA(linear)": {
+        "coverage_mean": 0.9671875,
+        "coverage_sd": 0.013883176822478721,
+        "length_mean": 110.25896017830647,
+        "length_sd": 24.713012226889745,
+        "seed_count": 20
+      },
+      "UR-ECA(log)": {
+        "coverage_mean": 0.9662499999999999,
+        "coverage_sd": 0.016647467011372537,
+        "length_mean": 89.45813812475542,
+        "length_sd": 19.530925928202162,
+        "seed_count": 20
+      },
+      "UR-ECA(sqrt)": {
+        "coverage_mean": 0.9675,
+        "coverage_sd": 0.015120132970732494,
+        "length_mean": 29.88036329090543,
+        "length_sd": 7.086706711089624,
+        "seed_count": 20
+      },
+      "UR-WECA(AoN)": {
+        "coverage_mean": 0.9615625,
+        "coverage_sd": 0.01894362741759988,
+        "length_mean": 4.831316680292093,
+        "length_sd": 1.7723870523537377,
+        "seed_count": 20
+      },
+      "UR-WECA(P2E)": {
+        "coverage_mean": 0.961875,
+        "coverage_sd": 0.019544567827888826,
+        "length_mean": 4.9308509814560635,
+        "length_sd": 1.8586403527917779,
+        "seed_count": 20
+      },
+      "UR-WECA(linear)": {
+        "coverage_mean": 0.9675,
+        "coverage_sd": 0.015120132970732487,
+        "length_mean": 103.8877320513069,
+        "length_sd": 30.72537613572367,
+        "seed_count": 20
+      },
+      "UR-WECA(log)": {
+        "coverage_mean": 0.9671875,
+        "coverage_sd": 0.0165825040566699,
+        "length_mean": 87.96035687169837,
+        "length_sd": 25.819918369532523,
+        "seed_count": 20
+      },
+      "UR-WECA(sqrt)": {
+        "coverage_mean": 0.97,
+        "coverage_sd": 0.01538967528127732,
+        "length_mean": 54.65822166781631,
+        "length_sd": 17.042134187018593,
+        "seed_count": 20
+      },
+      "WECA(AoN)": {
+        "coverage_mean": 0.9615625,
+        "coverage_sd": 0.01894362741759988,
+        "length_mean": 4.831316680292093,
+        "length_sd": 1.7723870523537377,
+        "seed_count": 20
+      },
+      "WECA(P2E)": {
+        "coverage_mean": 0.9634375000000001,
+        "coverage_sd": 0.02080562850844883,
+        "length_mean": 5.089945485869572,
+        "length_sd": 2.0597297411752042,
+        "seed_count": 20
+      },
+      "WECA(linear)": {
+        "coverage_mean": 1.0,
+        "coverage_sd": 0.0,
+        "length_mean": 115.48534270977491,
+        "length_sd": 34.620549362316446,
+        "seed_count": 20
+      },
+      "WECA(log)": {
+        "coverage_mean": 1.0,
+        "coverage_sd": 0.0,
+        "length_mean": 115.48534270977491,
+        "length_sd": 34.620549362316446,
+        "seed_count": 20
+      },
+      "WECA(sqrt)": {
+        "coverage_mean": 1.0,
+        "coverage_sd": 0.0,
+        "length_mean": 115.48534270977491,
+        "length_sd": 34.620549362316446,
+        "seed_count": 20
+      }
+    }
+  },
+  "summary": {
+    "all_four_tasks_present": true,
+    "all_full_seed_method_cells_present": true,
+    "all_p2e_empirical_coverage_within_tolerance": true,
+    "all_substantial_efficiency_gains": true,
+    "comparison_count": 24,
+    "dataset_integrity": {
+      "dataset_361234": true,
+      "dataset_361235": true,
+      "dataset_361237": true,
+      "dataset_361244": true
+    },
+    "duplicate_cell_count": 0,
+    "empirical_coverage_shortfall_tolerance": 0.02,
+    "exact_cell_set": true,
+    "expected_rows": 1920,
+    "expected_unique_cells": 1920,
+    "invalid_metric_row_count": 0,
+    "minimum_observed_relative_reduction": 0.40302055578705925,
+    "minimum_p2e_empirical_coverage": 0.9490322580645161,
+    "minimum_substantial_relative_reduction": 0.1,
+    "nominal_coverage": 0.95,
+    "nonfinite_row_count": 0,
+    "observed_unique_cells": 1920,
+    "p2e_empirical_coverage_cell_count": 8,
+    "p2e_empirical_coverage_pass_count": 8,
+    "p2e_shorter_count": 24,
+    "substantial_efficiency_gain_count": 24,
+    "unexpected_row_count": 0
+  }
+}

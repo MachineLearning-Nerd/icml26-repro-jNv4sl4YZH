@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail-closed local publication gate for the complete three-claim artifact."""
+"""Fail-closed local publication gate for the complete six-claim artifact."""
 
 from __future__ import annotations
 
@@ -15,12 +15,27 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE_COMMIT = "66cb1e1c76d1b1d3d133fe6cb3896c95d48b5974"
-CLAIMS_URL = (
+DEFAULT_CLAIMS_URL = (
     "https://huggingface.co/spaces/ICML-2026-agent-repro/challenge/"
     "resolve/main/claims.json"
 )
+ANCHORED_CLAIMS_URL = (
+    "https://huggingface.co/spaces/ICML-2026-agent-repro/challenge/"
+    "resolve/main/claims_anchored.json"
+)
+# Anchored claims override the broad fallback claims in the challenge frontend.
+# Keep this alias for callers that need the effective scoring source.
+CLAIMS_URL = ANCHORED_CLAIMS_URL
 REQUIRED_TAGS = {"icml2026-repro", "paper-jNv4sl4YZH"}
 JURY_CLAIM_TEXTS = (
+    "A calibrator is defined as set-preserving when converting conformal p-values at level alpha into e-values yields prediction sets identical to thresholding the e-values directly at 1/alpha (Section 2.1, Definition 2.2)",
+    "Among left-continuous p-to-e calibrators, only the all-or-nothing calibrator can be exactly set-preserving, which motivates a new sigmoid-based P2E construction (Proposition 2.3, Theorem 2.6, Equation 9)",
+    "The proposed sigmoid-based P2E calibrator is exact (expectation equal to 1), smooth, invertible, strictly positive, and strictly dominates the all-or-nothing calibrator in aggregation settings (Theorem 2.6)",
+    "Applied to e-Cross-Conformal Prediction (ECCP), the P2E calibrator preserves exact 1-alpha coverage, whereas standard cross-conformal-prediction variants only guarantee approximate 1-2alpha coverage (Proposition 4.1)",
+    "Applied to Weighted Conformal Aggregation (WECA), data-dependent weighted merging of e-values across multiple models retains valid coverage (Proposition 4.2)",
+    "Empirically, ECCP using the proposed P2E calibrator produces smaller prediction sets than baseline p-to-e conversion methods while maintaining valid coverage (Section 5)",
+)
+FALLBACK_JURY_CLAIM_TEXTS = (
     "P2E calibrator converts conformal p-values to e-values without altering the induced prediction set",
     "Yields substantial efficiency gains over existing p-to-e methods in conformal inference",
     "Enables exact 1-α coverage in cross-conformal prediction and conformal aggregation",
@@ -120,23 +135,38 @@ def assert_exact_ca_protocol(protocol: dict[str, object]) -> None:
 
 
 def assert_live_jury_claims(claims: object) -> None:
-    """Require the live challenge entry to retain the exact three pinned claims."""
+    """Require the effective anchored entry to retain all six pinned claims."""
     assert isinstance(claims, list), "live jury entry is not a claim list"
-    assert len(claims) == 3, "live jury claim count changed"
+    assert len(claims) == 6, "live anchored jury claim count changed"
     texts = tuple(
         claim.get("text") if isinstance(claim, dict) else None for claim in claims
     )
     assert texts == JURY_CLAIM_TEXTS, "live jury claim wording changed"
 
 
-def fetch_live_jury_claims() -> list[dict[str, object]]:
+def fetch_claim_payload(url: str) -> dict[str, object]:
     request = urllib.request.Request(
-        CLAIMS_URL, headers={"User-Agent": "icml2026-reproduction-gate/1"}
+        url, headers={"User-Agent": "icml2026-reproduction-gate/1"}
     )
     with urllib.request.urlopen(request, timeout=30) as response:
         payload = json.load(response)
     assert isinstance(payload, dict), "live claims payload is not a mapping"
-    claims = payload.get("jNv4sl4YZH")
+    return payload
+
+
+def fetch_live_jury_claims() -> list[dict[str, object]]:
+    """Mirror the frontend merge and prove the anchored override is live."""
+    fallback_payload = fetch_claim_payload(DEFAULT_CLAIMS_URL)
+    anchored_payload = fetch_claim_payload(ANCHORED_CLAIMS_URL)
+    fallback = fallback_payload.get("jNv4sl4YZH")
+    assert isinstance(fallback, list), "fallback jury entry is not a claim list"
+    fallback_texts = tuple(
+        claim.get("text") if isinstance(claim, dict) else None for claim in fallback
+    )
+    assert fallback_texts == FALLBACK_JURY_CLAIM_TEXTS, (
+        "fallback jury claim wording changed"
+    )
+    claims = anchored_payload.get("jNv4sl4YZH")
     assert_live_jury_claims(claims)
     return claims
 
@@ -289,10 +319,12 @@ def main() -> None:
 
     jury = load_json("repro/configs/jury_claims.json")
     assert jury["openreview_id"] == "jNv4sl4YZH"
-    assert jury["maximum_points"] == 6
+    assert jury["source_url"] == ANCHORED_CLAIMS_URL
+    assert jury["fallback_source_url"] == DEFAULT_CLAIMS_URL
+    assert jury["maximum_points"] == 12
     assert tuple(claim["text"] for claim in jury["claims"]) == JURY_CLAIM_TEXTS
-    assert [claim["claim"] for claim in jury["claims"]] == [1, 2, 3]
-    assert [claim["possible_points"] for claim in jury["claims"]] == [2, 2, 2]
+    assert [claim["claim"] for claim in jury["claims"]] == [1, 2, 3, 4, 5, 6]
+    assert [claim["possible_points"] for claim in jury["claims"]] == [2] * 6
     live_jury_claims = fetch_live_jury_claims()
 
     headline_config = load_json("repro/configs/paper_headlines.json")
@@ -320,6 +352,7 @@ def main() -> None:
         [sys.executable, "repro/src/verify_ca_p2e_domains.py", "--source", "upstream", "--output", "outputs/ca_p2e_domain_audit.json"],
         [sys.executable, "repro/src/verify_p2e_identity.py", "--output", "outputs/claim1_independent.json"],
         [sys.executable, "repro/src/crosscheck_source_p2e.py", "--source", "upstream", "--output", "outputs/claim1_source_crosscheck.json"],
+        [sys.executable, "repro/src/verify_anchored_claims.py", "--output", "outputs/anchored_claims_mechanism.json"],
         [sys.executable, "repro/src/verify_e_merge_coverage.py", "--output", "outputs/claim3_independent_e_merge.json"],
         [sys.executable, "repro/src/verify_weca_independence.py", "--source", "upstream", "--output", "outputs/weca_independence_audit.json"],
         [sys.executable, "repro/src/verify_ca_results.py", "--raw-dir", "outputs/raw/author_ca", "--output", "outputs/claim2_independent.json"],
@@ -424,6 +457,36 @@ def main() -> None:
         ),
     )
     assert claim1_source["summary"]["rows"] == 18
+    anchored = load_json("outputs/anchored_claims_mechanism.json")
+    assert anchored["source_url"] == "https://export.arxiv.org/e-print/2606.03600v1"
+    assert anchored["source_archive_sha256"] == (
+        "f5124c39036b9107b01439fdbeb5da82331a70b81a3211e3b36887e08109a2db"
+    )
+    assert anchored["main_tex_sha256"] == (
+        "49058ff8e986f43770936c09cc97360e5cace8802c6304a80d9e153d342ae857"
+    )
+    assert anchored["summary"] == {
+        "all_source_anchors_verified": True,
+        "c1_definition_verified": True,
+        "c2_aon_uniqueness_certificate_pass": True,
+        "c2_aon_uniqueness_source_verified": True,
+        "c2_left_continuity_witnesses_pass": True,
+        "c2_uniqueness_level_count": 4,
+        "c3_all_aggregation_dominance_pass": True,
+        "c3_all_exact_expectations_pass": True,
+        "c3_all_inverse_roundtrips_pass": True,
+        "c3_all_pointwise_aon_dominance_pass": True,
+        "c3_all_smoothness_certificates_pass": True,
+        "c3_all_strict_positivity_pass": True,
+        "c3_case_count": 18,
+        "c4_eccp_proposition_verified": True,
+        "c4_standard_ccp_bound_case_count": 4,
+        "c4_standard_ccp_bound_verified": True,
+        "c5_weca_proposition_verified": True,
+        "c5_weighted_expectation_identity_verified": True,
+        "c6_section5_scope_verified": True,
+        "source_anchor_count": 10,
+    }
     mechanism = load_json("outputs/claim3_independent_e_merge.json")
     assert_summary(
         mechanism,
@@ -578,14 +641,29 @@ def main() -> None:
     assert headlines["summary"]["within_tolerance_scalar_count"] == 488
 
     required_trackio_text = {
+        ".trackio/logbook/pages/claim-1/page.md": (
+            "Claim 1 verdict",
+        ),
         ".trackio/logbook/pages/claim-2/page.md": (
             "Independent full CA raw verification",
+            "Claim 2 verdict",
         ),
         ".trackio/logbook/pages/claim-3/page.md": (
             "Independent full CCP raw verification",
+            "Claim 3 verdict",
+        ),
+        ".trackio/logbook/pages/claim-4/page.md": (
             "Exchangeable and randomized e-merge coverage certificate",
+            "Claim 4 verdict",
+        ),
+        ".trackio/logbook/pages/claim-5/page.md": (
+            "Claim 5 verdict",
+        ),
+        ".trackio/logbook/pages/claim-6/page.md": (
+            "Claim 6 verdict",
         ),
         ".trackio/logbook/pages/methods-source-audit/page.md": (
+            "Six anchored-claim theorem and mechanism audit",
             "Released CA P2E theorem-domain audit",
             "Released OpenML CA input fingerprint audit",
             "Released source and dataset manifest audit",
@@ -608,6 +686,7 @@ def main() -> None:
         "outputs/source_manifest_audit.json",
         "outputs/claim1_independent.json",
         "outputs/claim1_source_crosscheck.json",
+        "outputs/anchored_claims_mechanism.json",
         "outputs/claim2_independent.json",
         "outputs/claim3_independent_e_merge.json",
         "outputs/weca_independence_audit.json",
@@ -625,7 +704,11 @@ def main() -> None:
         "paper": "jNv4sl4YZH",
         "source_commit": source_commit,
         "claims": len(jury["claims"]),
-        "claims_source_url": CLAIMS_URL,
+        "claims_source_url": ANCHORED_CLAIMS_URL,
+        "claims_source_urls": {
+            "anchored": ANCHORED_CLAIMS_URL,
+            "fallback": DEFAULT_CLAIMS_URL,
+        },
         "live_claims_verified": len(live_jury_claims),
         "maximum_points": jury["maximum_points"],
         "tests_passed": True,

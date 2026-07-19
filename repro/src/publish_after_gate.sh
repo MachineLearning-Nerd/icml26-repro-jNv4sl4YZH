@@ -50,17 +50,27 @@ from repro.src.prepublish_gate import (
 
 gate = json.loads(Path("outputs/prepublish_gate.json").read_text(encoding="utf-8"))
 assert gate["paper"] == "jNv4sl4YZH"
-assert gate["claims"] == 3
+assert gate["claims"] == 6
 assert gate["claims_source_url"] == (
     "https://huggingface.co/spaces/ICML-2026-agent-repro/challenge/"
-    "resolve/main/claims.json"
+    "resolve/main/claims_anchored.json"
 )
-assert gate["live_claims_verified"] == 3
-assert gate["maximum_points"] == 6
+assert gate["claims_source_urls"] == {
+    "anchored": (
+        "https://huggingface.co/spaces/ICML-2026-agent-repro/challenge/"
+        "resolve/main/claims_anchored.json"
+    ),
+    "fallback": (
+        "https://huggingface.co/spaces/ICML-2026-agent-repro/challenge/"
+        "resolve/main/claims.json"
+    ),
+}
+assert gate["live_claims_verified"] == 6
+assert gate["maximum_points"] == 12
 assert gate["tests_passed"] is True
 assert gate["publication_gate_passed"] is True
 assert Path(gate["trackio_artifact_bundle"]).is_file()
-assert len(gate["artifact_paths"]) == 19
+assert len(gate["artifact_paths"]) == 20
 assert set(gate["artifact_paths"]) == set(gate["artifact_sha256"])
 assert validate_artifact_bundle(
     gate["trackio_artifact_bundle"], tuple(gate["artifact_paths"])
@@ -75,7 +85,7 @@ validate_required_local_artifact(
 )
 assert hygiene["local_path_artifact_count"] >= 1
 print(
-    "Verified fresh fail-closed gate, all 19 bundle records, registered bundle, "
+    "Verified fresh fail-closed gate, all 20 bundle records, registered bundle, "
     "conclusion marker, and hygiene"
 )
 PY
