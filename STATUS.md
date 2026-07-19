@@ -228,3 +228,12 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   verifier and start Claim 3. Recovery failures retain any completed seed
   checkpoints and retry after 60 seconds. The replacement handoff is live at
   PID `3528025`; the complete `18/18` test suite and shell syntax check pass.
+- A paper/source calibrator audit found that Appendix Tables 6–8 define the
+  third classical CCP calibrator as `F3(p)=2(1-p)`, but the pinned released
+  `e-ccp` source instead exposes `ECCP(pow)` computed as `5(1-p)^4`. It would
+  be incorrect to relabel that source output as linear. The full CCP wrapper
+  now retains every author estimator, split, foldwise p-value, seed, grid, and
+  randomization stream, but reconstructs the paper-specified F3 intervals as
+  `ECCP(linear)` from those returned p-values. The protocol remains exactly 13
+  methods and 11,700 cells. A dedicated numerical falsifier proves the two
+  formulas differ; the expanded suite passes `19/19`. Commit: `e278564`.
