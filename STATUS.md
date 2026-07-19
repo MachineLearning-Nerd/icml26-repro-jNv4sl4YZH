@@ -6,15 +6,15 @@
 possible points. The full released CA run is complete at exactly 1,920 cells
 and has passed its independent structure, efficiency, coverage, input, and
 theorem-domain gates. The sole full released CCP worker is active: Boston and
-Abalone are complete at 3,900 cells each and Parkinson has completed 54/100
-seeds (2,106 cells), for 9,906/11,700 raw CCP cells overall as of
-`2026-07-19 23:43 IST`. A 50-seed independent checkpoint audit has the correct
+Abalone are complete at 3,900 cells each and Parkinson has completed 70/100
+seeds (2,730 cells), for 10,530/11,700 raw CCP cells overall as of
+`2026-07-19 23:57 IST`. A 69-seed independent checkpoint audit has the correct
 direction for all 36 calibrator comparisons, all 27 classical gains exceed the
-fixed 10% materiality threshold, and all 27 P2E coverage cells pass. Only three
-unaffected paper-table cells remain provisionally outside tolerance, all for
-Parkinson interval-length sample SD; this is not accepted as final evidence
-because 46 Parkinson seeds remain. Post-CCP watcher PID
-`3676814` will run all independent verifiers, render six verdicts, pass the
+fixed 10% materiality threshold, and all 27 P2E coverage cells pass. All 94
+unaffected table cells and all 72 reversible source-column replay scalars also
+pass their fixed tolerances at this checkpoint; this is not accepted as final
+evidence because 30 Parkinson seeds remain. Post-CCP watcher PID
+`3690266` will run all independent verifiers, render six verdicts, pass the
 fail-closed gate, push GitHub first, and atomically enqueue the paper for the
 shared Hugging Face drain. The local Trackio logbook remains unpublished until
 that complete handoff.
