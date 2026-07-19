@@ -4,7 +4,9 @@ import unittest
 from pathlib import Path
 
 from repro.src.prepublish_gate import (
+    EXPECTED_CA_PROTOCOL,
     EXPECTED_CCP_PROTOCOL,
+    assert_exact_ca_protocol,
     assert_exact_ccp_protocol,
     hygiene_gate,
     sha256,
@@ -189,6 +191,38 @@ class FullProtocolTests(unittest.TestCase):
         ):
             with self.subTest(key=key), self.assertRaises(AssertionError):
                 assert_exact_ccp_protocol({**expected, key: drifted_value})
+
+    def test_exact_ca_protocol_contract(self):
+        expected = {
+            "source": "Nabil-Ala/P2E_calibration@66cb1e1c76d1b1d3d133fe6cb3896c95d48b5974",
+            "tasks": [
+                "dataset_361237",
+                "dataset_361235",
+                "dataset_361244",
+                "dataset_361234",
+            ],
+            "task_ids": [361237, 361235, 361244, 361234],
+            "seeds": [
+                42, 0, 1, 7, 10, 13, 17, 19, 23, 29,
+                31, 37, 41, 43, 47, 53, 59, 61, 67, 71,
+            ],
+            "alpha": 0.05,
+            "M": 512,
+            "B": 500,
+        }
+        self.assertEqual(EXPECTED_CA_PROTOCOL, expected)
+        assert_exact_ca_protocol(expected)
+        for key, drifted_value in (
+            ("source", "Nabil-Ala/P2E_calibration@wrong-sha"),
+            ("tasks", expected["tasks"][:-1]),
+            ("task_ids", expected["task_ids"][:-1]),
+            ("seeds", expected["seeds"][:-1]),
+            ("alpha", 0.10),
+            ("M", 256),
+            ("B", 250),
+        ):
+            with self.subTest(key=key), self.assertRaises(AssertionError):
+                assert_exact_ca_protocol({**expected, key: drifted_value})
 
     def test_paper_table_fixture_is_bound_to_primary_tex(self):
         root = Path(__file__).resolve().parents[2]

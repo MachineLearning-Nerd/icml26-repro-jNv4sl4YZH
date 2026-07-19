@@ -26,6 +26,23 @@ HEADLINE_TOLERANCES = {
     "length_relative_tolerance": 0.05,
     "length_sd_relative_tolerance": 0.10,
 }
+EXPECTED_CA_PROTOCOL = {
+    "source": "Nabil-Ala/P2E_calibration@66cb1e1c76d1b1d3d133fe6cb3896c95d48b5974",
+    "tasks": [
+        "dataset_361237",
+        "dataset_361235",
+        "dataset_361244",
+        "dataset_361234",
+    ],
+    "task_ids": [361237, 361235, 361244, 361234],
+    "seeds": [
+        42, 0, 1, 7, 10, 13, 17, 19, 23, 29,
+        31, 37, 41, 43, 47, 53, 59, 61, 67, 71,
+    ],
+    "alpha": 0.05,
+    "M": 512,
+    "B": 500,
+}
 EXPECTED_CCP_PROTOCOL = {
     "source": "Nabil-Ala/P2E_calibration@66cb1e1c76d1b1d3d133fe6cb3896c95d48b5974",
     "datasets": {"boston": 15, "abalone": 15, "parkinson": 20},
@@ -90,6 +107,11 @@ def assert_summary(payload: dict[str, object], required_true: tuple[str, ...]) -
 def assert_exact_ccp_protocol(protocol: dict[str, object]) -> None:
     """Reject self-consistent CCP output produced at any non-paper scope."""
     assert protocol == EXPECTED_CCP_PROTOCOL, "CCP paper protocol drift"
+
+
+def assert_exact_ca_protocol(protocol: dict[str, object]) -> None:
+    """Reject self-consistent CA output produced at any non-paper scope."""
+    assert protocol == EXPECTED_CA_PROTOCOL, "CA paper protocol drift"
 
 
 def text_files() -> list[Path]:
@@ -313,6 +335,7 @@ def main() -> None:
     assert mechanism["summary"]["adaptive_weight_rejection_count"] == 8
 
     claim2 = load_json("outputs/claim2_independent.json")
+    assert_exact_ca_protocol(claim2["protocol"])
     assert_summary(
         claim2,
         (

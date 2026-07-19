@@ -328,3 +328,9 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   approximately 25--40 hours for `361234` (median about 29.5 hours). Its current
   ~16.7-hour final-task runtime is therefore consistent with expected finite
   work, not evidence of a hang; the active legacy process should remain intact.
+- Claim 2 now has the same exact raw-protocol contract as Claim 3. Both the
+  CA-to-CCP transition and final publication gate reject any drift in the pinned
+  source SHA, ordered four task names/IDs, released 20-seed tuple, alpha 0.05,
+  512 grid points, or 500 weight samples. Negative controls alter each field;
+  an internally consistent 1,920-cell result at a different scope can no longer
+  pass merely by declaring that reduced/changed scope in its own metadata.

@@ -65,9 +65,12 @@ python - <<'PY'
 import json
 from pathlib import Path
 
+from repro.src.prepublish_gate import assert_exact_ca_protocol
+
 result = json.loads(Path("outputs/claim2_independent.json").read_text())
 summary = result["summary"]
 
+assert_exact_ca_protocol(result["protocol"])
 assert summary["all_four_tasks_present"]
 assert summary["all_full_seed_method_cells_present"]
 assert all(summary["dataset_integrity"].values())
