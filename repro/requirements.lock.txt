@@ -1,0 +1,9 @@
+# Direct dependency snapshot used for the 2026-07-18 reproduction environment.
+numpy==2.5.1
+scipy==1.18.0
+pandas==2.3.3
+scikit-learn==1.9.0
+openml==0.15.1
+tqdm==4.69.0
+matplotlib==3.11.1
+jupyter==1.1.1

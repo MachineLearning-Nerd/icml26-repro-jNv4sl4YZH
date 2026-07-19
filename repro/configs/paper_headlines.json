@@ -1,0 +1,45 @@
+{
+  "source": "arXiv:2606.03600, Table 2 and Appendix Tables 6-8",
+  "comparison_policy": {
+    "coverage_absolute_tolerance": 0.01,
+    "coverage_sd_absolute_tolerance": 0.01,
+    "length_relative_tolerance": 0.05,
+    "length_sd_relative_tolerance": 0.10,
+    "purpose": "A reproducibility cross-check, not a substitute for the full raw-row claim checks. Deviations are reported explicitly because current live data/software may drift from the paper environment."
+  },
+  "conformal_aggregation": {
+    "dataset_361234": {
+      "WECA(P2E)": {"coverage_mean": 0.95, "coverage_sd": 0.01, "length_mean": 2.88, "length_sd": 0.19},
+      "UR-WECA(P2E)": {"coverage_mean": 0.95, "coverage_sd": 0.01, "length_mean": 2.88, "length_sd": 0.18}
+    },
+    "dataset_361235": {
+      "WECA(P2E)": {"coverage_mean": 0.95, "coverage_sd": 0.01, "length_mean": 1.71, "length_sd": 0.29},
+      "UR-WECA(P2E)": {"coverage_mean": 0.95, "coverage_sd": 0.01, "length_mean": 1.70, "length_sd": 0.30}
+    },
+    "dataset_361237": {
+      "WECA(P2E)": {"coverage_mean": 0.95, "coverage_sd": 0.03, "length_mean": 1.65, "length_sd": 0.25},
+      "UR-WECA(P2E)": {"coverage_mean": 0.95, "coverage_sd": 0.03, "length_mean": 1.64, "length_sd": 0.25}
+    },
+    "dataset_361244": {
+      "WECA(P2E)": {"coverage_mean": 0.96, "coverage_sd": 0.02, "length_mean": 5.09, "length_sd": 2.06},
+      "UR-WECA(P2E)": {"coverage_mean": 0.96, "coverage_sd": 0.02, "length_mean": 4.93, "length_sd": 1.86}
+    }
+  },
+  "cross_conformal": {
+    "boston": {
+      "OLS": {"ECCP": {"coverage_mean": 0.905, "coverage_sd": 0.033, "length_mean": 15.458, "length_sd": 0.850}},
+      "RF": {"ECCP": {"coverage_mean": 0.899, "coverage_sd": 0.032, "length_mean": 10.126, "length_sd": 0.616}},
+      "Lasso": {"ECCP": {"coverage_mean": 0.903, "coverage_sd": 0.031, "length_mean": 15.479, "length_sd": 0.839}}
+    },
+    "abalone": {
+      "OLS": {"ECCP": {"coverage_mean": 0.898, "coverage_sd": 0.021, "length_mean": 6.716, "length_sd": 0.076}},
+      "RF": {"ECCP": {"coverage_mean": 0.897, "coverage_sd": 0.024, "length_mean": 6.747, "length_sd": 0.087}},
+      "Lasso": {"ECCP": {"coverage_mean": 0.899, "coverage_sd": 0.022, "length_mean": 6.665, "length_sd": 0.082}}
+    },
+    "parkinson": {
+      "OLS": {"ECCP": {"coverage_mean": 0.897, "coverage_sd": 0.008, "length_mean": 30.100, "length_sd": 0.528}},
+      "RF": {"ECCP": {"coverage_mean": 0.890, "coverage_sd": 0.009, "length_mean": 5.627, "length_sd": 0.422}},
+      "Lasso": {"ECCP": {"coverage_mean": 0.898, "coverage_sd": 0.008, "length_mean": 30.093, "length_sd": 0.524}}
+    }
+  }
+}

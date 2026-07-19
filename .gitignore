@@ -1,0 +1,11 @@
+.venv/
+.env
+__pycache__/
+*.py[cod]
+.pytest_cache/
+outputs/raw/
+outputs/*.log
+outputs/*_evidence_bundle.jsonl
+outputs/openml_cache/
+upstream/
+.trackio/metadata.json

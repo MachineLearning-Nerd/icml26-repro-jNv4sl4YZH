@@ -1,0 +1,119 @@
+# Status
+
+## Current step
+
+`in_progress` — Claim 1 is complete locally. Claim 2's full released CA run is
+active under Trackio: tasks `361237`, `361235`, and `361244` are complete, with
+task `361234` still computing. The three completed tasks contain exactly 1,440
+raw rows (20 seeds × 24 methods each), all finite and structurally complete;
+their six P2E headline cells agree with the paper within `0.004` coverage and
+`0.22%` relative length. P2E is shorter in all 18 completed
+task/family/comparator cells versus log, square-root, and linear calibrators;
+the minimum relative reduction is `87.82%`. Claim 3's full CCP runner remains
+queued until CA finishes. The local Trackio logbook is structured and tagged
+but unpublished.
+
+## Pinned inputs
+
+- Paper: arXiv `2606.03600`, OpenReview `jNv4sl4YZH`.
+- Official source: `Nabil-Ala/P2E_calibration@66cb1e1c76d1b1d3d133fe6cb3896c95d48b5974`.
+- Aggregation data: live OpenML task IDs `361234`, `361235`, `361237`, and
+  `361244`, each queried successfully during the audit.
+- CCP data: bundled Boston, Abalone, and Parkinson/UPDRS CSVs.
+
+## Full-scope plan
+
+1. **C1 — complete:** the clean-room finite-rank construction passed all 18
+   `(n, alpha)` cells: zero p/e set mismatches, exact-e expectation error at
+   most `4.45e-16`, and all eligible classic-calibrator controls inflate the
+   set. A separate invocation of the pinned author implementation has the
+   same 18/18 membership identities and exact expectations. The source emits
+   IEEE underflowed zeros for extremely small, already-excluded e-values at
+   `n>=100`; this is documented in `outputs/claim1_source_crosscheck.json` and
+   does not alter the threshold decisions.
+2. **C2:** run the released conformal-aggregation protocol: four datasets,
+   20 fixed seeds, alpha `.05`, seven base regressors, `M=512`, `B=500`.
+   Recompute coverage and length from raw source outputs independently.
+3. **C3:** run paper-scale cross-conformal trials on bundled Boston, Abalone,
+   and Parkinson datasets with 100 fixed seeds and the paper's reported fold
+   counts; independently recompute all interval coverages/lengths and include
+   nominal/invalid-calibrator controls. A separate six-cell finite-rank
+   e-merge enumeration already verifies the exact mean-one mechanism and all
+   `1-alpha` Markov events. An exact sparse linear program additionally
+   maximizes failure probability over every joint coupling with the required
+   uniform conformal-rank marginals: all 6/6 valid nonuniform fixed-weight
+   worst cases remain at or below `alpha`. A 2x-invalid-e-value control is
+   correctly reported as only 2/6 under the LP (it remains conservative in
+   four cases), while forbidden outcome-adaptive max weighting violates the
+   bound in 6/6. This directly checks the independent-tuning requirement for
+   WECA and supports both CA and CCP, but does not replace the queued empirical
+   run.
+
+## Publication gate
+
+Do not publish until all source runs, independent verifiers, negative controls,
+tests, headline-number comparison, and secret scan pass. The current Hugging
+Face quota does not affect local implementation work. The fail-closed
+`repro/src/prepublish_gate.py` now reruns every independent checker and all
+tests, validates the 1,920 CA and 11,700 CCP cell sets, requires all 17 paper
+headline cells within tolerance, verifies the source pin and Trackio evidence,
+scans hygiene, and hashes every final artifact. It cannot pass until the full
+source outputs and final Conclusion marker exist. On success it packages seven
+summary/report artifacts plus all seven raw dataset files into one hash-indexed JSONL
+artifact that Trackio will promote to the Hugging Face bucket.
+The headline tolerances were fixed before the remaining results existed at
+`0.01` absolute coverage and `5%` relative length; larger drift halts the gate.
+The comparison now covers all four reported scalars in each headline cell:
+coverage mean/SD and length mean/SD, for 68 checks across 17 cells. The added
+SD tolerances (`0.01` absolute coverage SD and `10%` relative length SD) were
+fixed after three CA tasks but before the final CA task and all CCP outputs.
+
+## Fresh preflight — 2026-07-19
+
+- Confirmed the vendored official source remains clean at
+  `66cb1e1c76d1b1d3d133fe6cb3896c95d48b5974`.
+- Confirmed the checked-in protocol retains the paper-scale CA and CCP
+  configurations described above.
+- Ran all fifteen local mechanism/protocol/author-launcher/raw-verifier and
+  paper-headline drift-control tests successfully (including positive and
+  deliberately incomplete raw fixtures), including local-only Trackio artifact
+  path validation, and completed a scoped secret scan with no findings.
+- Pin `pandas==2.3.3`: the unmodified author Parkinson loader needs Pandas 2
+  compatibility for an in-place standardized-float assignment. The CCP wrapper
+  enters `e-ccp/` before source loading so the released relative data paths
+  resolve, while its raw evidence remains outside the vendored source tree.
+  Both source wrappers now write atomic per-seed checkpoints and never promote
+  a partial failed seed: 24 method cells per CA seed and 39 cells per CCP seed
+  (3 models × 13 methods). Final dataset artifacts are also atomic and are
+  revalidated before reuse; the author estimators and protocols are unchanged.
+  The CA loader accepts all three existing 480-row final artifacts as exactly
+  20 complete seeds each. Both independent raw verifiers fail closed on
+  protocol drift, missing, duplicate, unexpected, or non-finite cells.
+  CCP aggregation now matches the released driver's `numpy.nanmean` exactly;
+  a fake-source test confirms NaN element handling, all 39 per-seed cells, and
+  the interval-count/finite-summary guards before checkpoint promotion.
+- The author CA loader fetched all four released OpenML task IDs through the
+  pinned environment (1,030×8; 1,503×5; 1,066×2; and 4,177×7 retained numeric
+  rows respectively). It is therefore ready for the actual 4×20-seed sweep.
+- `repro/src/compare_paper_headlines.py` will compare the independently
+  summarized raw results to the 8 reported CA P2E cells and 9 reported CCP
+  ECCP cells transcribed from the paper, checking all 68 mean/SD scalars and
+  explicitly reporting any drift.
+- The serialized handoff launched Claim 2 after the unrelated shared sweep
+  completed. Three of four CA tasks are now complete; do not start the CCP
+  sweep until the final CA task and its independent verifier finish. A second
+  durable one-shot handoff waits for all three CCP final artifacts, then runs
+  the strict 11,700-cell verifier, all 68 scalar paper-headline checks, the
+  arbitrary-dependence LP, evidence-derived final Trackio cells, and the
+  fail-closed publication gate. After—and only after—that gate succeeds, the
+  final step creates/pushes the public GitHub repository and publishes the
+  Trackio Space. It then requires public Space/tag/SHA readback, the final
+  Conclusion marker, and an exact-size evidence bundle in the Trackio bucket.
+  Trackio's required local `abs_path` mapping is validated but its metadata
+  file is gitignored, preventing that local-only path from entering GitHub.
+- At `2026-07-19 10:31 IST`, the legacy (pre-checkpoint-patch) active process
+  for final task `361234` remained healthy at about `96.8%` CPU, `188 MB` RSS,
+  and zero swap. Its larger `4,177 x 7` retained input explains why it is much
+  slower than the three completed `1,030`- to `1,503`-row tasks. The exact-PID
+  continuation guard and both serialized handoffs remain alive. The required
+  Python 3.12 environment was re-entered and all `15/15` tests passed again.

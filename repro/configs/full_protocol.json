@@ -1,0 +1,24 @@
+{
+  "source_commit": "66cb1e1c76d1b1d3d133fe6cb3896c95d48b5974",
+  "claim_1": {
+    "alpha_values": [0.05, 0.1, 0.2],
+    "calibration_sizes": [10, 20, 30, 50, 100, 200]
+  },
+  "claim_2_conformal_aggregation": {
+    "openml_task_ids": [361234, 361235, 361237, 361244],
+    "seeds": 20,
+    "alpha": 0.05,
+    "grid_points": 512,
+    "weight_samples": 500
+  },
+  "claim_3_cross_conformal": {
+    "datasets": {
+      "boston": 15,
+      "abalone": 15,
+      "parkinson": 20
+    },
+    "seeds": 100,
+    "alpha": 0.1,
+    "grid_points": 300
+  }
+}
