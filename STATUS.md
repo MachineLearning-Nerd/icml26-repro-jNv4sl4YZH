@@ -504,3 +504,13 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   six evidence-derived verdicts, run the gate, push GitHub, and atomically
   enqueue the paper for the already-active shared HF drain. The paper remains
   intentionally absent from the queue until that complete gate passes.
+
+- **2026-07-19 22:44 IST early CCP gate:** Boston completed all 3,900 expected
+  cells with exact structure and valid metric ranges. A dataset-scoped run of
+  the final independent verifier passes all 12/12 calibrator comparisons,
+  including 3/3 strict AoN wins and 9/9 classical reductions above 10%; the
+  minimum classical reduction is `76.46%`. All 9/9 P2E coverage cells and all
+  3/3 ECCP coverage cells pass the fixed empirical shortfall rule (minimum
+  coverage `0.90` at nominal `0.90`). This is an early failure detector only;
+  the final gate still requires the exact combined 11,700-cell set across
+  Boston, Abalone, and Parkinson before any verdict, push, or queue entry.
