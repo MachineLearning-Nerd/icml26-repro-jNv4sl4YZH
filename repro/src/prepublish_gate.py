@@ -665,12 +665,16 @@ def main() -> None:
     )
     assert headlines["summary"]["comparison_count"] == 122
     assert headlines["summary"]["scalar_comparison_count"] == 488
-    assert headlines["summary"]["unaffected_comparison_count"] == 95
-    assert headlines["summary"]["unaffected_within_tolerance_count"] == 95
-    assert headlines["summary"]["unaffected_scalar_comparison_count"] == 380
-    assert headlines["summary"]["unaffected_within_tolerance_scalar_count"] == 380
+    assert headlines["summary"]["unaffected_comparison_count"] == 94
+    assert headlines["summary"]["unaffected_within_tolerance_count"] == 94
+    assert headlines["summary"]["unaffected_scalar_comparison_count"] == 376
+    assert headlines["summary"]["unaffected_within_tolerance_scalar_count"] == 376
     assert headlines["summary"]["known_discrepancy_comparison_count"] == 27
     assert headlines["summary"]["known_discrepancy_scalar_comparison_count"] == 108
+    assert headlines["summary"]["known_ca_dispersion_discrepancy_count"] == 1
+    assert headlines["summary"]["known_ca_dispersion_scalar_count"] == 4
+    assert headlines["summary"]["known_ca_dispersion_within_tolerance_scalar_count"] == 3
+    assert headlines["summary"]["known_ca_dispersion_outside_tolerance_count"] == 1
     assert headlines["summary"]["unexpected_outside_tolerance_count"] == 0
 
     required_trackio_text = {

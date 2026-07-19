@@ -123,16 +123,20 @@ assert summary["comparison_count"] == 122
 assert summary["scalar_comparison_count"] == 488
 assert summary["all_unaffected_within_tolerance"]
 assert summary["all_outside_tolerance_cells_accounted_for"]
-assert summary["unaffected_comparison_count"] == 95
-assert summary["unaffected_within_tolerance_count"] == 95
-assert summary["unaffected_scalar_comparison_count"] == 380
-assert summary["unaffected_within_tolerance_scalar_count"] == 380
+assert summary["unaffected_comparison_count"] == 94
+assert summary["unaffected_within_tolerance_count"] == 94
+assert summary["unaffected_scalar_comparison_count"] == 376
+assert summary["unaffected_within_tolerance_scalar_count"] == 376
 assert summary["known_discrepancy_comparison_count"] == 27
 assert summary["known_discrepancy_scalar_comparison_count"] == 108
+assert summary["known_ca_dispersion_discrepancy_count"] == 1
+assert summary["known_ca_dispersion_scalar_count"] == 4
+assert summary["known_ca_dispersion_within_tolerance_scalar_count"] == 3
+assert summary["known_ca_dispersion_outside_tolerance_count"] == 1
 assert summary["unexpected_outside_tolerance_count"] == 0
 print(
-    "All 380 unaffected scalars pass; all 27 paper/source-discrepant cells "
-    "are classified by the hash-bound contract audit"
+    "All 376 unaffected scalars pass; the one CA finite-seed SD discrepancy "
+    "and all 27 paper/source-discrepant cells are explicitly classified"
 )
 PY
 

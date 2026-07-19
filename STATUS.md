@@ -65,8 +65,9 @@ Do not publish until all source runs, independent verifiers, negative controls,
 tests, headline-number comparison, and secret scan pass. The current Hugging
 Face quota does not affect local implementation work. The fail-closed
 `repro/src/prepublish_gate.py` now reruns every independent checker and all
-tests, validates the 1,920 CA and 11,700 CCP cell sets, requires all 122 tabulated paper
-headline cells within tolerance, verifies the source pin and Trackio evidence,
+tests, validates the 1,920 CA and 11,700 CCP cell sets, compares all 122
+tabulated paper headline cells under the exact disclosed-difference policy,
+verifies the source pin and Trackio evidence,
 scans hygiene, and hashes every final artifact. It cannot pass until the full
 source outputs and final Conclusion marker exist. On success it packages twelve
 summary/report artifacts plus all seven raw dataset files into one hash-indexed JSONL
@@ -526,6 +527,8 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   audit bound to the exact arXiv TeX and released source hashes proves that the
   paper's CCP F1/F2/F3 definitions (log/square-root/linear) disagree with the
   released table driver's column formulas (square-root/log/power). The final
-  gate preserves formula-faithful labels, requires all 380 unaffected paper
-  scalars to pass, classifies the 108 affected scalars, and rejects any
-  unexpected drift. The evidence bundle will contain 21 records.
+  gate preserves formula-faithful labels, requires all 376 unaffected paper
+  scalars to pass, exactly classifies the one CA finite-seed length-SD mismatch
+  (`0.201898618094345` reproduced versus `0.18` reported), classifies the 108
+  CCP source-affected scalars, and rejects any unexpected drift. The evidence
+  bundle will contain 21 records.

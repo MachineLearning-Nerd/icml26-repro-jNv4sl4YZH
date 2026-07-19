@@ -28,6 +28,10 @@ from repro.src.verify_anchored_claims import (
 from repro.src.verify_ca_inputs import verify_inputs
 from repro.src.verify_ca_p2e_domains import verify_domains
 from repro.src.render_final_logbook import build_cells
+from repro.src.compare_paper_headlines import (
+    KNOWN_CA_DISPERSION_DISCREPANCY,
+    is_known_ca_dispersion_discrepancy,
+)
 from repro.src.run_author_ccp import EXECUTION_ADAPTER, METHOD_KEYS, PAPER_DATASETS
 from repro.src.verify_ccp_results import CALIBRATOR_BASELINES
 from repro.src.verify_ccp_calibrator_contract import (
@@ -53,6 +57,47 @@ from repro.src.verify_weca_independence import (
 
 
 class FullProtocolTests(unittest.TestCase):
+    def test_ca_dispersion_disclosure_is_exact_and_cannot_mask_new_drift(self):
+        measured = {
+            "metric_checks": {
+                "coverage_mean": True,
+                "coverage_sd": True,
+                "length_mean": True,
+                "length_sd": False,
+            },
+            "observed": {
+                "coverage_mean": 0.9518341307814993,
+                "coverage_sd": 0.012628390448076097,
+                "length_mean": 2.9117496605046425,
+                "length_sd": KNOWN_CA_DISPERSION_DISCREPANCY["observed"],
+            },
+            "paper": {
+                "coverage_mean": 0.95,
+                "coverage_sd": 0.01,
+                "length_mean": 2.88,
+                "length_sd": KNOWN_CA_DISPERSION_DISCREPANCY["paper"],
+            },
+        }
+        self.assertTrue(
+            is_known_ca_dispersion_discrepancy(
+                "dataset_361234", "UR-WECA(P2E)", measured
+            )
+        )
+        changed = json.loads(json.dumps(measured))
+        changed["observed"]["length_sd"] = 0.25
+        self.assertFalse(
+            is_known_ca_dispersion_discrepancy(
+                "dataset_361234", "UR-WECA(P2E)", changed
+            )
+        )
+        changed = json.loads(json.dumps(measured))
+        changed["metric_checks"]["coverage_mean"] = False
+        self.assertFalse(
+            is_known_ca_dispersion_discrepancy(
+                "dataset_361234", "UR-WECA(P2E)", changed
+            )
+        )
+
     def test_official_jury_claim_snapshot_has_six_claims_and_twelve_points(self):
         root = Path(__file__).resolve().parents[2]
         jury = json.loads(
@@ -721,12 +766,16 @@ class FullProtocolTests(unittest.TestCase):
                 "scalar_comparison_count": 488,
                 "all_unaffected_within_tolerance": True,
                 "all_outside_tolerance_cells_accounted_for": True,
-                "unaffected_comparison_count": 95,
-                "unaffected_within_tolerance_count": 95,
-                "unaffected_scalar_comparison_count": 380,
-                "unaffected_within_tolerance_scalar_count": 380,
+                "unaffected_comparison_count": 94,
+                "unaffected_within_tolerance_count": 94,
+                "unaffected_scalar_comparison_count": 376,
+                "unaffected_within_tolerance_scalar_count": 376,
                 "known_discrepancy_comparison_count": 27,
                 "known_discrepancy_scalar_comparison_count": 108,
+                "known_ca_dispersion_discrepancy_count": 1,
+                "known_ca_dispersion_scalar_count": 4,
+                "known_ca_dispersion_within_tolerance_scalar_count": 3,
+                "known_ca_dispersion_outside_tolerance_count": 1,
                 "unexpected_outside_tolerance_count": 0,
             }
         }
@@ -757,6 +806,7 @@ class FullProtocolTests(unittest.TestCase):
         self.assertIn("FULL_GATE_READY: jNv4sl4YZH", cells["conclusion"])
         self.assertIn("4 distinct alpha levels", cells["claim_2"])
         self.assertIn("36/36", cells["claim_6"])
+        self.assertIn("0.201898618094345", cells["claim_6"])
         self.assertEqual(cells["summary"]["anchored_claims"], 6)
         self.assertEqual(cells["summary"]["headline_scalars"], 488)
 

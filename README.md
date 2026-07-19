@@ -113,9 +113,11 @@ python repro/src/prepublish_gate.py \
 After the full source runs finish, `python repro/src/prepublish_gate.py` reruns
 all independent checks and tests, validates every raw cell, verifies the
 Trackio evidence and source pin, compares all 488 reported mean/SD scalars in
-the 122 tabulated paper cells, requires all 380 unaffected scalars to pass and
-all 108 scalars in the paper/released-code F1/F2/F3 inconsistency to be
-source-hash-bound and explicitly classified, requires all 24 CA material-efficiency comparisons
+the 122 tabulated paper cells, requires all 376 unaffected scalars to pass,
+requires the exact one-scalar CA finite-seed dispersion mismatch to be
+explicitly disclosed, and requires all 108 scalars in the
+paper/released-code F1/F2/F3 inconsistency to be source-hash-bound and
+explicitly classified. It also requires all 24 CA material-efficiency comparisons
 and all 36 CCP calibrator comparisons (including nine AoN cells), scans for
 secrets/local paths, and emits a SHA-256 manifest only if the complete
 publication gate passes. It also creates

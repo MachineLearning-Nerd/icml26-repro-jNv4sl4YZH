@@ -79,6 +79,32 @@ class RawVerifierTests(unittest.TestCase):
             self.assertEqual(matching["summary"]["unaffected_scalar_comparison_count"], 380)
             self.assertEqual(matching["summary"]["known_discrepancy_comparison_count"], 27)
             self.assertEqual(matching["summary"]["known_discrepancy_scalar_comparison_count"], 108)
+            self.assertEqual(matching["summary"]["known_ca_dispersion_discrepancy_count"], 0)
+
+            ca["summaries"]["dataset_361234"]["UR-WECA(P2E)"][
+                "length_sd"
+            ] = 0.201898618094345
+            ca_path.write_text(json.dumps(ca), encoding="utf-8")
+            subprocess.run(command, cwd=ROOT, check=True, capture_output=True, text=True)
+            disclosed = json.loads(output.read_text(encoding="utf-8"))
+            self.assertTrue(disclosed["summary"]["all_unaffected_within_tolerance"])
+            self.assertTrue(disclosed["summary"]["all_outside_tolerance_cells_accounted_for"])
+            self.assertEqual(disclosed["summary"]["unaffected_comparison_count"], 94)
+            self.assertEqual(disclosed["summary"]["unaffected_scalar_comparison_count"], 376)
+            self.assertEqual(disclosed["summary"]["known_ca_dispersion_discrepancy_count"], 1)
+            self.assertEqual(disclosed["summary"]["known_ca_dispersion_scalar_count"], 4)
+            self.assertEqual(
+                disclosed["summary"]["known_ca_dispersion_within_tolerance_scalar_count"],
+                3,
+            )
+            self.assertEqual(
+                disclosed["summary"]["known_ca_dispersion_outside_tolerance_count"],
+                1,
+            )
+            ca["summaries"]["dataset_361234"]["UR-WECA(P2E)"] = dict(
+                headlines["conformal_aggregation"]["dataset_361234"]["UR-WECA(P2E)"]
+            )
+            ca_path.write_text(json.dumps(ca), encoding="utf-8")
 
             original_known = dict(
                 ccp["summaries"]["boston"]["OLS"]["ECCP(log)"]
