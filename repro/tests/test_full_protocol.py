@@ -30,6 +30,7 @@ from repro.src.verify_paper_table_fixture import (
     mismatch_paths,
     parse_ca_alternative_table,
 )
+from repro.src.verify_source_manifest import validate_manifest
 from repro.src.verify_weca_independence import (
     METHODS_SHA256,
     WECA_FUNCTION_SHA256,
@@ -121,6 +122,41 @@ class FullProtocolTests(unittest.TestCase):
             with self.assertRaises(AssertionError):
                 validate_local_path_artifacts(valid, directory)
 
+    def test_released_source_and_dataset_manifest_is_exact(self):
+        root = Path(__file__).resolve().parents[2]
+        manifest = json.loads(
+            (root / "repro/configs/source_manifest.json").read_text(encoding="utf-8")
+        )
+        audit = json.loads(
+            (root / "outputs/source_manifest_audit.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(
+            audit["manifest_sha256"], sha256("repro/configs/source_manifest.json")
+        )
+        self.assertEqual(
+            audit["summary"],
+            {
+                "all_dataset_shapes_verified": True,
+                "all_files_git_blob_verified": True,
+                "all_files_hash_verified": True,
+                "all_loader_outputs_verified": True,
+                "dataset_count": 3,
+                "file_count": 10,
+                "source_worktree_clean": True,
+                "total_dataset_rows": 10_558,
+                "total_source_input_bytes": 1_181_454,
+            },
+        )
+        self.assertEqual(
+            validate_manifest(root / "upstream", manifest)["summary"],
+            audit["summary"],
+        )
+
+        corrupted = json.loads(json.dumps(manifest))
+        corrupted["files"][0]["sha256"] = "0" * 64
+        with self.assertRaises(AssertionError):
+            validate_manifest(root / "upstream", corrupted)
+
     def test_shared_queue_handoff_follows_initial_github_push(self):
         root = Path(__file__).resolve().parents[2]
         publisher = (root / "repro/src/publish_after_gate.sh").read_text(
@@ -132,6 +168,7 @@ class FullProtocolTests(unittest.TestCase):
         self.assertLess(initial_push, enqueue)
         self.assertLess(enqueue, wait_for_space)
         self.assertIn('gate["live_claims_verified"] == 3', publisher)
+        self.assertIn('len(gate["artifact_paths"]) == 17', publisher)
 
     def test_protocol_matches_released_paper_scale(self):
         root = Path(__file__).resolve().parents[2]

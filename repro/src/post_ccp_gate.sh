@@ -28,6 +28,13 @@ done
 source .venv/bin/activate
 
 trackio logbook run \
+  --page "Methods & source audit" \
+  --title "Released source and dataset manifest audit" \
+  -- python repro/src/verify_source_manifest.py \
+  --source upstream \
+  --output outputs/source_manifest_audit.json
+
+trackio logbook run \
   --page "Claim 3" \
   --title "Independent full CCP raw verification" \
   -- python repro/src/verify_ccp_results.py \

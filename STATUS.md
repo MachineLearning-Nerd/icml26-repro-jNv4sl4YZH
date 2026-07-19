@@ -423,3 +423,17 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   pass, and a real premature gate still emits no manifest/bundle. At
   `2026-07-19 21:11 IST`, the untouched CA worker remained active at `97.9%`
   CPU with `24:40:49` CPU time and about `191 MB` RSS.
+- The released inputs are now independently content-pinned, not merely bound
+  to a clean Git commit. A machine-readable manifest verifies SHA-256, Git blob
+  SHA-1, and byte size for all 10 CA/CCP code and bundled-data files. It parses
+  all three CCP CSV schemas (10,558 data rows total) and executes the released
+  loaders, requiring finite arrays of shapes `(506, 14)`, `(4177, 10)`, and
+  `(5875, 13)` plus the exact loader configs. A corrupted-hash control fails.
+  The audit is captured with a clean relative Trackio command, required by the
+  final gate, and included in the future 17-record evidence bundle. All 30
+  tests, compilation, shell syntax, and hygiene checks pass. A real premature
+  gate accepted the new audit and then rejected the absent fourth CA artifact,
+  emitting neither manifest nor bundle. At `2026-07-19 21:24 IST`, the
+  untouched CA worker remained active at `97.9%` CPU with `24:53:42` CPU time
+  and about `191 MB` RSS; both serialized handoffs and the shared HF drain
+  remained alive.

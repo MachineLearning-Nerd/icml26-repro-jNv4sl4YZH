@@ -2144,3 +2144,369 @@ if __name__ == "__main__":
 {"all_fields_match": true, "ca_cell_count": 32, "ccp_cell_count": 90, "mismatch_count": 0, "mismatch_paths": [], "parsed_values_sha256": "a412b883aebd9aa128293cf5308db45cd89ae69eb50b868a71551d7a05124b14", "scalar_count": 488, "total_cell_count": 122}
 
 ````
+
+
+---
+<!-- trackio-cell
+{"type": "code", "id": "cell_0e003382f985", "created_at": "2026-07-19T15:53:18+00:00", "title": "Released source and dataset manifest audit", "command": ["python", "repro/src/verify_source_manifest.py", "--source", "upstream", "--output", "outputs/source_manifest_audit.json"], "exit_code": 0, "duration_s": 1.482}
+-->
+````bash
+$ python repro/src/verify_source_manifest.py --source upstream --output outputs/source_manifest_audit.json
+````
+
+exit 0 · 1.5s
+
+
+````python title=verify_source_manifest.py
+#!/usr/bin/env python3
+"""Verify every released source/data input used by the full reproduction."""
+
+from __future__ import annotations
+
+import argparse
+import csv
+import hashlib
+import importlib.util
+import json
+import os
+import subprocess
+import warnings
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[2]
+EXPECTED_SOURCE = (
+    "Nabil-Ala/P2E_calibration@66cb1e1c76d1b1d3d133fe6cb3896c95d48b5974"
+)
+EXPECTED_FILE_PATHS = {
+    "e-ca/config.py",
+    "e-ca/main.py",
+    "e-ca/methods.py",
+    "e-ca/utils.py",
+    "e-ccp/data_loader.py",
+    "e-ccp/eccp_utils.py",
+    "e-ccp/main.py",
+    "e-ccp/datasets/Boston.csv",
+    "e-ccp/datasets/abalone.csv",
+    "e-ccp/datasets/merged_dataset.csv",
+}
+EXPECTED_DATASETS = {"boston", "abalone", "parkinson"}
+
+
+def file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def git(source: Path, *arguments: str) -> str:
+    return subprocess.run(
+        ["git", "-C", str(source), *arguments],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+
+
+def validate_relative_path(value: str) -> Path:
+    relative = Path(value)
+    if relative.is_absolute() or not relative.parts or ".." in relative.parts:
+        raise AssertionError(f"unsafe source-manifest path: {value!r}")
+    return relative
+
+
+def validate_manifest(source: Path, manifest: dict) -> dict:
+    source = source.resolve(strict=True)
+    commit = git(source, "rev-parse", "HEAD")
+    assert manifest["source"] == EXPECTED_SOURCE
+    assert manifest["git_commit"] == commit == EXPECTED_SOURCE.rsplit("@", 1)[1]
+    assert git(source, "status", "--porcelain") == ""
+
+    entries = manifest["files"]
+    assert isinstance(entries, list)
+    paths = [entry["path"] for entry in entries]
+    assert len(paths) == len(set(paths)) == len(EXPECTED_FILE_PATHS)
+    assert set(paths) == EXPECTED_FILE_PATHS
+
+    verified_files = []
+    total_bytes = 0
+    for entry in entries:
+        assert set(entry) == {
+            "path", "role", "byte_size", "sha256", "git_blob_sha1"
+        }
+        assert isinstance(entry["role"], str) and entry["role"].strip()
+        relative = validate_relative_path(entry["path"])
+        path = source / relative
+        assert path.is_file(), f"missing released source input: {relative}"
+        assert path.stat().st_size == entry["byte_size"]
+        assert file_sha256(path) == entry["sha256"]
+        blob = git(source, "rev-parse", f"HEAD:{relative.as_posix()}")
+        assert blob == entry["git_blob_sha1"]
+        total_bytes += path.stat().st_size
+        verified_files.append(
+            {
+                "path": relative.as_posix(),
+                "byte_size": path.stat().st_size,
+                "sha256": entry["sha256"],
+                "git_blob_sha1": blob,
+            }
+        )
+
+    datasets = manifest["datasets"]
+    assert set(datasets) == EXPECTED_DATASETS
+    verified_datasets = {}
+    for name, expected in datasets.items():
+        assert set(expected) == {
+            "path", "data_rows", "columns", "header",
+            "loaded_feature_count", "target", "loader_config",
+        }
+        relative = validate_relative_path(expected["path"])
+        assert relative.as_posix() in EXPECTED_FILE_PATHS
+        with (source / relative).open(newline="", encoding="utf-8") as handle:
+            reader = csv.reader(handle)
+            header = next(reader)
+            data_rows = list(reader)
+        assert header == expected["header"]
+        assert len(header) == expected["columns"]
+        assert len(data_rows) == expected["data_rows"]
+        assert all(len(row) == len(header) for row in data_rows)
+        assert expected["target"] in header
+        verified_datasets[name] = {
+            "path": relative.as_posix(),
+            "data_rows": len(data_rows),
+            "columns": len(header),
+            "loaded_feature_count": expected["loaded_feature_count"],
+            "target": expected["target"],
+        }
+
+    loader_path = source / "e-ccp/data_loader.py"
+    spec = importlib.util.spec_from_file_location("_p2e_source_data_loader", loader_path)
+    assert spec is not None and spec.loader is not None
+    loader = importlib.util.module_from_spec(spec)
+    original_cwd = Path.cwd()
+    try:
+        os.chdir(source / "e-ccp")
+        spec.loader.exec_module(loader)
+        for name, expected in datasets.items():
+            # The pinned loader intentionally relies on a Pandas-2 assignment
+            # that emits a FutureWarning containing its absolute local path.
+            # The behavior is separately documented and pinned; suppress only
+            # that warning so a Trackio command cannot publish a host path.
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore", FutureWarning)
+                features, targets, config = loader.load_dataset(name)
+            assert features.shape == (
+                expected["data_rows"], expected["loaded_feature_count"]
+            )
+            assert targets.shape == (expected["data_rows"],)
+            assert loader.np.isfinite(features).all()
+            assert loader.np.isfinite(targets).all()
+            assert config == expected["loader_config"]
+            verified_datasets[name]["loaded_shape"] = list(features.shape)
+            verified_datasets[name]["loader_config"] = config
+    finally:
+        os.chdir(original_cwd)
+
+    return {
+        "source": manifest["source"],
+        "git_commit": commit,
+        "files": verified_files,
+        "datasets": verified_datasets,
+        "summary": {
+            "all_files_hash_verified": True,
+            "all_files_git_blob_verified": True,
+            "all_dataset_shapes_verified": True,
+            "all_loader_outputs_verified": True,
+            "source_worktree_clean": True,
+            "file_count": len(verified_files),
+            "dataset_count": len(verified_datasets),
+            "total_source_input_bytes": total_bytes,
+            "total_dataset_rows": sum(
+                dataset["data_rows"] for dataset in verified_datasets.values()
+            ),
+        },
+    }
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--source", type=Path, required=True)
+    parser.add_argument(
+        "--manifest", type=Path,
+        default=Path("repro/configs/source_manifest.json"),
+    )
+    parser.add_argument("--output", type=Path, required=True)
+    args = parser.parse_args()
+
+    manifest_path = args.manifest if args.manifest.is_absolute() else ROOT / args.manifest
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    result = validate_manifest(args.source, manifest)
+    result["manifest_sha256"] = file_sha256(manifest_path)
+
+    output = args.output if args.output.is_absolute() else ROOT / args.output
+    output.parent.mkdir(parents=True, exist_ok=True)
+    temporary = output.with_name(output.name + ".tmp")
+    temporary.write_text(
+        json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    temporary.replace(output)
+    print(json.dumps(result["summary"], sort_keys=True))
+
+
+if __name__ == "__main__":
+    main()
+
+````
+
+
+````json title=source_manifest_audit.json
+{
+  "datasets": {
+    "abalone": {
+      "columns": 9,
+      "data_rows": 4177,
+      "loaded_feature_count": 10,
+      "loaded_shape": [
+        4177,
+        10
+      ],
+      "loader_config": {
+        "K": 10,
+        "alpha": 0.1,
+        "lambda_": 0.01,
+        "n_test": null,
+        "n_train": 4000,
+        "name": "Abalone",
+        "ntree": 200
+      },
+      "path": "e-ccp/datasets/abalone.csv",
+      "target": "Rings"
+    },
+    "boston": {
+      "columns": 15,
+      "data_rows": 506,
+      "loaded_feature_count": 14,
+      "loaded_shape": [
+        506,
+        14
+      ],
+      "loader_config": {
+        "K": 5,
+        "alpha": 0.1,
+        "lambda_": 0.01,
+        "n_test": null,
+        "n_train": 400,
+        "name": "Boston",
+        "ntree": 200
+      },
+      "path": "e-ccp/datasets/Boston.csv",
+      "target": "medv"
+    },
+    "parkinson": {
+      "columns": 21,
+      "data_rows": 5875,
+      "loaded_feature_count": 13,
+      "loaded_shape": [
+        5875,
+        13
+      ],
+      "loader_config": {
+        "K": 5,
+        "alpha": 0.1,
+        "lambda_": 0.01,
+        "n_test": null,
+        "n_train": 3000,
+        "name": "Parkinsons_UPDRS",
+        "ntree": 200
+      },
+      "path": "e-ccp/datasets/merged_dataset.csv",
+      "target": "total_UPDRS"
+    }
+  },
+  "files": [
+    {
+      "byte_size": 1676,
+      "git_blob_sha1": "2a21927b019bc01fe22948d0416eeda700e6dc47",
+      "path": "e-ca/config.py",
+      "sha256": "f4e7e7b174ce34a2dcb1a0b154a8f0f3adb7598d8d6328df2b62d0c2bbec34be"
+    },
+    {
+      "byte_size": 7208,
+      "git_blob_sha1": "66e67d19550e9468c8aa90e309418d9cc02737d3",
+      "path": "e-ca/main.py",
+      "sha256": "eec7b936cc62ec3ee55e6e73bad3644da5bc0573ecee2423b1d5fe2a51f3e643"
+    },
+    {
+      "byte_size": 13479,
+      "git_blob_sha1": "b0a9b14cd964ae5bb412520cdd87f729779eb04b",
+      "path": "e-ca/methods.py",
+      "sha256": "dda5d2429d4ca8c77be6a3b04bb3c159360bf3af58d1087a5f31cc17ea44cf86"
+    },
+    {
+      "byte_size": 4925,
+      "git_blob_sha1": "4468d16f02ed17f2147ebbf445fc96b726ba7fef",
+      "path": "e-ca/utils.py",
+      "sha256": "7aa2daf12c176af1679a5553fe903d594bc721f1b8c5e231de5a1fd8fc26a82f"
+    },
+    {
+      "byte_size": 3710,
+      "git_blob_sha1": "7a79954269b41c2dbde87ba62f2c71504bccb060",
+      "path": "e-ccp/data_loader.py",
+      "sha256": "85a3425c010cba6c47218974d5aeea7a66d3af529ddea6caa81ba425191034bc"
+    },
+    {
+      "byte_size": 23016,
+      "git_blob_sha1": "8df647cd5548212157622abad5ba615a90acd780",
+      "path": "e-ccp/eccp_utils.py",
+      "sha256": "7ef06bed7bef7c72dae5f760cf0f0c2b4cf4318af44f87763ac8cc0ab0687593"
+    },
+    {
+      "byte_size": 12051,
+      "git_blob_sha1": "8593e1c48524128546ba1775985a9ecc170f3fe4",
+      "path": "e-ccp/main.py",
+      "sha256": "4bfabc2a937a633db3d95a70f76e961a5541319b332e1452617ca6f64a8a57d6"
+    },
+    {
+      "byte_size": 37658,
+      "git_blob_sha1": "8c2d22a1cd9f06135b9a2fe2a379630e1d1d60dd",
+      "path": "e-ccp/datasets/Boston.csv",
+      "sha256": "a73bba75b82b2ffea542da3752edb63ea583620842d09810f0780fa2e8da9011"
+    },
+    {
+      "byte_size": 191968,
+      "git_blob_sha1": "e6d25ff2909d2afe82f0c0f0529eed8a252f2fdc",
+      "path": "e-ccp/datasets/abalone.csv",
+      "sha256": "50126af5ea3554ef637579b40f120be68e26aaa1d354df1e1f0e90775f629b44"
+    },
+    {
+      "byte_size": 885763,
+      "git_blob_sha1": "1c10affe990d8bbbb9befb02c4d91453783d01ee",
+      "path": "e-ccp/datasets/merged_dataset.csv",
+      "sha256": "81d62a8862e5f2faaab2f07fbac5feef5afbf2864f4d49b68134fdc2ca13c618"
+    }
+  ],
+  "git_commit": "66cb1e1c76d1b1d3d133fe6cb3896c95d48b5974",
+  "manifest_sha256": "5178f48f40f3d707783bbc1679f0c5148088c3e7de850cbcbcc6e15bdf3388f9",
+  "source": "Nabil-Ala/P2E_calibration@66cb1e1c76d1b1d3d133fe6cb3896c95d48b5974",
+  "summary": {
+    "all_dataset_shapes_verified": true,
+    "all_files_git_blob_verified": true,
+    "all_files_hash_verified": true,
+    "all_loader_outputs_verified": true,
+    "dataset_count": 3,
+    "file_count": 10,
+    "source_worktree_clean": true,
+    "total_dataset_rows": 10558,
+    "total_source_input_bytes": 1181454
+  }
+}
+
+````
+
+
+````output
+{"all_dataset_shapes_verified": true, "all_files_git_blob_verified": true, "all_files_hash_verified": true, "all_loader_outputs_verified": true, "dataset_count": 3, "file_count": 10, "source_worktree_clean": true, "total_dataset_rows": 10558, "total_source_input_bytes": 1181454}
+
+````

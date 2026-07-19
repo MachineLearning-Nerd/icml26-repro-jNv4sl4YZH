@@ -7,6 +7,16 @@ used for the conformal-aggregation study. Its `e-ccp/` tree contains the
 Boston, Abalone, and Parkinson/UPDRS inputs plus the 100-seed cross-conformal
 driver.
 
+The executable source and bundled CCP inputs are also pinned independently of
+the Git reference in `repro/configs/source_manifest.json`. The manifest records
+SHA-256, Git blob SHA-1, and byte size for all ten released files used to define
+or execute the CA/CCP protocols. Its verifier parses all three CSVs, checks
+10,558 data rows and their exact headers, then executes the pinned loader and
+requires the Boston, Abalone, and Parkinson arrays to have shapes `(506, 14)`,
+`(4177, 10)`, and `(5875, 13)` with finite values and exact loader configs. The
+final publication gate reruns this check and includes its hash-indexed audit in
+the public evidence bundle.
+
 The paper specifies `K=15` for Boston/Abalone and `K=20` for Parkinson in its
 reported CCP tables. The upstream driver exposes `K` as a local constant, so
 the reproduction runner will pass those values explicitly rather than silently

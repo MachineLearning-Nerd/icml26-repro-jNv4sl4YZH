@@ -315,6 +315,7 @@ def main() -> None:
     ) == 90
 
     commands = (
+        [sys.executable, "repro/src/verify_source_manifest.py", "--source", "upstream", "--output", "outputs/source_manifest_audit.json"],
         [sys.executable, "repro/src/verify_p2e_identity.py", "--output", "outputs/claim1_independent.json"],
         [sys.executable, "repro/src/crosscheck_source_p2e.py", "--source", "upstream", "--output", "outputs/claim1_source_crosscheck.json"],
         [sys.executable, "repro/src/verify_e_merge_coverage.py", "--output", "outputs/claim3_independent_e_merge.json"],
@@ -326,6 +327,26 @@ def main() -> None:
         [sys.executable, "-m", "unittest", "discover", "-s", "repro/tests", "-v"],
     )
     command_outputs = [run(command) for command in commands]
+
+    source_manifest = load_json("outputs/source_manifest_audit.json")
+    assert source_manifest["source"] == (
+        "Nabil-Ala/P2E_calibration@66cb1e1c76d1b1d3d133fe6cb3896c95d48b5974"
+    )
+    assert source_manifest["git_commit"] == SOURCE_COMMIT
+    assert source_manifest["manifest_sha256"] == sha256(
+        "repro/configs/source_manifest.json"
+    )
+    assert source_manifest["summary"] == {
+        "all_dataset_shapes_verified": True,
+        "all_files_git_blob_verified": True,
+        "all_files_hash_verified": True,
+        "all_loader_outputs_verified": True,
+        "dataset_count": 3,
+        "file_count": 10,
+        "source_worktree_clean": True,
+        "total_dataset_rows": 10_558,
+        "total_source_input_bytes": 1_181_454,
+    }
 
     claim1 = load_json("outputs/claim1_independent.json")
     assert_summary(
@@ -500,6 +521,7 @@ def main() -> None:
             "Exchangeable and randomized e-merge coverage certificate",
         ),
         ".trackio/logbook/pages/methods-source-audit/page.md": (
+            "Released source and dataset manifest audit",
             "Primary TeX table fixture audit",
             "WECA independent-tuning audit",
         ),
@@ -514,6 +536,7 @@ def main() -> None:
 
     hygiene = hygiene_gate()
     artifacts = (
+        "outputs/source_manifest_audit.json",
         "outputs/claim1_independent.json",
         "outputs/claim1_source_crosscheck.json",
         "outputs/claim2_independent.json",

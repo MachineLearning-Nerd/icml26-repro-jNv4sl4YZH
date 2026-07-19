@@ -1,0 +1,105 @@
+{
+  "source": "Nabil-Ala/P2E_calibration@66cb1e1c76d1b1d3d133fe6cb3896c95d48b5974",
+  "git_commit": "66cb1e1c76d1b1d3d133fe6cb3896c95d48b5974",
+  "files": [
+    {
+      "path": "e-ca/config.py",
+      "role": "CA paper-scale protocol",
+      "byte_size": 1676,
+      "sha256": "f4e7e7b174ce34a2dcb1a0b154a8f0f3adb7598d8d6328df2b62d0c2bbec34be",
+      "git_blob_sha1": "2a21927b019bc01fe22948d0416eeda700e6dc47"
+    },
+    {
+      "path": "e-ca/main.py",
+      "role": "CA released driver",
+      "byte_size": 7208,
+      "sha256": "eec7b936cc62ec3ee55e6e73bad3644da5bc0573ecee2423b1d5fe2a51f3e643",
+      "git_blob_sha1": "66e67d19550e9468c8aa90e309418d9cc02737d3"
+    },
+    {
+      "path": "e-ca/methods.py",
+      "role": "CA estimators and p-to-e methods",
+      "byte_size": 13479,
+      "sha256": "dda5d2429d4ca8c77be6a3b04bb3c159360bf3af58d1087a5f31cc17ea44cf86",
+      "git_blob_sha1": "b0a9b14cd964ae5bb412520cdd87f729779eb04b"
+    },
+    {
+      "path": "e-ca/utils.py",
+      "role": "CA OpenML loader and calibrators",
+      "byte_size": 4925,
+      "sha256": "7aa2daf12c176af1679a5553fe903d594bc721f1b8c5e231de5a1fd8fc26a82f",
+      "git_blob_sha1": "4468d16f02ed17f2147ebbf445fc96b726ba7fef"
+    },
+    {
+      "path": "e-ccp/data_loader.py",
+      "role": "CCP bundled-data loader",
+      "byte_size": 3710,
+      "sha256": "85a3425c010cba6c47218974d5aeea7a66d3af529ddea6caa81ba425191034bc",
+      "git_blob_sha1": "7a79954269b41c2dbde87ba62f2c71504bccb060"
+    },
+    {
+      "path": "e-ccp/eccp_utils.py",
+      "role": "CCP estimators and conformal methods",
+      "byte_size": 23016,
+      "sha256": "7ef06bed7bef7c72dae5f760cf0f0c2b4cf4318af44f87763ac8cc0ab0687593",
+      "git_blob_sha1": "8df647cd5548212157622abad5ba615a90acd780"
+    },
+    {
+      "path": "e-ccp/main.py",
+      "role": "CCP released driver and aggregation protocol",
+      "byte_size": 12051,
+      "sha256": "4bfabc2a937a633db3d95a70f76e961a5541319b332e1452617ca6f64a8a57d6",
+      "git_blob_sha1": "8593e1c48524128546ba1775985a9ecc170f3fe4"
+    },
+    {
+      "path": "e-ccp/datasets/Boston.csv",
+      "role": "CCP Boston input data",
+      "byte_size": 37658,
+      "sha256": "a73bba75b82b2ffea542da3752edb63ea583620842d09810f0780fa2e8da9011",
+      "git_blob_sha1": "8c2d22a1cd9f06135b9a2fe2a379630e1d1d60dd"
+    },
+    {
+      "path": "e-ccp/datasets/abalone.csv",
+      "role": "CCP Abalone input data",
+      "byte_size": 191968,
+      "sha256": "50126af5ea3554ef637579b40f120be68e26aaa1d354df1e1f0e90775f629b44",
+      "git_blob_sha1": "e6d25ff2909d2afe82f0c0f0529eed8a252f2fdc"
+    },
+    {
+      "path": "e-ccp/datasets/merged_dataset.csv",
+      "role": "CCP Parkinson input data",
+      "byte_size": 885763,
+      "sha256": "81d62a8862e5f2faaab2f07fbac5feef5afbf2864f4d49b68134fdc2ca13c618",
+      "git_blob_sha1": "1c10affe990d8bbbb9befb02c4d91453783d01ee"
+    }
+  ],
+  "datasets": {
+    "boston": {
+      "path": "e-ccp/datasets/Boston.csv",
+      "data_rows": 506,
+      "columns": 15,
+      "header": ["", "crim", "zn", "indus", "chas", "nox", "rm", "age", "dis", "rad", "tax", "ptratio", "black", "lstat", "medv"],
+      "loaded_feature_count": 14,
+      "target": "medv",
+      "loader_config": {"name": "Boston", "n_train": 400, "n_test": null, "K": 5, "alpha": 0.1, "lambda_": 0.01, "ntree": 200}
+    },
+    "abalone": {
+      "path": "e-ccp/datasets/abalone.csv",
+      "data_rows": 4177,
+      "columns": 9,
+      "header": ["Sex", "Length", "Diameter", "Height", "Whole_weight", "Shucked_weight", "Viscera_weight", "Shell_weight", "Rings"],
+      "loaded_feature_count": 10,
+      "target": "Rings",
+      "loader_config": {"name": "Abalone", "n_train": 4000, "n_test": null, "K": 10, "alpha": 0.1, "lambda_": 0.01, "ntree": 200}
+    },
+    "parkinson": {
+      "path": "e-ccp/datasets/merged_dataset.csv",
+      "data_rows": 5875,
+      "columns": 21,
+      "header": ["motor_UPDRS", "total_UPDRS", "age", "test_time", "Jitter(%)", "Jitter(Abs)", "Jitter:RAP", "Jitter:PPQ5", "Jitter:DDP", "Shimmer", "Shimmer(dB)", "Shimmer:APQ3", "Shimmer:APQ5", "Shimmer:APQ11", "Shimmer:DDA", "NHR", "HNR", "RPDE", "DFA", "PPE", "sex"],
+      "loaded_feature_count": 13,
+      "target": "total_UPDRS",
+      "loader_config": {"name": "Parkinsons_UPDRS", "n_train": 3000, "n_test": null, "K": 5, "alpha": 0.1, "lambda_": 0.01, "ntree": 200}
+    }
+  }
+}
