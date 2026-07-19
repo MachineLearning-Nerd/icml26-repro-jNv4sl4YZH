@@ -466,4 +466,5 @@ fixed after three CA tasks but before the final CA task and all CCP outputs.
   accepts the new OpenML certificate before rejecting the absent fourth CA
   output and emits neither manifest nor bundle. At `2026-07-19 21:43 IST`, the
   untouched CA worker remained compute-active at `97.9%` CPU and about `193 MB`
-  RSS; the handoffs and shared HF drain remained alive.
+  RSS; the handoffs and shared HF drain remained alive. The audit is committed
+  at `95f579b`; refreshed post-CCP watcher PID `3571647` owns the singleton lock.
