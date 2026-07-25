@@ -1,6 +1,6 @@
 # Evaluator-blind pre-publication review
 
-Status: `{{RED_TEAM_STATUS}}`
+Status: `PASS`
 
 This record is generated from a fresh candidate directory. The reviewer starts
 only at `README.md`, follows `#/current-overview`, then traverses the six
@@ -9,10 +9,17 @@ OpenResearch logs, dashboard artifacts, and unpublished branches are excluded.
 
 Files opened and conclusions are recorded in the downloadable
 [red-team JSON](https://huggingface.co/spaces/DineshAI/jNv4sl4YZH/resolve/main/evidence/current/release/red_team_review.json).
+The [final audit output](https://huggingface.co/spaces/DineshAI/jNv4sl4YZH/resolve/main/evidence/current/release/red_team_final.json)
+contains the exact traversal and fail-closed checks.
 
-First-pass missing items: `{{FIRST_PASS_MISSING}}`.
+First-pass missing item: the current overview did not link onward to the six
+claim pages, visibility matrix, release report, or this review. The navigation
+was repaired before the repeat.
 
-Repeat-pass result after fixes: `{{REPEAT_PASS_RESULT}}`.
+Repeat-pass result after fixes: all 11 canonical pages were reachable from
+`README.md`; all six visibility rows were complete; the judged 23-file tree
+remained a subset; historical claim and static content was unchanged; no
+placeholder, secret-like content, or missing evidence item was found.
 
 The review treats any undiscoverable code, raw data, checker, control,
 assumption, limitation, seed, command, environment, SHA, CPU allocation, or

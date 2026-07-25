@@ -139,6 +139,7 @@ set of unrelated branches.
 | [Claim 3](https://github.com/MachineLearning-Nerd/icml26-repro-jNv4sl4YZH/tree/orx/claim-3-analytic-and-full-scale-aon-verification) | Analytic properties and direct AoN comparison | `56ed828` | `ad831d30` | VERIFIED |
 | [Claim 4](https://github.com/MachineLearning-Nerd/icml26-repro-jNv4sl4YZH/tree/orx/claim-4-eccp-universal-mechanism-and-full-protoc) | Universal ECCP mechanism and full protocol | `3211d65` | `7aebe226` | VERIFIED |
 | [Claim 5](https://github.com/MachineLearning-Nerd/icml26-repro-jNv4sl4YZH/tree/orx/claim-5-data-dependent-weca-full-protocol) | Data-dependent weight audit and full protocol | `f218228` | `edbed16d` | VERIFIED |
+| [Cumulative release science](https://github.com/MachineLearning-Nerd/icml26-repro-jNv4sl4YZH/tree/orx/evaluator-visible-cumulative-release-candidate) | Six-claim regression and evaluator-visible artifacts | `23c37c4` | `1811c6e7` | 25/25 commands; 44/44 tests |
 
 All formal runs used the exact command shown above on Hugging Face
 `cpu-upgrade`. The passing scientific stages each used the platform’s 64-vCPU

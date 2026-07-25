@@ -1,0 +1,34 @@
+{
+  "candidate_path_count": 112,
+  "canonical_entrypoint": "README.md",
+  "claim_pages_checked": 6,
+  "failures": [],
+  "historical_path_count": 23,
+  "historical_path_subset": true,
+  "immutable_historical_content_unchanged": true,
+  "navigation_files_superseded": [
+    "README.md",
+    "logbook.json",
+    "pages/index.md"
+  ],
+  "opened_file_count": 11,
+  "opened_files": [
+    "README.md",
+    "pages/current-overview/page.md",
+    "pages/current-claim-1/page.md",
+    "pages/current-claim-2/page.md",
+    "pages/current-claim-3/page.md",
+    "pages/current-claim-4/page.md",
+    "pages/current-claim-5/page.md",
+    "pages/current-claim-6/page.md",
+    "pages/visibility-matrix/page.md",
+    "pages/release-report/page.md",
+    "pages/red-team-review/page.md"
+  ],
+  "placeholders": [],
+  "secret_hits": [],
+  "status": "PASS",
+  "text_files_scanned": 109,
+  "visibility_rows_complete": 6,
+  "warnings": []
+}

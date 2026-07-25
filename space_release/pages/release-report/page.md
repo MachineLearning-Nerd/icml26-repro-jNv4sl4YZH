@@ -25,9 +25,10 @@ public GitHub `main` branch to the identical release content.
 
 ## Compute and provenance
 
-All formal work used Hugging Face `cpu-upgrade`, never GPU. The release run is
-`{{FINAL_RUN_ID}}` at Git SHA `{{FINAL_SHA}}`, estimate 8 useful CPU cores,
-actual allocation 64 CPUs, campaign runtime `{{FINAL_RUNTIME}}` seconds.
+All formal work used Hugging Face `cpu-upgrade`, never GPU. The cumulative
+science release run is `1811c6e7-901f-4cb1-9a24-0ea0891b8717` at Git SHA
+`23c37c41627a5d2e4f55553726a8af2a8f1b97ba`, estimate 8 useful CPU cores,
+actual allocation 64 CPUs, campaign runtime `76.700822` seconds.
 The exact command was `uv run --frozen python repro/src/run_campaign.py`.
 
 The judged Space revision and its historical 23-file tree were downloaded

@@ -17,9 +17,9 @@ every value strictly positive. Across 11,700 CCP rows, P2E is strictly shorter
 than AoN in 9/9 dataset–model comparisons; minimum relative reduction
 `0.178669%`.
 
-**Run provenance.** Cumulative HF `cpu-upgrade` run `{{FINAL_RUN_ID}}`,
-Git SHA `{{FINAL_SHA}}`; estimated useful cores 8, actual allocation 64,
-campaign runtime `{{FINAL_RUNTIME}}` seconds. Fixed command:
+**Run provenance.** Cumulative HF `cpu-upgrade` run `1811c6e7-901f-4cb1-9a24-0ea0891b8717`,
+Git SHA `23c37c41627a5d2e4f55553726a8af2a8f1b97ba`; estimated useful cores 8, actual allocation 64,
+campaign runtime `76.700822` seconds. Fixed command:
 `uv run --frozen python repro/src/run_campaign.py`; one repository `.venv`,
 Python `==3.12.*`, exact `uv.lock`; 100 seeds per empirical cell.
 

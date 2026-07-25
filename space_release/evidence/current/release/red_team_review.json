@@ -1,5 +1,5 @@
 {
-  "status": "PENDING_FINAL_REPEAT",
+  "status": "PASS",
   "canonical_entrypoint": "README.md",
   "first_pass": {
     "candidate_files": 108,
@@ -15,9 +15,17 @@
   "navigation_fixed_pass": {
     "opened_file_count": 11,
     "all_current_pages_reachable": true,
-    "remaining_release_items": [
-      "Insert exact final cumulative run id, Git SHA, CPU allocation, and runtime.",
-      "Repeat the fresh-download audit without allowing placeholders."
-    ]
+    "remaining_release_items": []
+  },
+  "final_repeat": {
+    "entrypoint": "README.md",
+    "opened_file_count": 11,
+    "all_current_pages_reachable": true,
+    "all_visibility_rows_complete": true,
+    "historical_path_subset": true,
+    "immutable_historical_content_unchanged": true,
+    "unresolved_placeholders": 0,
+    "secret_hits": 0,
+    "result_file": "evidence/current/release/red_team_final.json"
   }
 }

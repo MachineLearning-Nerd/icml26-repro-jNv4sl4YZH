@@ -17,9 +17,9 @@ WECA/UR-WECA comparisons, minimum relative reduction `40.302%`, coverage 8/8.
 ECCP: 11,700/11,700 rows, P2E strictly shorter in 36/36 comparisons including
 AoN 9/9, minimum classical reduction `23.664%`, coverage 9/9.
 
-**Run provenance.** Cumulative HF `cpu-upgrade` run `{{FINAL_RUN_ID}}`,
-Git SHA `{{FINAL_SHA}}`; estimated useful cores 8, actual allocation 64,
-campaign runtime `{{FINAL_RUNTIME}}` seconds. Fixed command:
+**Run provenance.** Cumulative HF `cpu-upgrade` run `1811c6e7-901f-4cb1-9a24-0ea0891b8717`,
+Git SHA `23c37c41627a5d2e4f55553726a8af2a8f1b97ba`; estimated useful cores 8, actual allocation 64,
+campaign runtime `76.700822` seconds. Fixed command:
 `uv run --frozen python repro/src/run_campaign.py`; one repository `.venv`,
 Python `==3.12.*`, exact `uv.lock`. CA uses 20 seeds; CCP uses 100.
 
