@@ -91,7 +91,10 @@ TEXT_SUFFIXES = {
     "", ".cfg", ".csv", ".gitignore", ".ini", ".json", ".md", ".py",
     ".sh", ".toml", ".txt", ".yaml", ".yml",
 }
-SKIP_PARTS = {".git", ".venv", "__pycache__"}
+# ``.agents`` is injected by the OpenResearch harness and is never part of the
+# repository or publication candidate.  Do not confuse its compute-skill
+# documentation (which names credential environment variables) with evidence.
+SKIP_PARTS = {".agents", ".git", ".venv", "__pycache__"}
 SECRET_PATTERNS = (
     re.compile("hf" + r"_[A-Za-z0-9]{20,}"),
     re.compile("gh" + r"[pousr]_[A-Za-z0-9]{20,}"),
