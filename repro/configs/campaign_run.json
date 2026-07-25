@@ -1,0 +1,7 @@
+{
+  "stage": "judged_baseline",
+  "estimated_required_cores": 8,
+  "selected_backend": "hf",
+  "selected_flavor": "cpu-upgrade",
+  "extra_commands": []
+}
