@@ -1,0 +1,12 @@
+{
+  "classic_calibrator_inflation_cases": 18,
+  "classic_calibrators": [
+    "log",
+    "sqrt",
+    "linear"
+  ],
+  "all_classic_controls_inflate_sets": true,
+  "excluded_domain_controls": 5,
+  "all_excluded_domain_controls_rejected": true,
+  "tampered_membership_checker_exit_nonzero": true
+}

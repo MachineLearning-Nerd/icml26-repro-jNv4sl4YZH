@@ -1,0 +1,19 @@
+{
+  "claim": 4,
+  "exact_statement": "Under Proposition 4.1 assumptions, ECCP has finite-sample coverage at least 1-alpha; the named standard CCP variants only carry an approximate 1-2alpha lower bound.",
+  "paper_anchor": "arXiv:2606.03600v1, Proposition prop:ECCP and Equation eq:ccpbound",
+  "assumptions": [
+    "test point is exchangeable with the data",
+    "each fold conformal P2E output is an e-variable",
+    "U is independent uniform for randomized ECCP",
+    "fold-wise e-values are additionally exchangeable for the prefix variants"
+  ],
+  "interpretation": "exact means a finite-sample >=1-alpha guarantee, not equality of empirical coverage",
+  "success_criteria": [
+    "universal proof certificate independent of finite enumeration",
+    "all released 11,700 CCP rows present",
+    "nine 100-seed ECCP coverage cells within predeclared 0.02 tolerance",
+    "invalid scaling and dependence controls rejected"
+  ],
+  "verdict": "VERIFIED"
+}

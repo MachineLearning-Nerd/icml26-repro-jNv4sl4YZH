@@ -1,0 +1,19 @@
+{
+  "claim": 6,
+  "exact_statement": "At the released Section 5 protocols, P2E aggregation produces smaller prediction sets than the named p-to-e baselines while empirical coverage remains within the predeclared absolute shortfall tolerance.",
+  "paper_anchor": "arXiv:2606.03600v1, Section 5 experiment tables",
+  "assumptions": [
+    "the complete released CA protocol has four OpenML tasks and 20 seeds",
+    "the complete released CCP protocol has three datasets, three models, and 100 seeds",
+    "formula-faithful log, square-root, and linear calibrators are used despite the released CCP column-label drift",
+    "coverage is an empirical sanity result, while finite-sample validity is established separately in Claims 4 and 5"
+  ],
+  "success_criteria": [
+    "exactly 1,920 CA rows and 11,700 CCP rows",
+    "P2E shorter in 24/24 CA comparisons",
+    "P2E strictly shorter in 36/36 CCP comparisons including 9/9 AoN",
+    "all eight CA and nine ECCP coverage cells pass the predeclared tolerance",
+    "independent checker and negative controls pass"
+  ],
+  "verdict": "VERIFIED"
+}

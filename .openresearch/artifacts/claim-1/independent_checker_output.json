@@ -1,0 +1,10 @@
+{
+  "cleanroom_cells_checked": 18,
+  "failures": [],
+  "maximum_expectation_abs_error": 4.440892098500626e-16,
+  "membership_mismatches": 0,
+  "negative_controls_checked": 23,
+  "source_cells_checked": 18,
+  "status": "PASS",
+  "verdict_checked": "VERIFIED"
+}

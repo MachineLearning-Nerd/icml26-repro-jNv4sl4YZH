@@ -1,0 +1,162 @@
+{
+  "actual_process_parallelism": 1,
+  "corrected_theorem": {
+    "paper_proof_itself_concludes_only_positive_intervals": true,
+    "statement": "Every left-continuous set-preserving calibrator equals F_AoN on (0,1]; its value at 0 is not identified beyond monotonicity.",
+    "symbolic_steps": [
+      "set preservation plus left continuity forces F(alpha)=1/alpha",
+      "monotonicity forces F(p)>=1/alpha on (0,alpha]",
+      "that interval consumes the full integral budget alpha*(1/alpha)=1",
+      "nonnegativity forces F=0 almost everywhere on (alpha,1]",
+      "monotonicity and left continuity upgrade both a.e. statements pointwise",
+      "no step constrains F(0) to equal 1/alpha"
+    ]
+  },
+  "counterexample": {
+    "contradicts_uniqueness": true,
+    "definition": "F*(0)=infinity; F*(p)=1/alpha for 0<p<=alpha; F*(p)=0 for alpha<p<=1",
+    "satisfies_every_printed_assumption": true,
+    "works_for_every_alpha_in_(0,1)": true
+  },
+  "deterministic_seed": null,
+  "estimated_required_cores": 1,
+  "finite_exact_cross_checks": [
+    {
+      "alpha": "1/100",
+      "candidate_differs_from_aon_at_zero": true,
+      "candidate_equals_aon_at_every_positive_grid_point": true,
+      "candidate_is_decreasing_on_complete_1_over_300_grid": true,
+      "conformal_membership_mismatches_n_1_through_500": 0,
+      "conformal_support_points_checked": 125750,
+      "exact_integral": "1",
+      "integral_ignores_single_endpoint": true,
+      "left_continuity_at_zero_is_vacuous_on_domain_[0,1]": true,
+      "left_continuous_at_every_positive_breakpoint": true
+    },
+    {
+      "alpha": "1/20",
+      "candidate_differs_from_aon_at_zero": true,
+      "candidate_equals_aon_at_every_positive_grid_point": true,
+      "candidate_is_decreasing_on_complete_1_over_300_grid": true,
+      "conformal_membership_mismatches_n_1_through_500": 0,
+      "conformal_support_points_checked": 125750,
+      "exact_integral": "1",
+      "integral_ignores_single_endpoint": true,
+      "left_continuity_at_zero_is_vacuous_on_domain_[0,1]": true,
+      "left_continuous_at_every_positive_breakpoint": true
+    },
+    {
+      "alpha": "1/10",
+      "candidate_differs_from_aon_at_zero": true,
+      "candidate_equals_aon_at_every_positive_grid_point": true,
+      "candidate_is_decreasing_on_complete_1_over_300_grid": true,
+      "conformal_membership_mismatches_n_1_through_500": 0,
+      "conformal_support_points_checked": 125750,
+      "exact_integral": "1",
+      "integral_ignores_single_endpoint": true,
+      "left_continuity_at_zero_is_vacuous_on_domain_[0,1]": true,
+      "left_continuous_at_every_positive_breakpoint": true
+    },
+    {
+      "alpha": "1/5",
+      "candidate_differs_from_aon_at_zero": true,
+      "candidate_equals_aon_at_every_positive_grid_point": true,
+      "candidate_is_decreasing_on_complete_1_over_300_grid": true,
+      "conformal_membership_mismatches_n_1_through_500": 0,
+      "conformal_support_points_checked": 125750,
+      "exact_integral": "1",
+      "integral_ignores_single_endpoint": true,
+      "left_continuity_at_zero_is_vacuous_on_domain_[0,1]": true,
+      "left_continuous_at_every_positive_breakpoint": true
+    },
+    {
+      "alpha": "1/3",
+      "candidate_differs_from_aon_at_zero": true,
+      "candidate_equals_aon_at_every_positive_grid_point": true,
+      "candidate_is_decreasing_on_complete_1_over_300_grid": true,
+      "conformal_membership_mismatches_n_1_through_500": 0,
+      "conformal_support_points_checked": 125750,
+      "exact_integral": "1",
+      "integral_ignores_single_endpoint": true,
+      "left_continuity_at_zero_is_vacuous_on_domain_[0,1]": true,
+      "left_continuous_at_every_positive_breakpoint": true
+    },
+    {
+      "alpha": "1/2",
+      "candidate_differs_from_aon_at_zero": true,
+      "candidate_equals_aon_at_every_positive_grid_point": true,
+      "candidate_is_decreasing_on_complete_1_over_300_grid": true,
+      "conformal_membership_mismatches_n_1_through_500": 0,
+      "conformal_support_points_checked": 125750,
+      "exact_integral": "1",
+      "integral_ignores_single_endpoint": true,
+      "left_continuity_at_zero_is_vacuous_on_domain_[0,1]": true,
+      "left_continuous_at_every_positive_breakpoint": true
+    },
+    {
+      "alpha": "9/10",
+      "candidate_differs_from_aon_at_zero": true,
+      "candidate_equals_aon_at_every_positive_grid_point": true,
+      "candidate_is_decreasing_on_complete_1_over_300_grid": true,
+      "conformal_membership_mismatches_n_1_through_500": 0,
+      "conformal_support_points_checked": 125750,
+      "exact_integral": "1",
+      "integral_ignores_single_endpoint": true,
+      "left_continuity_at_zero_is_vacuous_on_domain_[0,1]": true,
+      "left_continuous_at_every_positive_breakpoint": true
+    }
+  ],
+  "limitations": [
+    "This falsifies the proposition literally on [0,1], not its corrected form on (0,1].",
+    "The operational conformal conclusion is unchanged because conformal p-values are positive.",
+    "Finite grids are regression checks only; the contradiction is the symbolic endpoint construction."
+  ],
+  "literal_claim": "Among all left-continuous p-to-e calibrators F:[0,1]->[0,infinity], only F_AoN is set-preserving at fixed alpha in (0,1).",
+  "negative_controls": {
+    "low_endpoint_control": {
+      "decreasing_condition_at_zero": false,
+      "rejected_for_nonmonotonicity": true
+    },
+    "positive_interval_inflation": {
+      "calibrator_budget_rejected": true,
+      "integral": "101/100"
+    },
+    "shifted_jump_control": {
+      "n": 99,
+      "rejected_for_set_mismatch": true,
+      "set_membership_matches": false,
+      "witness_p": "1/10"
+    }
+  },
+  "negative_controls_pass": true,
+  "non_circularity": {
+    "counterexample_endpoint_is_inside_printed_domain": true,
+    "counterexample_endpoint_is_never_in_conformal_support": true,
+    "finite_sweep_is_not_the_proof": true,
+    "formula_derived_budget_used_as_empirical_evidence": false,
+    "universal_counterexample_is_symbolic": true
+  },
+  "paper_source": {
+    "anchors": {
+      "definition": "main.tex:342-362 (section sec:ptoe_cp)",
+      "integral_characterization": "main.tex:1165-1173 (prop:ptoe_carac)",
+      "proof": "main.tex:1182-1226 (proof of Proposition 2.3)",
+      "proposition": "main.tex:372-375 (prop:only_aon_set_preserving)"
+    },
+    "archive_sha256": "f5124c39036b9107b01439fdbeb5da82331a70b81a3211e3b36887e08109a2db",
+    "main_tex_sha256": "49058ff8e986f43770936c09cc97360e5cace8802c6304a80d9e153d342ae857",
+    "retrieved_utc": "2026-07-25T06:41:06Z",
+    "url": "https://export.arxiv.org/e-print/2606.03600v1"
+  },
+  "primary_reference": {
+    "anchor": "Proposition 2.1, PDF pp. 3-4: decreasing f:[0,1]->[0,infinity] is a calibrator iff integral_0^1 f <= 1; admissibility explicitly requires f(0)=infinity; upper semicontinuity is called equivalent to left-continuity in this monotone class.",
+    "authors": "Vladimir Vovk and Ruodu Wang",
+    "doi": "10.1214/20-AOS2020",
+    "retrieved_utc": "2026-07-25",
+    "sha256": "59a4d93c7465d0acaee06a0d30b5b7d9a95bf999579685502245c69632244a9e",
+    "title": "E-values: Calibration, combination, and applications",
+    "url": "https://pure.royalholloway.ac.uk/ws/portalfiles/portal/39179068/Accepted_Manuscript.pdf"
+  },
+  "runtime_seconds": 1.9475951249996797,
+  "verdict": "FALSIFIED"
+}

@@ -1,0 +1,211 @@
+{
+  "rows": [
+    {
+      "alpha": 0.1,
+      "cleanroom_set_mismatches": 0,
+      "n_calibration": 10,
+      "source_C": 68.11548520237208,
+      "source_float_underflow_count": 0,
+      "source_mean_e": 1.0000000000000002,
+      "source_s": 0.14500000000000002,
+      "source_set_mismatches": 0,
+      "theorem_domain_verified": true
+    },
+    {
+      "alpha": 0.2,
+      "cleanroom_set_mismatches": 0,
+      "n_calibration": 10,
+      "source_C": 70.2132429606004,
+      "source_float_underflow_count": 0,
+      "source_mean_e": 0.9999999999999999,
+      "source_s": 0.24,
+      "source_set_mismatches": 0,
+      "theorem_domain_verified": true
+    },
+    {
+      "alpha": 0.05,
+      "cleanroom_set_mismatches": 0,
+      "n_calibration": 20,
+      "source_C": 153.1638207934431,
+      "source_float_underflow_count": 0,
+      "source_mean_e": 0.9999999999999998,
+      "source_s": 0.07488095238095238,
+      "source_set_mismatches": 0,
+      "theorem_domain_verified": true
+    },
+    {
+      "alpha": 0.1,
+      "cleanroom_set_mismatches": 0,
+      "n_calibration": 20,
+      "source_C": 148.9403555297182,
+      "source_float_underflow_count": 0,
+      "source_mean_e": 1.0,
+      "source_s": 0.12357142857142858,
+      "source_set_mismatches": 0,
+      "theorem_domain_verified": true
+    },
+    {
+      "alpha": 0.2,
+      "cleanroom_set_mismatches": 0,
+      "n_calibration": 20,
+      "source_C": 158.63182229120778,
+      "source_float_underflow_count": 0,
+      "source_mean_e": 0.9999999999999998,
+      "source_s": 0.22095238095238096,
+      "source_set_mismatches": 0,
+      "theorem_domain_verified": true
+    },
+    {
+      "alpha": 0.05,
+      "cleanroom_set_mismatches": 0,
+      "n_calibration": 30,
+      "source_C": 171.33773647550407,
+      "source_float_underflow_count": 0,
+      "source_mean_e": 0.9999999999999998,
+      "source_s": 0.057983870967741935,
+      "source_set_mismatches": 0,
+      "theorem_domain_verified": true
+    },
+    {
+      "alpha": 0.1,
+      "cleanroom_set_mismatches": 0,
+      "n_calibration": 30,
+      "source_C": 238.19898753142024,
+      "source_float_underflow_count": 0,
+      "source_mean_e": 1.0,
+      "source_s": 0.11596774193548387,
+      "source_set_mismatches": 0,
+      "theorem_domain_verified": true
+    },
+    {
+      "alpha": 0.2,
+      "cleanroom_set_mismatches": 0,
+      "n_calibration": 30,
+      "source_C": 257.23510240678536,
+      "source_float_underflow_count": 0,
+      "source_mean_e": 0.9999999999999999,
+      "source_s": 0.2141935483870968,
+      "source_set_mismatches": 0,
+      "theorem_domain_verified": true
+    },
+    {
+      "alpha": 0.05,
+      "cleanroom_set_mismatches": 0,
+      "n_calibration": 40,
+      "source_C": 332.368003712594,
+      "source_float_underflow_count": 0,
+      "source_mean_e": 1.0000000000000002,
+      "source_s": 0.06274390243902439,
+      "source_set_mismatches": 0,
+      "theorem_domain_verified": true
+    },
+    {
+      "alpha": 0.05,
+      "cleanroom_set_mismatches": 0,
+      "n_calibration": 50,
+      "source_C": 368.68323974534627,
+      "source_float_underflow_count": 0,
+      "source_mean_e": 1.0,
+      "source_s": 0.05485294117647059,
+      "source_set_mismatches": 0,
+      "theorem_domain_verified": true
+    },
+    {
+      "alpha": 0.1,
+      "cleanroom_set_mismatches": 0,
+      "n_calibration": 50,
+      "source_C": 432.899874439994,
+      "source_float_underflow_count": 0,
+      "source_mean_e": 0.9999999999999999,
+      "source_s": 0.10970588235294118,
+      "source_set_mismatches": 0,
+      "theorem_domain_verified": true
+    },
+    {
+      "alpha": 0.2,
+      "cleanroom_set_mismatches": 0,
+      "n_calibration": 50,
+      "source_C": 473.6657222193878,
+      "source_float_underflow_count": 0,
+      "source_mean_e": 1.0,
+      "source_s": 0.20862745098039218,
+      "source_set_mismatches": 0,
+      "theorem_domain_verified": true
+    },
+    {
+      "alpha": 0.05,
+      "cleanroom_set_mismatches": 0,
+      "n_calibration": 100,
+      "source_C": 949.3460610436144,
+      "source_float_underflow_count": 17,
+      "source_mean_e": 1.0000000000000002,
+      "source_s": 0.05517326732673268,
+      "source_set_mismatches": 0,
+      "theorem_domain_verified": true
+    },
+    {
+      "alpha": 0.1,
+      "cleanroom_set_mismatches": 0,
+      "n_calibration": 100,
+      "source_C": 976.466583244924,
+      "source_float_underflow_count": 14,
+      "source_mean_e": 0.9999999999999997,
+      "source_s": 0.10490099009900991,
+      "source_set_mismatches": 0,
+      "theorem_domain_verified": true
+    },
+    {
+      "alpha": 0.2,
+      "cleanroom_set_mismatches": 0,
+      "n_calibration": 100,
+      "source_C": 1081.133680479836,
+      "source_float_underflow_count": 11,
+      "source_mean_e": 1.0000000000000002,
+      "source_s": 0.20435643564356437,
+      "source_set_mismatches": 0,
+      "theorem_domain_verified": true
+    },
+    {
+      "alpha": 0.05,
+      "cleanroom_set_mismatches": 0,
+      "n_calibration": 200,
+      "source_C": 2111.583645546632,
+      "source_float_underflow_count": 120,
+      "source_mean_e": 1.0000000000000002,
+      "source_s": 0.05259950248756219,
+      "source_set_mismatches": 0,
+      "theorem_domain_verified": true
+    },
+    {
+      "alpha": 0.1,
+      "cleanroom_set_mismatches": 0,
+      "n_calibration": 200,
+      "source_C": 2195.949372184457,
+      "source_float_underflow_count": 113,
+      "source_mean_e": 1.0,
+      "source_s": 0.10246268656716419,
+      "source_set_mismatches": 0,
+      "theorem_domain_verified": true
+    },
+    {
+      "alpha": 0.2,
+      "cleanroom_set_mismatches": 0,
+      "n_calibration": 200,
+      "source_C": 2448.5110038263592,
+      "source_float_underflow_count": 100,
+      "source_mean_e": 1.0000000000000002,
+      "source_s": 0.20218905472636817,
+      "source_set_mismatches": 0,
+      "theorem_domain_verified": true
+    }
+  ],
+  "source": "upstream",
+  "summary": {
+    "all_cleanroom_membership_pass": true,
+    "all_source_expectations_pass": true,
+    "all_source_membership_pass": true,
+    "all_theorem_domain_verified": true,
+    "rows": 18,
+    "underflow_is_documented": true
+  }
+}

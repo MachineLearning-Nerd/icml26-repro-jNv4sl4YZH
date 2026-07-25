@@ -1,0 +1,20 @@
+{
+  "claim": 1,
+  "exact_statement": "For every conformal p-value on the stated finite-rank theorem domain, the P2E conversion is set-preserving: p > alpha if and only if F(p) < 1/alpha.",
+  "paper_anchor": "arXiv:2606.03600v1, Section 2.1, Definition 2.2 and Theorem 2.6",
+  "assumptions": [
+    "p is supported on the conformal rank grid {1/(n+1), ..., 1}",
+    "alpha(n+1) > 1",
+    "alpha(n+1) is non-integral",
+    "the exact mean-one positive sigmoid construction is used"
+  ],
+  "success_criteria": [
+    "zero membership mismatches in all 18 predeclared theorem-domain cells",
+    "zero threshold-identity error",
+    "expectation error below 1e-11",
+    "author-source cross-check passes independently",
+    "five excluded-domain inputs are rejected",
+    "classic log, square-root, and linear controls inflate sets"
+  ],
+  "verdict": "VERIFIED"
+}

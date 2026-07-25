@@ -1,0 +1,21 @@
+[project]
+name = "icml26-repro-jnv4sl4yzh"
+version = "0.1.0"
+description = "Claim-by-claim reproduction of Set-Preserving Calibration from Conformal P-Values to E-Values"
+readme = "README.md"
+requires-python = "==3.12.*"
+dependencies = [
+  "huggingface-hub>=1.4,<2",
+  "jupyter==1.1.1",
+  "marimo>=0.16,<1",
+  "matplotlib==3.11.1",
+  "numpy==2.5.1",
+  "openml==0.15.1",
+  "pandas==2.3.3",
+  "scikit-learn==1.9.0",
+  "scipy==1.18.0",
+  "tqdm==4.69.0",
+]
+
+[tool.uv]
+package = false

@@ -1,0 +1,9 @@
+{
+  "ca_comparisons_checked": 24,
+  "ca_rows_checked": 1920,
+  "eccp_comparisons_checked": 36,
+  "eccp_rows_checked": 11700,
+  "failures": [],
+  "status": "PASS",
+  "verdict_checked": "VERIFIED"
+}

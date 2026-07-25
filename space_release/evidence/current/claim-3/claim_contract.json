@@ -1,0 +1,17 @@
+{
+  "claim": 3,
+  "exact_statement": "The sigmoid P2E calibrator is exact, smooth, invertible, strictly positive, and dominates all-or-nothing in aggregation settings.",
+  "paper_anchor": "arXiv:2606.03600v1, Theorem 2.6 (main_theorem), Equation final_evalue, Equation equation:FAon_larger",
+  "assumptions": [
+    "P_n is the conformal p-variable",
+    "alpha*(n+1)>1 and is not an integer",
+    "s is strictly between alpha and ceil(alpha*(n+1))/(n+1)",
+    "C_{n,alpha}>0 is the exactness root"
+  ],
+  "success_criteria": {
+    "analytic": "derive and check strict negative derivative, explicit inverse, positivity, exact discrete expectation, and pointwise AoN dominance",
+    "empirical": "directly compare P2E and AoN on every released full-scale CCP dataset-model cell",
+    "scope": "do not turn theorem subset inclusion into universal strict set-size reduction"
+  },
+  "verdict": "VERIFIED"
+}

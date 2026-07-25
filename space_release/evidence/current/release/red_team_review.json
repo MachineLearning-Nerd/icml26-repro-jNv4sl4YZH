@@ -1,0 +1,23 @@
+{
+  "status": "PENDING_FINAL_REPEAT",
+  "canonical_entrypoint": "README.md",
+  "first_pass": {
+    "candidate_files": 108,
+    "opened_files": [
+      "README.md",
+      "pages/current-overview/page.md"
+    ],
+    "missing": [
+      "Current overview did not link onward to the six current claim pages, visibility matrix, release report, or red-team record."
+    ],
+    "audit_implementation_issue_fixed": "The absolute-link parser incorrectly treated the letter s as whitespace; this was a reviewer-tool defect, not a candidate defect."
+  },
+  "navigation_fixed_pass": {
+    "opened_file_count": 11,
+    "all_current_pages_reachable": true,
+    "remaining_release_items": [
+      "Insert exact final cumulative run id, Git SHA, CPU allocation, and runtime.",
+      "Repeat the fresh-download audit without allowing placeholders."
+    ]
+  }
+}

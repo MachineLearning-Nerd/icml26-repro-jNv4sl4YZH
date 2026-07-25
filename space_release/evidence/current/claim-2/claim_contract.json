@@ -1,0 +1,17 @@
+{
+  "claim": 2,
+  "domain": "F:[0,1]->[0,infinity] at fixed alpha in (0,1)",
+  "exact_statement": "Among all left-continuous p-to-e calibrators, only F_AoN is set-preserving.",
+  "paper_anchor": "arXiv:2606.03600v1, Proposition 2.3, label prop:only_aon_set_preserving",
+  "printed_assumptions": [
+    "F is decreasing",
+    "F maps [0,1] to [0,infinity]",
+    "F is a p-to-e calibrator",
+    "F is left-continuous",
+    "F is set-preserving for every n and every nonconformity score"
+  ],
+  "quantifier": "universal over all such F",
+  "success_criterion": "FALSIFIED only if one explicit F satisfies every printed assumption and differs from F_AoN somewhere in [0,1]",
+  "verdict": "FALSIFIED",
+  "witness": "F*(0)=infinity and F*(p)=F_AoN(p) for every p in (0,1]"
+}

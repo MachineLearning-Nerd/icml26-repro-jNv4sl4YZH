@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "title": "Repro - Set-Preserving Calibration from Conformal P-Values to E-Values",
+  "emoji": "🎯",
+  "space_id": "DineshAI/jNv4sl4YZH",
+  "paper": {
+    "arxiv_id": "2606.03600",
+    "openreview_id": "jNv4sl4YZH"
+  },
+  "tags": [
+    "icml2026-repro",
+    "paper-jNv4sl4YZH"
+  ],
+  "updated_at": "2026-07-21T08:08:46+00:00",
+  "root": {
+    "slug": "index",
+    "title": "Repro - Set-Preserving Calibration from Conformal P-Values to E-Values",
+    "file": "pages/index.md",
+    "children": [
+      {
+        "slug": "claim-1",
+        "title": "Claim 1",
+        "file": "pages/claim-1/page.md",
+        "children": []
+      },
+      {
+        "slug": "claim-2",
+        "title": "Claim 2",
+        "file": "pages/claim-2/page.md",
+        "children": []
+      },
+      {
+        "slug": "claim-3",
+        "title": "Claim 3",
+        "file": "pages/claim-3/page.md",
+        "children": []
+      },
+      {
+        "slug": "methods-source-audit",
+        "title": "Methods & source audit",
+        "file": "pages/methods-source-audit/page.md",
+        "children": []
+      },
+      {
+        "slug": "negative-controls",
+        "title": "Negative controls",
+        "file": "pages/negative-controls/page.md",
+        "children": []
+      },
+      {
+        "slug": "conclusion",
+        "title": "Conclusion",
+        "file": "pages/conclusion/page.md",
+        "children": []
+      },
+      {
+        "slug": "overview",
+        "title": "Overview",
+        "file": "pages/overview/page.md",
+        "children": []
+      },
+      {
+        "slug": "claim-4",
+        "title": "Claim 4",
+        "file": "pages/claim-4/page.md",
+        "children": []
+      },
+      {
+        "slug": "claim-5",
+        "title": "Claim 5",
+        "file": "pages/claim-5/page.md",
+        "children": []
+      },
+      {
+        "slug": "claim-6",
+        "title": "Claim 6",
+        "file": "pages/claim-6/page.md",
+        "children": []
+      }
+    ]
+  },
+  "agent_view_tokens": 16715,
+  "revision": "1784621326715025390"
+}

@@ -1,0 +1,6 @@
+{
+  "all_pass": true,
+  "coverage_tolerance_cannot_be_vacuous": true,
+  "missing_cell_contract_is_fail_closed": true,
+  "reversed_efficiency_rule_would_fail": true
+}

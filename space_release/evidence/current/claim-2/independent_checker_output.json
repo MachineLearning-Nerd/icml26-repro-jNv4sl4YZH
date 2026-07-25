@@ -1,0 +1,7 @@
+{
+  "checked_alpha_rows": 7,
+  "checker_is_independent_of_verifier_implementation": true,
+  "failures": [],
+  "status": "PASS",
+  "verdict_checked": "FALSIFIED"
+}

@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "title": "Repro - Set-Preserving Calibration from Conformal P-Values to E-Values",
+  "emoji": "🎯",
+  "space_id": "DineshAI/jNv4sl4YZH",
+  "paper": {
+    "arxiv_id": "2606.03600",
+    "openreview_id": "jNv4sl4YZH"
+  },
+  "tags": [
+    "icml2026-repro",
+    "paper-jNv4sl4YZH"
+  ],
+  "updated_at": "2026-07-25T00:00:00+00:00",
+  "root": {
+    "slug": "index",
+    "title": "Current verification — Set-Preserving P2E Calibration",
+    "file": "pages/index.md",
+    "children": [
+      {"slug": "current-overview", "title": "Current overview", "file": "pages/current-overview/page.md", "children": []},
+      {"slug": "current-claim-1", "title": "Current Claim 1 — VERIFIED", "file": "pages/current-claim-1/page.md", "children": []},
+      {"slug": "current-claim-2", "title": "Current Claim 2 — FALSIFIED", "file": "pages/current-claim-2/page.md", "children": []},
+      {"slug": "current-claim-3", "title": "Current Claim 3 — VERIFIED", "file": "pages/current-claim-3/page.md", "children": []},
+      {"slug": "current-claim-4", "title": "Current Claim 4 — VERIFIED", "file": "pages/current-claim-4/page.md", "children": []},
+      {"slug": "current-claim-5", "title": "Current Claim 5 — VERIFIED", "file": "pages/current-claim-5/page.md", "children": []},
+      {"slug": "current-claim-6", "title": "Current Claim 6 — VERIFIED", "file": "pages/current-claim-6/page.md", "children": []},
+      {"slug": "visibility-matrix", "title": "Evaluator visibility matrix", "file": "pages/visibility-matrix/page.md", "children": []},
+      {"slug": "release-report", "title": "Release report", "file": "pages/release-report/page.md", "children": []},
+      {"slug": "red-team-review", "title": "Evaluator-blind review", "file": "pages/red-team-review/page.md", "children": []},
+      {"slug": "claim-1", "title": "Historical rejected baseline — Claim 1", "file": "pages/claim-1/page.md", "children": []},
+      {"slug": "claim-2", "title": "Historical rejected baseline — Claim 2", "file": "pages/claim-2/page.md", "children": []},
+      {"slug": "claim-3", "title": "Historical rejected baseline — Claim 3", "file": "pages/claim-3/page.md", "children": []},
+      {"slug": "claim-4", "title": "Historical rejected baseline — Claim 4", "file": "pages/claim-4/page.md", "children": []},
+      {"slug": "claim-5", "title": "Historical rejected baseline — Claim 5", "file": "pages/claim-5/page.md", "children": []},
+      {"slug": "claim-6", "title": "Historical rejected baseline — Claim 6", "file": "pages/claim-6/page.md", "children": []},
+      {"slug": "methods-source-audit", "title": "Historical methods and source audit", "file": "pages/methods-source-audit/page.md", "children": []},
+      {"slug": "negative-controls", "title": "Historical negative controls", "file": "pages/negative-controls/page.md", "children": []},
+      {"slug": "conclusion", "title": "Historical conclusion", "file": "pages/conclusion/page.md", "children": []},
+      {"slug": "overview", "title": "Historical overview", "file": "pages/overview/page.md", "children": []}
+    ]
+  },
+  "revision": "release-candidate-2026-07-25"
+}

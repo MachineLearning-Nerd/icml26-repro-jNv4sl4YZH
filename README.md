@@ -1,6 +1,44 @@
 # Reproduction: Set-Preserving Calibration from Conformal P-Values to E-Values
 
-ICML 2026 paper / OpenReview `jNv4sl4YZH` / arXiv `2606.03600`.
+[![Open in molab](https://marimo.io/molab-shield.svg)](https://molab.marimo.io/github/MachineLearning-Nerd/icml26-repro-jNv4sl4YZH/blob/main/notebooks/p2e_claims.py)
+
+**Paper:** ICML 2026 / OpenReview `jNv4sl4YZH` /
+[arXiv `2606.03600`](https://arxiv.org/abs/2606.03600) · **Live judged
+baseline:** 7/12 · **Compute:** Hugging Face `cpu-upgrade`, CPU only
+
+The paper claims that its sigmoid p-to-e calibration preserves conformal sets,
+retains finite-sample validity under ECCP and data-dependent WECA merging, and
+improves prediction-set efficiency. We audited all six evaluator claims.
+Observed evidence is: Claim 1 VERIFIED; literal Claim 2 FALSIFIED by an
+assumption-satisfying endpoint witness; Claims 3–6 VERIFIED. On the complete
+released protocols, P2E was shorter in 36/36 ECCP calibrator comparisons and
+24/24 WECA/UR-WECA classical-calibrator comparisons. All 9 ECCP and 8 WECA
+P2E coverage means met the predeclared 0.02 shortfall tolerance.
+
+This campaign does not downscale the paper’s reported CA/CCP grids: it
+revalidates 1,920 and 11,700 immutable raw cells, respectively. The cumulative
+campaign reaggregates those hash-pinned cells rather than retraining every
+author estimator. Coverage intervals are descriptive; Claims 4 and 5 use
+separate proof-level mechanism certificates. A best-supported 12/12 is only a
+forecast until the live judge evaluates the new Space revision.
+
+- [Illustrated technical report](reports/set-preserving-p2e-reproduction-2026-07-25/report.md)
+- [Self-contained marimo tutorial](notebooks/p2e_claims.py)
+- [Claim contracts and fail-closed evidence](.openresearch/artifacts)
+
+## Experiment log
+
+The exact run command is identical on every formal node:
+`uv run --frozen python repro/src/run_campaign.py`.
+
+| Branch / experiment | Purpose or change | Exact run command | Assessment / outcome | Compute |
+| --- | --- | --- | --- | --- |
+| `main` | Public landing page, report, notebook, and published release mirror | Not run as an experiment (publication surface) | Presentation-only | None |
+| [`orx/baseline-metadata-reconstruction`](https://github.com/MachineLearning-Nerd/icml26-repro-jNv4sl4YZH/tree/orx/baseline-metadata-reconstruction) | Passing cumulative baseline after deterministic packaging repairs | `uv run --frozen python repro/src/run_campaign.py` | 14/14 commands; 35/35 tests | HF `cpu-upgrade`, 64 vCPU allocation, 1m29s wall |
+| [`orx/claim-2-literal-endpoint-counterexample`](https://github.com/MachineLearning-Nerd/icml26-repro-jNv4sl4YZH/tree/orx/claim-2-literal-endpoint-counterexample) | Test Proposition 2.3 on its printed `[0,1]` domain | `uv run --frozen python repro/src/run_campaign.py` | Literal statement FALSIFIED; positive-domain correction verified | HF `cpu-upgrade`, 64 vCPU allocation, 1m45s wall |
+| [`orx/claim-3-analytic-and-full-scale-aon-verification`](https://github.com/MachineLearning-Nerd/icml26-repro-jNv4sl4YZH/tree/orx/claim-3-analytic-and-full-scale-aon-verification) | Smoothness, inverse, positivity, exactness, and direct AoN comparison | `uv run --frozen python repro/src/run_campaign.py` | VERIFIED; P2E shorter than AoN 9/9 | HF `cpu-upgrade`, 64 vCPU allocation, 1m51s wall |
+| [`orx/claim-4-eccp-universal-mechanism-and-full-protoc`](https://github.com/MachineLearning-Nerd/icml26-repro-jNv4sl4YZH/tree/orx/claim-4-eccp-universal-mechanism-and-full-protoc) | Universal ECCP mechanism plus the 11,700-row protocol | `uv run --frozen python repro/src/run_campaign.py` | VERIFIED; 9/9 coverage cells | HF `cpu-upgrade`, 64 vCPU allocation, 1m45s wall |
+| [`orx/claim-5-data-dependent-weca-full-protocol`](https://github.com/MachineLearning-Nerd/icml26-repro-jNv4sl4YZH/tree/orx/claim-5-data-dependent-weca-full-protocol) | Source-level data-dependence audit plus the 1,920-row protocol | `uv run --frozen python repro/src/run_campaign.py` | VERIFIED; 8/8 coverage cells; adaptive control rejected | HF `cpu-upgrade`, 64 vCPU allocation, 1m45s wall |
 
 ## Scope
 
