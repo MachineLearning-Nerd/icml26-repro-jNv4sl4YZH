@@ -1,0 +1,17 @@
+{
+  "negative_C_control": {
+    "derivative_at_p_0.2": 5.124973964842104,
+    "rejected_for_increasing": true
+  },
+  "scaled_control": {
+    "expectation": 0.99,
+    "rejected_for_failed_AoN_equality_at_alpha": true,
+    "rejected_for_inexact_expectation": true,
+    "value_at_alpha": 9.899999999999999
+  },
+  "zero_C_control": {
+    "derivative": 0.0,
+    "rejected_for_not_invertible": true,
+    "rejected_for_not_strictly_decreasing": true
+  }
+}

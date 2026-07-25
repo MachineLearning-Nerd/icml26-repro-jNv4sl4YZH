@@ -1,5 +1,5 @@
 {
-  "stage": "claim2_endpoint_counterexample",
+  "stage": "claim3_analytic_fullscale_aon",
   "estimated_required_cores": 8,
   "selected_backend": "hf",
   "selected_flavor": "cpu-upgrade",
@@ -19,6 +19,24 @@
       "outputs/claim2_endpoint_counterexample.json",
       "--output",
       ".openresearch/artifacts/claim-2/independent_checker_output.json"
+    ],
+    [
+      "python",
+      "repro/src/verify_claim3_properties.py",
+      "--ccp-summary",
+      "outputs/claim3_independent.json",
+      "--output",
+      "outputs/claim3_properties_fullscale.json",
+      "--artifact-dir",
+      ".openresearch/artifacts/claim-3"
+    ],
+    [
+      "python",
+      "repro/src/check_claim3_properties.py",
+      "--input",
+      "outputs/claim3_properties_fullscale.json",
+      "--output",
+      ".openresearch/artifacts/claim-3/independent_checker_output.json"
     ]
   ]
 }
