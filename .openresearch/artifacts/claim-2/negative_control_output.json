@@ -1,0 +1,16 @@
+{
+  "low_endpoint_control": {
+    "decreasing_condition_at_zero": false,
+    "rejected_for_nonmonotonicity": true
+  },
+  "positive_interval_inflation": {
+    "calibrator_budget_rejected": true,
+    "integral": "101/100"
+  },
+  "shifted_jump_control": {
+    "n": 99,
+    "rejected_for_set_mismatch": true,
+    "set_membership_matches": false,
+    "witness_p": "1/10"
+  }
+}

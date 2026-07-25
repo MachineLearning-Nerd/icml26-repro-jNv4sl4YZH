@@ -1,7 +1,24 @@
 {
-  "stage": "judged_baseline",
+  "stage": "claim2_endpoint_counterexample",
   "estimated_required_cores": 8,
   "selected_backend": "hf",
   "selected_flavor": "cpu-upgrade",
-  "extra_commands": []
+  "extra_commands": [
+    [
+      "python",
+      "repro/src/verify_claim2_endpoint.py",
+      "--output",
+      "outputs/claim2_endpoint_counterexample.json",
+      "--artifact-dir",
+      ".openresearch/artifacts/claim-2"
+    ],
+    [
+      "python",
+      "repro/src/check_claim2_endpoint.py",
+      "--input",
+      "outputs/claim2_endpoint_counterexample.json",
+      "--output",
+      ".openresearch/artifacts/claim-2/independent_checker_output.json"
+    ]
+  ]
 }
