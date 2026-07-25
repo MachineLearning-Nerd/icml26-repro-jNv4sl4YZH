@@ -139,6 +139,7 @@ def restore_historical_evidence() -> dict[str, object]:
         raise RuntimeError(
             f"historical evidence record count mismatch: {len(records)}"
         )
+    payload_by_path = {record["path"]: record["payload"] for record in records}
 
     restored = 0
     exact_existing = 0
@@ -160,11 +161,44 @@ def restore_historical_evidence() -> dict[str, object]:
         if json.loads(destination.read_text(encoding="utf-8")) != record["payload"]:
             raise RuntimeError(f"semantic restoration failed: {relative}")
         restored += 1
+
+    # The immutable bundle contains the complete author-run protocol inside the
+    # independently verified claim summaries, but the historical uploader did
+    # not include the two raw-directory sidecars consumed by the verifiers.
+    # Reconstruct only those redundant sidecars from the hash-bound summaries.
+    sidecars = {
+        "outputs/raw/author_ca/protocol.json": (
+            "outputs/claim2_independent.json",
+            "protocol",
+        ),
+        "outputs/raw/author_ccp/protocol.json": (
+            "outputs/claim3_independent.json",
+            "protocol",
+        ),
+    }
+    reconstructed_sidecars = 0
+    for destination_path, (summary_path, key) in sidecars.items():
+        try:
+            sidecar_payload = payload_by_path[summary_path][key]
+        except KeyError as error:
+            raise RuntimeError(
+                f"historical evidence lacks {summary_path}:{key}"
+            ) from error
+        destination = ROOT / destination_path
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_text(
+            json.dumps(sidecar_payload, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        if json.loads(destination.read_text(encoding="utf-8")) != sidecar_payload:
+            raise RuntimeError(f"sidecar reconstruction failed: {destination_path}")
+        reconstructed_sidecars += 1
     return {
         "bundle_sha256": observed_bundle_sha,
         "records": len(records),
         "exact_existing_files": exact_existing,
         "semantically_restored_files": restored,
+        "reconstructed_protocol_sidecars": reconstructed_sidecars,
     }
 
 
