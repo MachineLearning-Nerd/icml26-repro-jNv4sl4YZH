@@ -1,0 +1,8 @@
+{
+  "adaptive_randomized_weight_coverage_violation_detected": true,
+  "adaptive_weight_coverage_violation_detected": true,
+  "all_pass": true,
+  "forbidden_test_adaptive_weight_changes_in_source_audit": true,
+  "minimum_invalid_randomized_tail_to_alpha_ratio": 1.9428630069079045,
+  "minimum_invalid_tail_to_alpha_ratio": 1.8181818181818181
+}

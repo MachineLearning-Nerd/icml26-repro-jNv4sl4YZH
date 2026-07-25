@@ -1,5 +1,5 @@
 {
-  "stage": "claim4_eccp_full_protocol",
+  "stage": "claim5_data_dependent_weca",
   "estimated_required_cores": 8,
   "selected_backend": "hf",
   "selected_flavor": "cpu-upgrade",
@@ -59,6 +59,28 @@
       "outputs/claim4_eccp_full_protocol.json",
       "--output",
       ".openresearch/artifacts/claim-4/independent_checker_output.json"
+    ],
+    [
+      "python",
+      "repro/src/verify_claim5_weca.py",
+      "--ca",
+      "outputs/claim2_independent.json",
+      "--independence",
+      "outputs/weca_independence_audit.json",
+      "--mechanism",
+      "outputs/claim3_independent_e_merge.json",
+      "--output",
+      "outputs/claim5_weca_full_protocol.json",
+      "--artifact-dir",
+      ".openresearch/artifacts/claim-5"
+    ],
+    [
+      "python",
+      "repro/src/check_claim5_weca.py",
+      "--input",
+      "outputs/claim5_weca_full_protocol.json",
+      "--output",
+      ".openresearch/artifacts/claim-5/independent_checker_output.json"
     ]
   ]
 }

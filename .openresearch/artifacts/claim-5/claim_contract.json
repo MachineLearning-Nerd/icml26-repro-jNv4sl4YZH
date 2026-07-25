@@ -1,0 +1,19 @@
+{
+  "claim": 5,
+  "exact_statement": "WECA may select weights from tuning data and retains finite-sample coverage when those weights are independent of inference e-values and the test point.",
+  "paper_anchor": "arXiv:2606.03600v1, Equation WECA, following proposition, and Appendix Theoretical Validity of WECA",
+  "assumptions": [
+    "omega* is in the simplex and is a function only of tuning data",
+    "test point is independent of tuning data",
+    "test point is exchangeable with each inference split",
+    "final e-values are constructed only from inference splits"
+  ],
+  "success_criteria": [
+    "conditional weighted-e proof",
+    "released source flow and split audit",
+    "inference/test mutation invariance",
+    "forbidden test-adaptive control changes weights and violates coverage",
+    "complete 1,920-row empirical protocol with eight coverage cells"
+  ],
+  "verdict": "VERIFIED"
+}
