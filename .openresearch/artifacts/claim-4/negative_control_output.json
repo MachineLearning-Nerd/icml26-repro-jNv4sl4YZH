@@ -1,0 +1,6 @@
+{
+  "controls_pass": true,
+  "invalid_arbitrary_dependence_for_prefix_detected": true,
+  "invalid_randomized_arbitrary_dependence_detected": true,
+  "invalid_scaling_detected": true
+}

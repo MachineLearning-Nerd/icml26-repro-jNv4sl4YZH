@@ -1,5 +1,5 @@
 {
-  "stage": "claim3_analytic_fullscale_aon",
+  "stage": "claim4_eccp_full_protocol",
   "estimated_required_cores": 8,
   "selected_backend": "hf",
   "selected_flavor": "cpu-upgrade",
@@ -37,6 +37,28 @@
       "outputs/claim3_properties_fullscale.json",
       "--output",
       ".openresearch/artifacts/claim-3/independent_checker_output.json"
+    ],
+    [
+      "python",
+      "repro/src/verify_claim4_eccp.py",
+      "--ccp",
+      "outputs/claim3_independent.json",
+      "--mechanism",
+      "outputs/claim3_independent_e_merge.json",
+      "--anchored",
+      "outputs/anchored_claims_mechanism.json",
+      "--output",
+      "outputs/claim4_eccp_full_protocol.json",
+      "--artifact-dir",
+      ".openresearch/artifacts/claim-4"
+    ],
+    [
+      "python",
+      "repro/src/check_claim4_eccp.py",
+      "--input",
+      "outputs/claim4_eccp_full_protocol.json",
+      "--output",
+      ".openresearch/artifacts/claim-4/independent_checker_output.json"
     ]
   ]
 }
