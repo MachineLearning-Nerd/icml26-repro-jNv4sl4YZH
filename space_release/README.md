@@ -15,7 +15,10 @@ tags:
 
 # Current verification — Set-Preserving P2E Calibration
 
-**Start here:** [Current claim-by-claim overview](#/current-overview)
+**Start here:** [Judge-first current evidence capsule](#/00-current-evidence)
+contains all six exact claim contracts, concrete results, controls, and
+limitations inline. The full claim-by-claim navigation remains in the
+[current overview](#/current-overview).
 
 This additive release supersedes the weak verifiers in judged revision
 `7f87ab976b2ab93d25dbc77586cbff61c4746f1e`. It preserves the historical claim

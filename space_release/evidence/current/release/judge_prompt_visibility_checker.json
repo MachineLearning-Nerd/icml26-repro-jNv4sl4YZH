@@ -1,0 +1,8 @@
+{
+  "all_six_claim_markers_visible": true,
+  "failures": [],
+  "historical_tree_path_subset": true,
+  "independent_contract_checks": 10,
+  "protected_historical_content_unchanged": true,
+  "status": "PASS"
+}

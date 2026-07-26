@@ -68,6 +68,10 @@ evidence/current/claim-6/source_audit.md
 evidence/current/claim-6/verifier.py
 evidence/current/environment/pyproject.toml
 evidence/current/environment/uv.lock
+evidence/current/release/audit_judge_prompt_visibility.py
+evidence/current/release/check_judge_prompt_visibility.py
+evidence/current/release/judge_prompt_visibility.json
+evidence/current/release/judge_prompt_visibility_checker.json
 evidence/current/release/red_team_final.json
 evidence/current/release/red_team_review.json
 evidence/current/release/upload_allowlist.txt
@@ -79,6 +83,7 @@ evidence/historical/judged-7f87ab976b2ab93d25dbc77586cbff61c4746f1e/README.md
 evidence/historical/judged-7f87ab976b2ab93d25dbc77586cbff61c4746f1e/index.md
 evidence/historical/judged-7f87ab976b2ab93d25dbc77586cbff61c4746f1e/logbook.json
 logbook.json
+pages/00-current-evidence/page.md
 pages/current-claim-1/page.md
 pages/current-claim-2/page.md
 pages/current-claim-3/page.md

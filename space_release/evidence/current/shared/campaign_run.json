@@ -1,5 +1,5 @@
 {
-  "stage": "release_candidate_cumulative",
+  "stage": "judge_first_compact_evidence",
   "estimated_required_cores": 8,
   "selected_backend": "hf",
   "selected_flavor": "cpu-upgrade",
@@ -111,6 +111,24 @@
       "outputs/claim6_full_protocol.json",
       "--output",
       ".openresearch/artifacts/claim-6/independent_checker_output.json"
+    ],
+    [
+      "python",
+      "repro/src/audit_judge_prompt_visibility.py",
+      "--candidate-root",
+      "space_release",
+      "--output",
+      "outputs/judge_prompt_visibility.json",
+      "--artifact-dir",
+      ".openresearch/artifacts/judge-visibility"
+    ],
+    [
+      "python",
+      "repro/src/check_judge_prompt_visibility.py",
+      "--input",
+      "outputs/judge_prompt_visibility.json",
+      "--output",
+      ".openresearch/artifacts/judge-visibility/independent_checker_output.json"
     ]
   ]
 }

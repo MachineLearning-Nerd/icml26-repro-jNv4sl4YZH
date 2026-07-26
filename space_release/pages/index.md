@@ -4,6 +4,7 @@
 
 | Page | Verdict |
 | --- | --- |
+| [Judge-first current evidence capsule](#/00-current-evidence) | All six exact contracts, results, controls, and limitations inline |
 | [Current overview](#/current-overview) | Start here |
 | [Claim 1 — set preservation](#/current-claim-1) | VERIFIED |
 | [Claim 2 — literal uniqueness](#/current-claim-2) | FALSIFIED |

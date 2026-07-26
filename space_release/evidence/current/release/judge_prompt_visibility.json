@@ -1,0 +1,106 @@
+{
+  "candidate": {
+    "all_six_claim_markers_visible": true,
+    "capsule_complete_before_truncation": true,
+    "prompt_characters": 120036,
+    "trace": [
+      {
+        "path": "pages/index.md",
+        "prompt_characters": 1846,
+        "source_characters": 1812,
+        "truncated": false
+      },
+      {
+        "path": "pages/00-current-evidence/page.md",
+        "prompt_characters": 16786,
+        "source_characters": 16733,
+        "truncated": false
+      },
+      {
+        "path": "pages/claim-1/page.md",
+        "prompt_characters": 60401,
+        "source_characters": 60360,
+        "truncated": false
+      },
+      {
+        "path": "pages/claim-2/page.md",
+        "prompt_characters": 37989,
+        "source_characters": 37948,
+        "truncated": false
+      },
+      {
+        "path": "pages/claim-3/page.md",
+        "prompt_characters": 3014,
+        "source_characters": 144962,
+        "truncated": true
+      }
+    ]
+  },
+  "capsule_marker": "JUDGE_FIRST_EVIDENCE_V2",
+  "capsule_path": "pages/00-current-evidence/page.md",
+  "claim_markers": [
+    "EXACT_CLAIM_1_EVIDENCE",
+    "EXACT_CLAIM_2_EVIDENCE",
+    "EXACT_CLAIM_3_EVIDENCE",
+    "EXACT_CLAIM_4_EVIDENCE",
+    "EXACT_CLAIM_5_EVIDENCE",
+    "EXACT_CLAIM_6_EVIDENCE"
+  ],
+  "failures": [],
+  "historical_negative_control": {
+    "capsule_absent": true,
+    "exact_claim_markers_absent": true,
+    "prompt_characters": 120036,
+    "trace": [
+      {
+        "path": "pages/index.md",
+        "prompt_characters": 1711,
+        "source_characters": 1677,
+        "truncated": false
+      },
+      {
+        "path": "pages/claim-1/page.md",
+        "prompt_characters": 60401,
+        "source_characters": 60360,
+        "truncated": false
+      },
+      {
+        "path": "pages/claim-2/page.md",
+        "prompt_characters": 37989,
+        "source_characters": 37948,
+        "truncated": false
+      },
+      {
+        "path": "pages/claim-3/page.md",
+        "prompt_characters": 19935,
+        "source_characters": 144962,
+        "truncated": true
+      }
+    ]
+  },
+  "historical_subset": {
+    "allowed_changed": [
+      "README.md",
+      "evidence/current/release/upload_allowlist.txt",
+      "evidence/current/release/upload_manifest.sha256",
+      "evidence/current/shared/campaign_run.json",
+      "pages/index.md"
+    ],
+    "changed": [
+      "README.md",
+      "evidence/current/release/upload_allowlist.txt",
+      "evidence/current/release/upload_manifest.sha256",
+      "evidence/current/shared/campaign_run.json",
+      "pages/index.md"
+    ],
+    "missing": [],
+    "parent_file_count": 112,
+    "path_subset": true,
+    "protected_changed": [],
+    "protected_content_unchanged": true
+  },
+  "judge_max_logbook_characters": 120000,
+  "parent_revision": "a7496ba32db672e7aa46c42edb3b7c3c45ff6725",
+  "space_id": "DineshAI/jNv4sl4YZH",
+  "status": "PASS"
+}
