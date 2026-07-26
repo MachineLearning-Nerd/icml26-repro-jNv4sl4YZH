@@ -22,6 +22,14 @@ author estimator. Coverage intervals are descriptive; Claims 4 and 5 use
 separate proof-level mechanism certificates. A best-supported 12/12 is only a
 forecast until the live judge evaluates the new Space revision.
 
+The previous candidate revision was discovered by the live judge, but its
+three attempts ended in model-router HTTP 504s. A separate evaluator audit then
+found that the judge reads Markdown lexically and truncates at 120,000
+characters: the preserved historical pages consumed the prompt before any
+`current-claim-*` page. The repaired Space adds one compact
+`00-current-evidence` page, proves all six exact claim markers are visible
+before truncation, and retains the historical tree.
+
 - [Illustrated technical report](reports/set-preserving-p2e-reproduction-2026-07-25/report.md)
 - [Self-contained marimo tutorial](notebooks/p2e_claims.py)
 - [Claim contracts and fail-closed evidence](.openresearch/artifacts)
@@ -40,6 +48,8 @@ The exact run command is identical on every formal node:
 | [`orx/claim-4-eccp-universal-mechanism-and-full-protoc`](https://github.com/MachineLearning-Nerd/icml26-repro-jNv4sl4YZH/tree/orx/claim-4-eccp-universal-mechanism-and-full-protoc) | Universal ECCP mechanism plus the 11,700-row protocol | `uv run --frozen python repro/src/run_campaign.py` | VERIFIED; 9/9 coverage cells | HF `cpu-upgrade`, 64 vCPU allocation, 1m45s wall |
 | [`orx/claim-5-data-dependent-weca-full-protocol`](https://github.com/MachineLearning-Nerd/icml26-repro-jNv4sl4YZH/tree/orx/claim-5-data-dependent-weca-full-protocol) | Source-level data-dependence audit plus the 1,920-row protocol | `uv run --frozen python repro/src/run_campaign.py` | VERIFIED; 8/8 coverage cells; adaptive control rejected | HF `cpu-upgrade`, 64 vCPU allocation, 1m45s wall |
 | [`orx/evaluator-visible-cumulative-release-candidate`](https://github.com/MachineLearning-Nerd/icml26-repro-jNv4sl4YZH/tree/orx/evaluator-visible-cumulative-release-candidate) | Cumulative six-claim regression plus evaluator-visible report, notebook, and Space candidate | `uv run --frozen python repro/src/run_campaign.py` | 25/25 commands; 44/44 tests; Claims 1–6 cumulative gate passed | HF `cpu-upgrade`, 64 vCPU allocation, 1m46s wall |
+| [`orx/judge-first-compact-evidence`](https://github.com/MachineLearning-Nerd/icml26-repro-jNv4sl4YZH/tree/orx/judge-first-compact-evidence) | Reproduce and repair the live judge's 120k prompt truncation | `uv run --frozen python repro/src/run_campaign.py` | Scientific suite reached; OpenML 504 exposed the need for a fail-closed availability path | HF `cpu-upgrade`, 64 vCPU allocation, two environmental attempts |
+| [`orx/fail-closed-openml-outage-fallback`](https://github.com/MachineLearning-Nerd/icml26-repro-jNv4sl4YZH/tree/orx/fail-closed-openml-outage-fallback) | Cumulative winner with guarded OpenML 5xx fallback and judge-first audit | `uv run --frozen python repro/src/run_campaign.py` | 27/27 commands; 49/49 tests; all six claim markers visible before truncation | HF `cpu-upgrade`, 64 vCPU allocation, 5m22s wall |
 
 ## Scope
 

@@ -3,8 +3,9 @@
 Status: `PASS`
 
 This record is generated from a fresh candidate directory. The reviewer starts
-only at `README.md`, follows `#/current-overview`, then traverses the six
-current claim pages and the visibility matrix. Repository knowledge,
+only at `README.md`, opens `#/00-current-evidence` first, follows
+`#/current-overview`, then traverses the six current claim pages and the
+visibility matrix. Repository knowledge,
 OpenResearch logs, dashboard artifacts, and unpublished branches are excluded.
 
 Files opened and conclusions are recorded in the downloadable
@@ -16,8 +17,9 @@ First-pass missing item: the current overview did not link onward to the six
 claim pages, visibility matrix, release report, or this review. The navigation
 was repaired before the repeat.
 
-Repeat-pass result after fixes: all 11 canonical pages were reachable from
-`README.md`; all six visibility rows were complete; the judged 23-file tree
+Repeat-pass result after fixes: all 12 canonical pages were reachable from
+`README.md`; the capsule contained all six exact evidence markers and its end
+marker; all six visibility rows were complete; the judged 23-file tree
 remained a subset; historical claim and static content was unchanged; no
 placeholder, secret-like content, or missing evidence item was found.
 

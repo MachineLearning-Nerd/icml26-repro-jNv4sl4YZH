@@ -19,7 +19,8 @@
   },
   "final_repeat": {
     "entrypoint": "README.md",
-    "opened_file_count": 11,
+    "opened_file_count": 12,
+    "judge_first_capsule_reachable": true,
     "all_current_pages_reachable": true,
     "all_visibility_rows_complete": true,
     "historical_path_subset": true,

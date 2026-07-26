@@ -11,12 +11,13 @@
     "icml2026-repro",
     "paper-jNv4sl4YZH"
   ],
-  "updated_at": "2026-07-25T00:00:00+00:00",
+  "updated_at": "2026-07-26T00:00:00+00:00",
   "root": {
     "slug": "index",
     "title": "Current verification — Set-Preserving P2E Calibration",
     "file": "pages/index.md",
     "children": [
+      {"slug": "00-current-evidence", "title": "Judge-first current evidence capsule", "file": "pages/00-current-evidence/page.md", "children": []},
       {"slug": "current-overview", "title": "Current overview", "file": "pages/current-overview/page.md", "children": []},
       {"slug": "current-claim-1", "title": "Current Claim 1 — VERIFIED", "file": "pages/current-claim-1/page.md", "children": []},
       {"slug": "current-claim-2", "title": "Current Claim 2 — FALSIFIED", "file": "pages/current-claim-2/page.md", "children": []},

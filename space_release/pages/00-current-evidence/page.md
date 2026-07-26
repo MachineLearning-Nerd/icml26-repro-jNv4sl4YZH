@@ -29,12 +29,12 @@ uv run --frozen python repro/src/run_campaign.py
 ```
 
 The accepted cumulative run is OpenResearch run
-`4d6a277e-0df9-4aba-a23e-853ca6523efd`, Git
-`2b58fe4c1394f47084879ac5d3c78c3c4bcf628f`, on Hugging Face
+`88a1580c-ae40-4095-a76a-893e8ffbdcf7`, Git
+`e21845d8d451497c3cb34dc36587cabe69eb5cd3`, on Hugging Face
 `cpu-upgrade`; estimated useful cores 8, actual allocation 64, campaign
-runtime `75.866505` seconds. It used Python `==3.12.*`, the repository
-`uv.lock`, one repository `.venv`, and exited zero on 25/25 commands and
-44/44 tests. CA uses the 20 released deterministic seeds; CCP uses seeds
+runtime `307.135424` seconds. It used Python `==3.12.*`, the repository
+`uv.lock`, one repository `.venv`, and exited zero on 27/27 commands and
+49/49 tests. CA uses the 20 released deterministic seeds; CCP uses seeds
 45–144. Each checker exits nonzero on any failed contract field.
 
 **OpenML availability rule.** The current regression first re-downloads and

@@ -94,6 +94,7 @@ def main() -> None:
                 failures.append(f"linked Space evidence missing: {linked}")
 
     canonical = [
+        "pages/00-current-evidence/page.md",
         "pages/current-overview/page.md",
         *(f"pages/current-claim-{claim}/page.md" for claim in range(1, 7)),
         "pages/visibility-matrix/page.md",
@@ -103,6 +104,14 @@ def main() -> None:
     for relative in canonical:
         if relative not in visited:
             failures.append(f"canonical page not reachable from README: {relative}")
+
+    capsule = text(root / "pages/00-current-evidence/page.md")
+    for claim in range(1, 7):
+        marker = f"EXACT_CLAIM_{claim}_EVIDENCE"
+        if marker not in capsule:
+            failures.append(f"judge-first capsule missing marker: {marker}")
+    if "END_JUDGE_FIRST_EVIDENCE_V2" not in capsule:
+        failures.append("judge-first capsule is incomplete")
 
     exact_claim_tokens = {
         1: ("Exact source claim", "Assumptions audited", "Direct result", "membership mismatches"),

@@ -3,7 +3,7 @@
 This page is the canonical evaluator entrypoint for the 2026-07-25 cumulative
 release. The previous live judged score is **7/12** at Space revision
 `7f87ab976b2ab93d25dbc77586cbff61c4746f1e`. The conservative projected range
-is **9–12/12**; **12/12 is the best-supported possible forecast**, not a judge
+is **10–12/12**; **12/12 is the best-supported possible forecast**, not a judge
 result.
 
 ## Fixed reproduction contract

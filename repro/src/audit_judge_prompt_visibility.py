@@ -32,7 +32,13 @@ MUTABLE_RELEASE_PATHS = {
     "pages/index.md",
     "evidence/current/release/upload_allowlist.txt",
     "evidence/current/release/upload_manifest.sha256",
+    "evidence/current/release/red_team_final.json",
+    "evidence/current/release/red_team_review.json",
     "evidence/current/shared/campaign_run.json",
+    "pages/current-overview/page.md",
+    "pages/release-report/page.md",
+    "pages/red-team-review/page.md",
+    "pages/visibility-matrix/page.md",
 }
 
 

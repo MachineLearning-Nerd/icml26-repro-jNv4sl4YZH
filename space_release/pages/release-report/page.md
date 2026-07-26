@@ -1,7 +1,7 @@
 # Release report
 
 - Previous live judged score: `7/12`
-- Conservative projected score range after the proposed change: `9–12/12`
+- Conservative projected score range after the proposed change: `10–12/12`
 - Best-supported possible new score: `12/12` **forecast; not a judge result**
 
 | Claim | Current points | Possible points | Confidence | Evidence status | Basis and remaining risk |
@@ -25,11 +25,21 @@ public GitHub `main` branch to the identical release content.
 
 ## Compute and provenance
 
-All formal work used Hugging Face `cpu-upgrade`, never GPU. The cumulative
-science release run is `1811c6e7-901f-4cb1-9a24-0ea0891b8717` at Git SHA
-`23c37c41627a5d2e4f55553726a8af2a8f1b97ba`, estimate 8 useful CPU cores,
-actual allocation 64 CPUs, campaign runtime `76.700822` seconds.
+All formal work used Hugging Face `cpu-upgrade`, never GPU. The winning
+cumulative run is `88a1580c-ae40-4095-a76a-893e8ffbdcf7` at Git SHA
+`e21845d8d451497c3cb34dc36587cabe69eb5cd3`, estimate 8 useful CPU cores,
+actual allocation 64 CPUs, campaign runtime `307.135424` seconds, with
+27/27 commands and 49/49 tests passing. OpenML returned a server-side 5xx, so
+the disclosed fail-closed path revalidated the immutable prior live attestation
+against every task/array hash, the exact manifest, source commit, loader hash,
+and clean worktree. The 4xx and tamper controls passed.
 The exact command was `uv run --frozen python repro/src/run_campaign.py`.
+
+The public judge's exact 120,000-character assembly was independently
+reproduced. Revision `a7496ba32db672e7aa46c42edb3b7c3c45ff6725`
+contains none of the six current evidence markers before truncation. The
+candidate reads the complete 17,339-character capsule second, exposes all six
+markers, then reaches the cap in the preserved historical pages.
 
 The judged Space revision and its historical 23-file tree were downloaded
 before modification. The old path set remains a subset of the new tree; the

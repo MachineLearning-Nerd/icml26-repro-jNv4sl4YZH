@@ -12,8 +12,8 @@
       },
       {
         "path": "pages/00-current-evidence/page.md",
-        "prompt_characters": 17392,
-        "source_characters": 17339,
+        "prompt_characters": 17393,
+        "source_characters": 17340,
         "truncated": false
       },
       {
@@ -30,7 +30,7 @@
       },
       {
         "path": "pages/claim-3/page.md",
-        "prompt_characters": 2408,
+        "prompt_characters": 2407,
         "source_characters": 144962,
         "truncated": true
       }
@@ -81,17 +81,31 @@
   "historical_subset": {
     "allowed_changed": [
       "README.md",
+      "evidence/current/release/red_team_final.json",
+      "evidence/current/release/red_team_review.json",
       "evidence/current/release/upload_allowlist.txt",
       "evidence/current/release/upload_manifest.sha256",
       "evidence/current/shared/campaign_run.json",
-      "pages/index.md"
+      "logbook.json",
+      "pages/current-overview/page.md",
+      "pages/index.md",
+      "pages/red-team-review/page.md",
+      "pages/release-report/page.md",
+      "pages/visibility-matrix/page.md"
     ],
     "changed": [
       "README.md",
+      "evidence/current/release/red_team_final.json",
+      "evidence/current/release/red_team_review.json",
       "evidence/current/release/upload_allowlist.txt",
       "evidence/current/release/upload_manifest.sha256",
       "evidence/current/shared/campaign_run.json",
-      "pages/index.md"
+      "logbook.json",
+      "pages/current-overview/page.md",
+      "pages/index.md",
+      "pages/red-team-review/page.md",
+      "pages/release-report/page.md",
+      "pages/visibility-matrix/page.md"
     ],
     "missing": [],
     "parent_file_count": 112,

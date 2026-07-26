@@ -1,5 +1,5 @@
 {
-  "candidate_path_count": 112,
+  "candidate_path_count": 117,
   "canonical_entrypoint": "README.md",
   "claim_pages_checked": 6,
   "failures": [],
@@ -11,9 +11,10 @@
     "logbook.json",
     "pages/index.md"
   ],
-  "opened_file_count": 11,
+  "opened_file_count": 12,
   "opened_files": [
     "README.md",
+    "pages/00-current-evidence/page.md",
     "pages/current-overview/page.md",
     "pages/current-claim-1/page.md",
     "pages/current-claim-2/page.md",
@@ -28,7 +29,7 @@
   "placeholders": [],
   "secret_hits": [],
   "status": "PASS",
-  "text_files_scanned": 109,
+  "text_files_scanned": 114,
   "visibility_rows_complete": 6,
   "warnings": []
 }

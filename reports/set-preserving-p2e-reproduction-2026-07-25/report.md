@@ -48,6 +48,33 @@ archive SHA-256
 `main.tex` SHA-256
 `49058ff8e986f43770936c09cc97360e5cace8802c6304a80d9e153d342ae857`.
 
+## Making the evidence visible to the evaluator
+
+The first additive Space revision contained the stronger science, but the live
+judge did not score it: all three model-router attempts returned HTTP 504.
+Auditing the public judge implementation uncovered a second, deterministic
+problem. It reads `pages/index.md`, then all other Markdown pages in lexical
+order, and truncates the concatenation at 120,000 characters. Because the
+historical pages must be preserved, old Claim 1 and Claim 2 consumed almost the
+entire prompt before any `current-claim-*` page appeared.
+
+The release now adds a 17,339-character `00-current-evidence` capsule with all
+six exact contracts, concrete numerical results, proof steps, controls,
+limitations, commands, and raw links inline. A fail-closed replica of the
+judge assembly shows:
+
+| Prompt | Files visible before cap | Current claim markers |
+| --- | --- | ---: |
+| Previous Space `a7496ba` | index, old Claim 1, old Claim 2, part of old Claim 3 | 0/6 |
+| Repaired candidate | index, complete evidence capsule, old Claim 1, old Claim 2, part of old Claim 3 | 6/6 |
+
+The negative control uses the exact previous Space revision. The independent
+checker also requires the 112-path parent tree to remain a subset and every
+protected historical file to remain byte-identical. The winning cumulative run
+`88a1580c-ae40-4095-a76a-893e8ffbdcf7` passed 27/27 commands and 49/49 tests
+in 307.14 seconds on HF `cpu-upgrade` (8 useful cores estimated, 64 allocated,
+no GPU).
+
 ## Headline empirical result
 
 ![P2E efficiency against four calibrators](images/eccp_efficiency.png)
@@ -140,6 +167,8 @@ set of unrelated branches.
 | [Claim 4](https://github.com/MachineLearning-Nerd/icml26-repro-jNv4sl4YZH/tree/orx/claim-4-eccp-universal-mechanism-and-full-protoc) | Universal ECCP mechanism and full protocol | `3211d65` | `7aebe226` | VERIFIED |
 | [Claim 5](https://github.com/MachineLearning-Nerd/icml26-repro-jNv4sl4YZH/tree/orx/claim-5-data-dependent-weca-full-protocol) | Data-dependent weight audit and full protocol | `f218228` | `edbed16d` | VERIFIED |
 | [Cumulative release science](https://github.com/MachineLearning-Nerd/icml26-repro-jNv4sl4YZH/tree/orx/evaluator-visible-cumulative-release-candidate) | Six-claim regression and evaluator-visible artifacts | `23c37c4` | `1811c6e7` | 25/25 commands; 44/44 tests |
+| [Judge-first capsule](https://github.com/MachineLearning-Nerd/icml26-repro-jNv4sl4YZH/tree/orx/judge-first-compact-evidence) | Reproduce and repair the live judge's 120k truncation | `0c8d208` | `dae8938a` | Science reached; upstream OpenML 504 |
+| [Outage-safe winner](https://github.com/MachineLearning-Nerd/icml26-repro-jNv4sl4YZH/tree/orx/fail-closed-openml-outage-fallback) | Guarded OpenML 5xx fallback plus cumulative visibility gate | `e21845d` | `88a1580c` | 27/27 commands; 49/49 tests; visibility PASS |
 
 All formal runs used the exact command shown above on Hugging Face
 `cpu-upgrade`. The passing scientific stages each used the platform’s 64-vCPU
