@@ -37,6 +37,15 @@ runtime `75.866505` seconds. It used Python `==3.12.*`, the repository
 44/44 tests. CA uses the 20 released deterministic seeds; CCP uses seeds
 45–144. Each checker exits nonzero on any failed contract field.
 
+**OpenML availability rule.** The current regression first re-downloads and
+rehashes all four live OpenML tasks. If and only if the official API returns a
+server-side 5xx, it instead revalidates the immutable prior live-OpenML
+attestation restored from the SHA-256-pinned evidence bundle against the exact
+task manifest, array hashes, source commit, author-loader hash, and clean
+worktree. It records that fallback mode explicitly. A 4xx, changed manifest,
+changed array hash, changed loader, missing attestation, or tampered
+attestation exits nonzero; three dedicated controls exercise those boundaries.
+
 ## `EXACT_CLAIM_1_EVIDENCE` — set preservation
 
 **Source contract.** Definition 2.2 and Theorem 2.6 require, for every

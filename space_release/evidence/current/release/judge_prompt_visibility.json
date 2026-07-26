@@ -12,8 +12,8 @@
       },
       {
         "path": "pages/00-current-evidence/page.md",
-        "prompt_characters": 16786,
-        "source_characters": 16733,
+        "prompt_characters": 17392,
+        "source_characters": 17339,
         "truncated": false
       },
       {
@@ -30,7 +30,7 @@
       },
       {
         "path": "pages/claim-3/page.md",
-        "prompt_characters": 3014,
+        "prompt_characters": 2408,
         "source_characters": 144962,
         "truncated": true
       }
