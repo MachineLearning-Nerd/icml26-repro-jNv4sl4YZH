@@ -1,0 +1,64 @@
+{
+  "artifact_manifest": {
+    "path": "outputs/artifact_manifest.json",
+    "sha256": "c8a53105da80f03cb31b3adade826d625b4d27ab2ac813612fc9bfb6bed6b5de"
+  },
+  "bundle": {
+    "path": "outputs/evidence_bundle.jsonl",
+    "records": 24,
+    "sha256": "660bc20c9fbe217428736a2eaed2e8418f75ed69ac0f8c27d5dcac00ab284ed8"
+  },
+  "ca_rows": 1920,
+  "ccp_rows": 11700,
+  "claims": {
+    "C1": "VERIFIED",
+    "C2": "FALSIFIED_LITERAL_CORRECTED_POSITIVE_DOMAIN",
+    "C3": "VERIFIED",
+    "C4": "VERIFIED",
+    "C5": "VERIFIED",
+    "C6": "VERIFIED"
+  },
+  "evidence_artifacts": [
+    "repro/configs/jury_claims.json",
+    "repro/configs/source_manifest.json",
+    "repro/configs/ca_input_manifest.json",
+    "repro/configs/full_protocol.json",
+    "repro/configs/paper_headlines.json",
+    "outputs/claim1_source_crosscheck.json",
+    "outputs/claim1_independent.json",
+    "outputs/claim2_endpoint_counterexample.json",
+    "outputs/anchored_claims_mechanism.json",
+    "outputs/claim3_properties_fullscale.json",
+    "outputs/claim3_independent_e_merge.json",
+    "outputs/claim4_eccp_full_protocol.json",
+    "outputs/claim5_weca_full_protocol.json",
+    "outputs/claim2_independent.json",
+    "outputs/claim3_independent.json",
+    "outputs/weca_independence_audit.json",
+    "outputs/claim6_full_protocol.json",
+    "outputs/paper_headline_comparison.json",
+    "outputs/ccp_calibrator_contract_audit.json",
+    "outputs/ca_p2e_domain_audit.json",
+    "outputs/ca_input_audit.json",
+    "outputs/source_manifest_audit.json",
+    "outputs/paper_table_fixture_audit.json",
+    "outputs/final_logbook_cells.json"
+  ],
+  "falsified_claims": 1,
+  "headline_cells": 122,
+  "headline_scalars": 488,
+  "hygiene": {
+    "absolute_path_hits": [],
+    "env_files": [],
+    "forbidden_paths": [],
+    "secret_hits": [],
+    "tracked_files": 255
+  },
+  "maximum_points": 12,
+  "openreview_id": "jNv4sl4YZH",
+  "paper": "2606.03600",
+  "producers_skipped": true,
+  "publication_gate_passed": true,
+  "source_commit": "66cb1e1c76d1b1d3d133fe6cb3896c95d48b5974",
+  "verified_claims": 5
+}

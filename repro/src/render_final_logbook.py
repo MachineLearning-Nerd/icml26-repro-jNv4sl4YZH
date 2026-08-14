@@ -31,6 +31,7 @@ def build_cells(
     claim3: dict[str, object],
     calibrator_contract: dict[str, object],
     headlines: dict[str, object],
+    endpoint: dict[str, object] | None = None,
 ) -> dict[str, object]:
     c1_summary = claim1["summary"]
     anchored_summary = anchored["summary"]
@@ -41,6 +42,7 @@ def build_cells(
     c3_summary = claim3["summary"]
     contract_summary = calibrator_contract["summary"]
     headline_summary = headlines["summary"]
+    endpoint = endpoint or load("outputs/claim2_endpoint_counterexample.json")
     assert isinstance(c1_summary, dict)
     assert isinstance(anchored_summary, dict)
     assert isinstance(c2_summary, dict)
@@ -50,6 +52,23 @@ def build_cells(
     assert isinstance(c3_summary, dict)
     assert isinstance(contract_summary, dict)
     assert isinstance(headline_summary, dict)
+    if endpoint.get("verdict") != "FALSIFIED":
+        raise RuntimeError("Claim 2 endpoint verdict is not FALSIFIED")
+    counterexample = endpoint.get("counterexample")
+    corrected_theorem = endpoint.get("corrected_theorem")
+    if not isinstance(counterexample, dict) or not isinstance(corrected_theorem, dict):
+        raise RuntimeError("Claim 2 endpoint evidence is incomplete")
+    if not all(
+        counterexample.get(key) is True
+        for key in (
+            "contradicts_uniqueness",
+            "satisfies_every_printed_assumption",
+            "works_for_every_alpha_in_(0,1)",
+        )
+    ):
+        raise RuntimeError("Claim 2 endpoint counterexample controls failed")
+    if corrected_theorem.get("paper_proof_itself_concludes_only_positive_intervals") is not True:
+        raise RuntimeError("Claim 2 corrected positive-domain qualification missing")
 
     require_true(
         c1_summary,
@@ -256,6 +275,8 @@ def build_cells(
 
     summary = {
         "anchored_claims": 6,
+        "verified_claims": 5,
+        "falsified_claims": 1,
         "maximum_points": 12,
         "source_anchors": int(anchored_summary["source_anchor_count"]),
         "aon_uniqueness_levels": int(
@@ -347,7 +368,7 @@ def build_cells(
 
     claim1_markdown = f"""Claim 1 is verified from both the pinned Definition 2.2 source block and an independent finite-rank construction. At every one of {summary['claim1_cells']} theorem-valid `(n, alpha)` cells, membership under `P_n > alpha` is identical to membership under `F(P_n) < 1/alpha`; the threshold identity also passes exactly. The constructed e-variable has maximum expectation error {summary['claim1_maximum_expectation_error']:.3g}. This directly reproduces the definition of set preservation rather than inferring it from empirical coverage."""
 
-    claim2_markdown = f"""Claim 2 is verified by a source-hash-bound proof contract and an exact rational budget certificate. For {summary['aon_uniqueness_levels']} distinct alpha levels, set preservation forces `F >= 1/alpha` on `(0, alpha]`, which consumes exactly the entire p-to-e integral budget; nonnegativity and monotonicity then force `F=1/alpha` below alpha and `F=0` above it, while explicit conformal-grid witnesses exercise the left-continuity boundary argument. The pinned Proposition 2.3, Theorem 2.6, and Equation 9 blocks are among {summary['source_anchors']} independently hashed source anchors, tying the uniqueness result to the sigmoid construction it motivates."""
+    claim2_markdown = f"""Claim 2 is **FALSIFIED as literally printed**. The exact endpoint witness sets `F*(0)=infinity` and equals AoN on `(0,1]`; it satisfies every printed assumption for every `alpha in (0,1)` and therefore contradicts uniqueness on `[0,1]`. The source-hash-bound proof contract still verifies the corrected statement on positive intervals: for {summary['aon_uniqueness_levels']} distinct alpha levels, set preservation consumes the full integral budget below alpha and forces the AoN form on `(0,1]`. The pinned Proposition 2.3, Theorem 2.6, and Equation 9 blocks are among {summary['source_anchors']} independently hashed source anchors. The operational conformal conclusion is unchanged because conformal p-values are positive."""
 
     claim3_markdown = f"""Claim 3 is verified in {summary['sigmoid_mechanism_cases']} independent theorem-domain cases. The normalized sigmoid has expectation one, finite log-values (strict positivity), a strictly negative analytic derivative (smoothness and invertibility), and a closed-form inverse that round-trips numerically. Pointwise P2E values dominate AoN, so every weighted or unweighted aggregate P2E e-value is at least the corresponding AoN aggregate and the P2E prediction set is a subset. The full released CCP results additionally show strict empirical improvement over AoN in {summary['claim2_ccp_aon_wins']}/9 matched dataset/model cells."""
 
@@ -361,7 +382,7 @@ def build_cells(
 
     controls_markdown = f"""The controls fail in the intended direction. All {summary['claim1_domain_controls']} excluded theorem-domain boundary cases are rejected, and classical p-to-e calibrators inflate the conformal set in all {c1_summary['classic_control_case_count']} valid finite-rank cases. Invalid 2x e-value scaling violates the arbitrary-dependence deterministic bound in {mechanism_summary['invalid_arbitrary_dependence_rejection_count']}/{mechanism_summary['case_count']} cases and the randomized bound in {mechanism_summary['invalid_randomized_arbitrary_dependence_rejection_count']}/{mechanism_summary['case_count']} cases. It also violates the exchangeable ECCP-Exch and UR-ECCP-Exch orbit bounds in {mechanism_summary['invalid_exchangeable_prefix_rejection_count']}/{mechanism_summary['exchangeable_prefix_case_count']} and {mechanism_summary['invalid_exchangeable_randomized_prefix_rejection_count']}/{mechanism_summary['exchangeable_prefix_case_count']} cases. Inference-adaptive one-hot weights fail both weighted-merge bounds in {mechanism_summary['adaptive_weight_rejection_count']}/{mechanism_summary['case_count']} and {mechanism_summary['adaptive_randomized_weight_rejection_count']}/{mechanism_summary['case_count']} cases. All raw verifiers separately reject protocol drift, missing, duplicate, unexpected or non-finite cells, invalid metric ranges, and insufficient efficiency gains."""
 
-    conclusion_markdown = f"""All six anchored jury claims are verified at the declared scope. The source-bound mechanism audit covers Definition 2.2, Proposition 2.3, Theorem 2.6/Equation 9, Propositions 4.1–4.2, and Section 5; independent exact/numerical certificates verify set preservation, AoN uniqueness, sigmoid properties and dominance, ECCP coverage, and tuning-independent WECA validity. Complete released CA and CCP runs supply {summary['claim2_raw_rows']:,} + {summary['claim3_raw_rows']:,} raw cells. All {summary['headline_unaffected_scalars']} unaffected table scalars reproduce within fixed tolerances; one CA finite-seed length-SD scalar is `0.201898618094345` versus `0.18`, and the paper/released-code F1/F2/F3 inconsistency affecting {summary['headline_discrepancy_scalars']} scalars is source-hash-bound, numerically witnessed, and disclosed rather than force-fit. The reversible released log/square-root column swap independently replays all {summary['headline_source_replay_scalars']} affected scalars within the same fixed tolerances.
+    conclusion_markdown = f"""Five of six anchored jury claims are supported at the declared scope; the literal Claim 2 uniqueness statement is falsified by the endpoint witness above, while its corrected positive-domain form is verified. The source-bound mechanism audit covers Definition 2.2, Proposition 2.3, Theorem 2.6/Equation 9, Propositions 4.1–4.2, and Section 5; independent exact/numerical certificates verify set preservation, the qualified AoN result, sigmoid properties and dominance, ECCP coverage, and tuning-independent WECA validity. Complete released CA and CCP runs supply {summary['claim2_raw_rows']:,} + {summary['claim3_raw_rows']:,} raw cells. All {summary['headline_unaffected_scalars']} unaffected table scalars reproduce within fixed tolerances; one CA finite-seed length-SD scalar is `0.201898618094345` versus `0.18`, and the paper/released-code F1/F2/F3 inconsistency affecting {summary['headline_discrepancy_scalars']} scalars is source-hash-bound, numerically witnessed, and disclosed rather than force-fit. The reversible released log/square-root column swap independently replays all {summary['headline_source_replay_scalars']} affected scalars within the same fixed tolerances.
 
 ## Scope & cost
 
@@ -372,7 +393,7 @@ def build_cells(
 | Claim 5 / CA | {summary['claim2_raw_rows']:,} raw cells; four tasks x 20 seeds x 24 methods; source-bound split audit | Same released tasks, seeds, methods, M=512, B=500 |
 | Hardware | Local CPU; no GPU | CPU-compatible released implementation |
 | External compute cost | $0 | No cloud run required |
-| Outcome | 6/6 anchored claims verified; 12 possible points | Full challenge-claim scope |
+| Outcome | 5/6 claims supported; C2 falsified literally; 12 possible points | Full challenge-claim scope |
 
 Source float underflow for already-excluded extreme e-values is disclosed; stable log-e arithmetic confirms strict positivity and leaves every threshold decision unchanged.
 

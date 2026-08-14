@@ -8,4 +8,5 @@ outputs/*.log
 outputs/*_evidence_bundle.jsonl
 outputs/openml_cache/
 upstream/
-.trackio/metadata.json
+.openresearch/
+*.tmp

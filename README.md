@@ -1,203 +1,162 @@
-# Reproduction: Set-Preserving Calibration from Conformal P-Values to E-Values
+# ICML 2026 reproduction: Set-Preserving P2E Calibration
 
-[![Open in molab](https://marimo.io/molab-shield.svg)](https://molab.marimo.io/github/MachineLearning-Nerd/icml26-repro-jNv4sl4YZH/blob/main/notebooks/p2e_claims.py)
+This repository is the clean-room audit for [*Set-Preserving Calibration from
+Conformal P-Values to E-Values*](https://arxiv.org/abs/2606.03600) by Nabil
+Alami, Jad Zakharia, and Souhaib Ben Taieb. The paper studies when conformal
+p-values can be converted into e-values without changing prediction sets, and
+whether the resulting e-values can be merged more efficiently.
 
-**Paper:** ICML 2026 / OpenReview `jNv4sl4YZH` /
-[arXiv `2606.03600`](https://arxiv.org/abs/2606.03600) · **Live judged
-baseline:** 7/12 · **Compute:** Hugging Face `cpu-upgrade`, CPU only
+Repository target name: `icml26-set-preserving-p2e-calibration`
 
-The paper claims that its sigmoid p-to-e calibration preserves conformal sets,
-retains finite-sample validity under ECCP and data-dependent WECA merging, and
-improves prediction-set efficiency. We audited all six evaluator claims.
-Observed evidence is: Claim 1 VERIFIED; literal Claim 2 FALSIFIED by an
-assumption-satisfying endpoint witness; Claims 3–6 VERIFIED. On the complete
-released protocols, P2E was shorter in 36/36 ECCP calibrator comparisons and
-24/24 WECA/UR-WECA classical-calibrator comparisons. All 9 ECCP and 8 WECA
-P2E coverage means met the predeclared 0.02 shortfall tolerance.
+Paper: [arXiv:2606.03600](https://arxiv.org/abs/2606.03600) ·
+[OpenReview:jNv4sl4YZH](https://openreview.net/forum?id=jNv4sl4YZH)
 
-This campaign does not downscale the paper’s reported CA/CCP grids: it
-revalidates 1,920 and 11,700 immutable raw cells, respectively. The cumulative
-campaign reaggregates those hash-pinned cells rather than retraining every
-author estimator. Coverage intervals are descriptive; Claims 4 and 5 use
-separate proof-level mechanism certificates. A best-supported 12/12 is only a
-forecast until the live judge evaluates the new Space revision.
+## Current result
 
-The previous candidate revision was discovered by the live judge, but its
-three attempts ended in model-router HTTP 504s. A separate evaluator audit then
-found that the judge reads Markdown lexically and truncates at 120,000
-characters: the preserved historical pages consumed the prompt before any
-`current-claim-*` page. The repaired Space adds one compact
-`00-current-evidence` page, proves all six exact claim markers are visible
-before truncation, and retains the historical tree.
+The evidence supports five of the six anchored challenge claims. Claim 2 is
+**falsified as literally printed**: its uniqueness statement quantifies over
+`[0,1]`, but the printed assumptions permit an endpoint value
+`F*(0)=infinity` while leaving `F*` equal to the all-or-nothing calibrator on
+`(0,1]`. The corrected positive-domain statement is verified, and the
+operational conformal result is unchanged because conformal p-values are
+positive.
 
-- [Illustrated technical report](reports/set-preserving-p2e-reproduction-2026-07-25/report.md)
-- [Self-contained marimo tutorial](notebooks/p2e_claims.py)
-- [Claim contracts and fail-closed evidence](.openresearch/artifacts)
+The complete released protocols contain 1,920 conformal-aggregation rows and
+11,700 cross-conformal rows. P2E is shorter than the named baselines in 24/24
+aggregation comparisons and 36/36 cross-conformal comparisons, including 9/9
+comparisons against AoN. All eight aggregation and 27 cross-conformal P2E
+coverage sanity cells pass the predeclared 0.02 absolute shortfall tolerance.
+The exact validity claims are supported by proof-level e-value and
+arbitrary-dependence certificates, not by those empirical means alone.
 
-## Experiment log
+No challenge score is claimed here. The repository records evidence verdicts,
+source drift, limitations, and reproduction scope.
 
-The exact run command is identical on every formal node:
-`uv run --frozen python repro/src/run_campaign.py`.
+## What is in the repository
 
-| Branch / experiment | Purpose or change | Exact run command | Assessment / outcome | Compute |
-| --- | --- | --- | --- | --- |
-| `main` | Public landing page, report, notebook, and published release mirror | Not run as an experiment (publication surface) | Presentation-only | None |
-| [`orx/baseline-metadata-reconstruction`](https://github.com/MachineLearning-Nerd/icml26-repro-jNv4sl4YZH/tree/orx/baseline-metadata-reconstruction) | Passing cumulative baseline after deterministic packaging repairs | `uv run --frozen python repro/src/run_campaign.py` | 14/14 commands; 35/35 tests | HF `cpu-upgrade`, 64 vCPU allocation, 1m29s wall |
-| [`orx/claim-2-literal-endpoint-counterexample`](https://github.com/MachineLearning-Nerd/icml26-repro-jNv4sl4YZH/tree/orx/claim-2-literal-endpoint-counterexample) | Test Proposition 2.3 on its printed `[0,1]` domain | `uv run --frozen python repro/src/run_campaign.py` | Literal statement FALSIFIED; positive-domain correction verified | HF `cpu-upgrade`, 64 vCPU allocation, 1m45s wall |
-| [`orx/claim-3-analytic-and-full-scale-aon-verification`](https://github.com/MachineLearning-Nerd/icml26-repro-jNv4sl4YZH/tree/orx/claim-3-analytic-and-full-scale-aon-verification) | Smoothness, inverse, positivity, exactness, and direct AoN comparison | `uv run --frozen python repro/src/run_campaign.py` | VERIFIED; P2E shorter than AoN 9/9 | HF `cpu-upgrade`, 64 vCPU allocation, 1m51s wall |
-| [`orx/claim-4-eccp-universal-mechanism-and-full-protoc`](https://github.com/MachineLearning-Nerd/icml26-repro-jNv4sl4YZH/tree/orx/claim-4-eccp-universal-mechanism-and-full-protoc) | Universal ECCP mechanism plus the 11,700-row protocol | `uv run --frozen python repro/src/run_campaign.py` | VERIFIED; 9/9 coverage cells | HF `cpu-upgrade`, 64 vCPU allocation, 1m45s wall |
-| [`orx/claim-5-data-dependent-weca-full-protocol`](https://github.com/MachineLearning-Nerd/icml26-repro-jNv4sl4YZH/tree/orx/claim-5-data-dependent-weca-full-protocol) | Source-level data-dependence audit plus the 1,920-row protocol | `uv run --frozen python repro/src/run_campaign.py` | VERIFIED; 8/8 coverage cells; adaptive control rejected | HF `cpu-upgrade`, 64 vCPU allocation, 1m45s wall |
-| [`orx/evaluator-visible-cumulative-release-candidate`](https://github.com/MachineLearning-Nerd/icml26-repro-jNv4sl4YZH/tree/orx/evaluator-visible-cumulative-release-candidate) | Cumulative six-claim regression plus evaluator-visible report, notebook, and Space candidate | `uv run --frozen python repro/src/run_campaign.py` | 25/25 commands; 44/44 tests; Claims 1–6 cumulative gate passed | HF `cpu-upgrade`, 64 vCPU allocation, 1m46s wall |
-| [`orx/judge-first-compact-evidence`](https://github.com/MachineLearning-Nerd/icml26-repro-jNv4sl4YZH/tree/orx/judge-first-compact-evidence) | Reproduce and repair the live judge's 120k prompt truncation | `uv run --frozen python repro/src/run_campaign.py` | Scientific suite reached; OpenML 504 exposed the need for a fail-closed availability path | HF `cpu-upgrade`, 64 vCPU allocation, two environmental attempts |
-| [`orx/fail-closed-openml-outage-fallback`](https://github.com/MachineLearning-Nerd/icml26-repro-jNv4sl4YZH/tree/orx/fail-closed-openml-outage-fallback) | Cumulative winner with guarded OpenML 5xx fallback and judge-first audit | `uv run --frozen python repro/src/run_campaign.py` | 27/27 commands; 49/49 tests; all six claim markers visible before truncation | HF `cpu-upgrade`, 64 vCPU allocation, 5m22s wall |
+| Path | Purpose |
+| --- | --- |
+| `repro/src/` | Independent verifiers, source-audit code, protocol runners, and the local publication gate |
+| `repro/tests/` | Focused regression tests for protocol, source, claim, and negative-control contracts |
+| `repro/configs/` | Paper claim snapshot, source manifest, protocol, and headline-table fixtures |
+| `outputs/` | Hash-bound machine-readable evidence used by the final gate |
+| `docs/` | Claim/evidence, source, branch, publication, and research-log documentation |
+| `sources/arxiv-v1/` | Retrieved arXiv v1 source archive, primary TeX, and PDF used for the audit |
+| `reports/` | Human-readable claim-by-claim technical report |
+| `space_release/` | Historical evaluator-visible evidence snapshot; it is not the local publication authority |
+| `notebooks/` | Small interactive explanation of the P2E identities and claims |
 
-## Scope
+The filename `claim2_independent.json` is retained for provenance: it is the
+paper's CA protocol artifact and supplies evidence for challenge Claim 5. The
+literal uniqueness result is stored separately as
+`claim2_endpoint_counterexample.json`.
 
-This reproduction evaluates all six anchored challenge claims at the released paper
-protocol, rather than treating a small synthetic example as a substitute:
+## Claim-to-evidence map
 
-1. Definition 2.2 set preservation across the exact finite-rank domain.
-2. Proposition 2.3 uniqueness of the left-continuous AoN calibrator and the
-   resulting sigmoid motivation.
-3. Theorem 2.6 exactness, smoothness, invertibility, positivity, and AoN
-   dominance of the proposed P2E sigmoid.
-4. Proposition 4.1 exact `1-alpha` ECCP validity versus the weaker standard
-   CCP guarantee.
-5. Proposition 4.2 tuning-independent data-dependent WECA validity.
-6. Section 5 paper-scale ECCP efficiency with valid empirical coverage.
+| Challenge claim | Verdict | How the result is produced | Primary evidence |
+| --- | --- | --- | --- |
+| C1 — Definition 2.2 set preservation | **VERIFIED** | Construct finite-rank p-values and the P2E e-variable independently; compare set membership and threshold identities over 18 theorem-domain cells; cross-check against the pinned author source and reject five domain controls. | `outputs/claim1_independent.json`, `outputs/claim1_source_crosscheck.json` |
+| C2 — Proposition 2.3 uniqueness | **FALSIFIED literally**; corrected `(0,1]` form verified | Build the symbolic endpoint witness `F*(0)=infinity`, `F*(p)=1/alpha` for `0<p<=alpha`, and `F*(p)=0` otherwise; check monotonicity, left continuity, integral budget, and set preservation. | `outputs/claim2_endpoint_counterexample.json`, `outputs/anchored_claims_mechanism.json` |
+| C3 — Theorem 2.6 sigmoid properties | **VERIFIED** | Evaluate exactness, positivity, derivative sign, inverse round-trips, pointwise AoN dominance, and aggregation dominance in 18 independent cases; compare full CCP results. | `outputs/claim3_properties_fullscale.json`, `outputs/claim3_independent.json` |
+| C4 — ECCP validity | **VERIFIED** | Use exact e-merge expectations, sparse LPs over arbitrary fold-rank couplings, exchangeable-prefix orbit LPs, randomized Markov controls, and the complete 11,700-row CCP protocol. | `outputs/claim4_eccp_full_protocol.json`, `outputs/claim3_independent_e_merge.json` |
+| C5 — WECA validity | **VERIFIED** | Audit the released split flow, mutate final-calibration/test data, require weights to remain bit-identical, reject outcome-adaptive controls, and verify the complete 1,920-row CA protocol. | `outputs/claim5_weca_full_protocol.json`, `outputs/weca_independence_audit.json`, `outputs/claim2_independent.json` |
+| C6 — Section 5 efficiency | **VERIFIED** | Recompute coverage and length from all raw cells; require every P2E comparison and materiality threshold; compare 488 paper scalars while classifying the documented source mismatches. | `outputs/claim6_full_protocol.json`, `outputs/paper_headline_comparison.json`, `outputs/ccp_calibrator_contract_audit.json` |
 
-The mechanism audit includes exact rank-tuple enumeration and sparse linear
-programs over every joint coupling with the prescribed rank marginals, for
-both deterministic and the paper's independent-uniform randomized thresholds,
-plus an orbit LP for the exchangeable prefix-maximum ECCP variants, so the
-coverage check is not restricted to independent folds. See
-[`docs/arbitrary_dependence_coverage.md`](docs/arbitrary_dependence_coverage.md).
-The exact current jury wording and the evidence/gate for each claim are mapped
-in [`docs/jury_claim_evidence_matrix.md`](docs/jury_claim_evidence_matrix.md).
+The production path is intentionally explicit:
 
-The source implementation is checked out locally under `upstream/` at
-`Nabil-Ala/P2E_calibration@66cb1e1c76d1b1d3d133fe6cb3896c95d48b5974`.
-`repro/` contains independent checks and a full-protocol runner. Generated
-summaries belong in `outputs/`.
+```text
+paper/source hashes
+        -> independent mechanism verifiers
+        -> raw protocol runners and cell-set verifiers
+        -> negative controls and source-drift audits
+        -> publication_gate.py
+        -> outputs/publication_gate.json
+```
 
-## Reproduce from a fresh clone
+## Reproduce
 
-The local official-source checkout is intentionally not committed as an
-embedded Git repository. Fetch and verify the exact source revision before
-running the evidence pipeline:
+The deterministic environment is Python 3.12 and the locked dependencies in
+`uv.lock`.
 
 ```bash
+uv sync --frozen
+
 git clone https://github.com/Nabil-Ala/P2E_calibration.git upstream
 git -C upstream checkout 66cb1e1c76d1b1d3d133fe6cb3896c95d48b5974
-test "$(git -C upstream rev-parse HEAD)" = \
-  66cb1e1c76d1b1d3d133fe6cb3896c95d48b5974
 
-uv venv --python 3.12 .venv
-source .venv/bin/activate
-uv pip install -r repro/requirements.lock.txt
-```
-
-Run the deterministic Claim 1 checks and the complete released Claim 2 and
-Claim 3 protocols. The runners write one atomic final file per dataset and can
-reuse a previously completed dataset safely:
-
-```bash
-python repro/src/verify_p2e_identity.py \
+uv run python repro/src/verify_p2e_identity.py \
   --output outputs/claim1_independent.json
-python repro/src/crosscheck_source_p2e.py \
-  --source upstream --output outputs/claim1_source_crosscheck.json
-python repro/src/verify_anchored_claims.py \
+uv run python repro/src/verify_claim2_endpoint.py \
+  --output outputs/claim2_endpoint_counterexample.json
+uv run python repro/src/verify_anchored_claims.py \
   --output outputs/anchored_claims_mechanism.json
-python repro/src/verify_source_manifest.py \
-  --source upstream --output outputs/source_manifest_audit.json
-python repro/src/verify_ca_inputs.py \
-  --source upstream --output outputs/ca_input_audit.json
-python repro/src/verify_ca_p2e_domains.py \
-  --source upstream --output outputs/ca_p2e_domain_audit.json
-
-python repro/src/run_author_ca.py \
-  --source upstream --output-dir outputs/raw/author_ca
-python repro/src/verify_ca_results.py \
-  --raw-dir outputs/raw/author_ca --output outputs/claim2_independent.json
-
-python repro/src/run_author_ccp.py \
-  --source upstream --output-dir outputs/raw/author_ccp
-python repro/src/verify_ccp_results.py \
-  --raw-dir outputs/raw/author_ccp --output outputs/claim3_independent.json
-
-python repro/src/verify_e_merge_coverage.py \
-  --output outputs/claim3_independent_e_merge.json
-python repro/src/verify_weca_independence.py \
-  --source upstream --output outputs/weca_independence_audit.json
-python repro/src/compare_paper_headlines.py \
-  --ca outputs/claim2_independent.json \
-  --ccp outputs/claim3_independent.json \
-  --output outputs/paper_headline_comparison.json
-
-# Independently re-download the hash-pinned arXiv v1 source and verify that
-# all 122 fixture cells / 488 scalars were transcribed exactly from its TeX.
-python repro/src/verify_paper_table_fixture.py \
-  --output outputs/paper_table_fixture_audit.json
-python repro/src/verify_ccp_calibrator_contract.py \
-  --source upstream --output outputs/ccp_calibrator_contract_audit.json
-python -m unittest discover -s repro/tests -v
+uv run python -m unittest discover -s repro/tests -v
 ```
 
-The CA run evaluates 1,920 raw method/seed cells (four OpenML tasks, 20
-seeds). The CCP run evaluates 11,700 raw model/method/seed cells (three bundled
-datasets, 100 seeds). CCP uses the fail-closed
-`vectorized-exact-postprocessing-v1` adapter: all source estimator, grid,
-foldwise p-value, and RNG outputs are preserved, while deterministic p/e
-aggregation is vectorized. Literal-source parity is tested across OLS, RF, and
-Lasso for all 13 methods. These are long CPU runs, not smoke tests. After they
-finish, build the evidence-derived logbook cells and execute the final gate:
+The complete released protocols are CPU-heavy. `run_campaign.py` is the
+historical cumulative runner and may retrieve the immutable public evidence
+bundle before rerunning the full checks. For a clean clone that already has
+the checked-in evidence outputs, the scoped publication check is:
 
 ```bash
-python repro/src/render_final_logbook.py \
-  --output outputs/final_logbook_cells.json
-python repro/src/prepublish_gate.py \
-  --output outputs/prepublish_gate.json
+uv run python repro/src/publication_gate.py --skip-producers
 ```
 
-After the full source runs finish, `python repro/src/prepublish_gate.py` reruns
-all independent checks and tests, validates every raw cell, verifies the
-Trackio evidence and source pin, compares all 488 reported mean/SD scalars in
-the 122 tabulated paper cells, requires all 376 unaffected scalars to pass,
-requires the exact one-scalar CA finite-seed dispersion mismatch to be
-explicitly disclosed, and requires all 108 scalars in the
-paper/released-code F1/F2/F3 inconsistency to be source-hash-bound and
-explicitly classified. The reversible released log/square-root column swap is
-additionally replayed against the paper table, and all 72 available scalars
-must pass the same fixed tolerances. It also requires all 24 CA material-efficiency comparisons
-and all 36 CCP calibrator comparisons (including nine AoN cells), scans for
-secrets/local paths, and emits a SHA-256 manifest only if the complete
-publication gate passes. It also creates
-a hash-indexed JSONL bundle containing fourteen summary/report artifacts and all
-seven full raw dataset files; Trackio recognizes this format and promotes
-it to the Hugging Face artifact bucket on publication.
+The gate is fail-closed. It checks the paper/source identifiers, every claim
+verdict, raw-cell counts, protocol summaries, headline discrepancy accounting,
+negative controls, source hashes, tracked-file hygiene, and the JSON evidence
+bundle. It does not publish to GitHub, Hugging Face, Trackio, or any other
+service.
 
-`repro/src/publish_after_gate.sh` is the final idempotent publication step. It
-accepts only a passing six-claim/12-point gate, pushes the public GitHub repository,
-atomically joins the single shared Hugging Face publication queue, and reads
-both services back after the shared drain publishes the Trackio Space. Success requires
-the public challenge tags, a nonempty Space commit SHA, the final Conclusion
-marker, and an artifact-bucket copy of the evidence bundle with the exact
-local byte size. Trackio's local-only metadata is deliberately gitignored so
-its artifact source path cannot leak into GitHub.
+## Branch audit
 
-## Current status
+`main` is the canonical public branch. The other branches preserve the
+experiment lineage with descriptive names; the full tip mapping and status are
+in [`docs/BRANCH_AUDIT.md`](docs/BRANCH_AUDIT.md).
 
-The reproduction is complete and publicly submitted for verdict. The full
-four-dataset CA run contains 1,920/1,920 cells, the full three-dataset CCP run
-contains 11,700/11,700 cells, and the six-claim theorem/mechanism audit passes.
-All 35 tests and the final publication gate pass. The public GitHub repository
-is `MachineLearning-Nerd/icml26-repro-jNv4sl4YZH`; canonical backlog entry 43
-was drained to `DineshAI/jNv4sl4YZH`, whose challenge tags, nonempty commit SHA,
-Conclusion marker, and 2,781,144-byte Trackio evidence bundle were read back.
-A hash-bound audit verifies that the paper defines the three alternative CCP
-columns as log/square-root/linear while the released table driver fills those
-positions with square-root/log/power; formula-faithful results remain honestly
-labeled.
-The environment pins `pandas==2.3.3` because the unmodified released Parkinson
-loader relies on a Pandas-2-compatible in-place numeric assignment; the reason
-and exact wrapper boundary are documented in `docs/source_audit.md`.
+| Branch | Role |
+| --- | --- |
+| `baseline/judged-7-of-12` | Original live-score baseline |
+| `baseline/protocol-sidecar-repair` | Repaired missing protocol sidecars |
+| `baseline/metadata-reconstruction` | Passing cumulative baseline |
+| `audit/claim-2-endpoint-counterexample` | Literal uniqueness falsifier |
+| `audit/claim-3-sigmoid-aon` | Analytic sigmoid and AoN audit |
+| `audit/claim-4-eccp-coverage` | ECCP mechanism and full protocol |
+| `audit/claim-5-weca-independence` | WECA split-independence and CA protocol |
+| `audit/judge-first-visibility` | Evaluator prompt-truncation audit |
+| `release/evaluator-visible-cumulative` | Cumulative evidence release candidate |
+| `release/openml-outage-fallback` | Fail-closed OpenML availability path |
+| `release/final-judge-first` | Final judge-first package |
+| `release/audited-publication-package` | Earlier audited publication package |
+
+The old `orx/` prefix described the execution tool, not the scientific role;
+it is not retained in the final public branch names.
+
+## Paper citation
+
+```bibtex
+@inproceedings{alami2026setpreserving,
+  title     = {Set-Preserving Calibration from Conformal P-Values to E-Values},
+  author    = {Alami, Nabil and Zakharia, Jad and Ben Taieb, Souhaib},
+  booktitle = {Proceedings of the 43rd International Conference on Machine Learning},
+  year      = {2026},
+  eprint    = {2606.03600},
+  archivePrefix = {arXiv},
+  url       = {https://arxiv.org/abs/2606.03600}
+}
+```
+
+## Thank you
+
+Thank you to Nabil Alami, Jad Zakharia, and Souhaib Ben Taieb for making the
+paper and the pinned `Nabil-Ala/P2E_calibration` implementation available. The
+public source made it possible to inspect the theorem domain, reproduce the
+released protocols, identify the endpoint qualification, and document the
+paper/source formula drift precisely. This repository is an independent
+reproduction audit and is not an official author repository.
+
+For the evidence policy, source provenance, branch history, and publication
+checks, see [`docs/CLAIM_EVIDENCE.md`](docs/CLAIM_EVIDENCE.md),
+[`docs/SOURCE_AUDIT.md`](docs/SOURCE_AUDIT.md),
+[`docs/PUBLICATION_GATE.md`](docs/PUBLICATION_GATE.md), and
+[`STATUS.md`](STATUS.md).

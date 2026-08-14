@@ -1,5 +1,5 @@
 [project]
-name = "icml26-repro-jnv4sl4yzh"
+name = "icml26-set-preserving-p2e-calibration"
 version = "0.1.0"
 description = "Claim-by-claim reproduction of Set-Preserving Calibration from Conformal P-Values to E-Values"
 readme = "README.md"

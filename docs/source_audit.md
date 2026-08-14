@@ -1,133 +1,72 @@
-# Source audit
+# Source and provenance audit
 
-The repository is author-owned and describes itself as the ICML 2026
-reproduction package. Its `e-ca/` implementation has the four exact OpenML
-task IDs, 20 fixed seeds, alpha `.05`, seven base models, `M=512`, and `B=500`
-used for the conformal-aggregation study. Its `e-ccp/` tree contains the
-Boston, Abalone, and Parkinson/UPDRS inputs plus the 100-seed cross-conformal
-driver.
+## Primary paper
 
-The executable source and bundled CCP inputs are also pinned independently of
-the Git reference in `repro/configs/source_manifest.json`. The manifest records
-SHA-256, Git blob SHA-1, and byte size for all ten released files used to define
-or execute the CA/CCP protocols. Its verifier parses all three CSVs, checks
-10,558 data rows and their exact headers, then executes the pinned loader and
-requires the Boston, Abalone, and Parkinson arrays to have shapes `(506, 14)`,
-`(4177, 10)`, and `(5875, 13)` with finite values and exact loader configs. The
-final publication gate reruns this check and includes its hash-indexed audit in
-the public evidence bundle.
+- Title: *Set-Preserving Calibration from Conformal P-Values to E-Values*.
+- Authors: Nabil Alami, Jad Zakharia, and Souhaib Ben Taieb.
+- arXiv: [`2606.03600`](https://arxiv.org/abs/2606.03600), v1 used for the
+  paper-table audit.
+- OpenReview: [`jNv4sl4YZH`](https://openreview.net/forum?id=jNv4sl4YZH).
+- v1 source URL: `https://export.arxiv.org/e-print/2606.03600v1`.
+- v1 PDF URL: `https://arxiv.org/pdf/2606.03600v1`.
 
-The CA datasets are live OpenML tasks rather than repository files, so they
-have a separate content certificate in `repro/configs/ca_input_manifest.json`.
-It binds task IDs to dataset IDs, names, versions, targets, processed shapes,
-and SHA-256 hashes of the exact float64 arrays returned by the pinned released
-loader after numeric-column selection and missing/non-finite-row removal. The
-four tasks resolve to 7,776 finite rows and 47,126 feature values. Both the
-final gate and a corruption control re-check these fingerprints, preventing a
-stable task ID from hiding OpenML metadata, cache, or data drift.
+The checked-in source artifacts are under `sources/arxiv-v1/`:
 
-The paper specifies `K=15` for Boston/Abalone and `K=20` for Parkinson in its
-reported CCP tables. The upstream driver exposes `K` as a local constant, so
-the reproduction runner will pass those values explicitly rather than silently
-using its default of five folds. This is a transparent protocol completion, not
-a change to the P2E method.
+| Artifact | SHA-256 |
+| --- | --- |
+| `source.tar.gz` | `f5124c39036b9107b01439fdbeb5da82331a70b81a3211e3b36887e08109a2db` |
+| `main.tex` | `49058ff8e986f43770936c09cc97360e5cace8802c6304a80d9e153d342ae857` |
+| `paper.pdf` | `702dbea68adb646d41255420c67122b63f879c66b333684f904fc39d11c718e2` |
 
-The independent verifier will not import the upstream P2E helper: it will
-construct the finite rank distribution and P2E threshold separately, recompute
-the e-value expectation and p/e set equality, and reconstruct coverage and
-length summaries from raw output rows.
+The paper-table fixture verifier independently checks the archive and TeX
+hashes before parsing the 122 configured headline cells.
 
-The hash-pinned primary TeX states the main P2E theorem only when
-`alpha*(n+1) > 1` and this quantity is non-integer. The Claim-1 verifier now
-enforces that contract before solving for the calibrator: its 18 positive cells
-all satisfy the theorem assumptions, and five deliberately low-level or
-exact-rank-boundary inputs must be rejected. This corrects an earlier audit
-grid that included `(n=10, alpha=.05)` as a numerical extension even though it
-was outside the stated theorem domain.
+## Official implementation
 
-The released CA split/subsampling logic generates 1,680 internal P2E
-calibration contexts across ECA, WECA tuning, and WECA final calibration.
-An audit that executes that pinned logic finds 1,600 contexts inside the stated
-theorem domain and 80 exact-rank boundaries across 27 unique calibration
-sizes. At a boundary `alpha=m/(n+1)`, no positive strictly decreasing
-calibrator normalized at `F(alpha)=1/alpha` can have exact mean one: its first
-`m` rank values already sum to at least `n+1`, while later positive values add
-more. The released implementation uses its `C=1e6` upper bracket there, a
-floating-point limit that produces the same prediction set and differs from
-exact all-or-nothing values by at most `6.43e-174`. The audit verifies the
-source behavior and an exact mean-one all-or-nothing repair separately. These
-80 empirical source cells remain part of the released-protocol reproduction,
-but are not described as positive exact-P2E theorem instances.
+The author repository is
+[`Nabil-Ala/P2E_calibration`](https://github.com/Nabil-Ala/P2E_calibration),
+pinned at commit `66cb1e1c76d1b1d3d133fe6cb3896c95d48b5974`. It is cloned into
+the ignored `upstream/` directory for source-dependent checks and is never
+embedded as a gitlink in this repository.
 
-The WECA guarantee additionally requires its selected nonuniform weights not
-to depend on final inference e-values. The pinned source partitions calibration
-indices into `i1/i2/i3`, builds candidate weights from `i1` scores and `i2`
-covariates, then evaluates final p/e-values only with `i3`. A separate
-source-hash-bound noninterference audit mutates all `i3` rows and, independently,
-all test covariates/outcomes across six released seeds. The returned weights are
-bit-identical in all 12 mutations, whereas a deliberately test-adaptive control
-changes in 6/6 cases.
+The ten hash-bound files are declared in
+`repro/configs/source_manifest.json` and cover the released CA driver,
+calibrators, CCP driver, utilities, and three bundled datasets. The audit
+requires the source worktree to be clean, all Git blob IDs and SHA-256 values
+to match, all loader shapes to match, and 10,558 source dataset rows to be
+accounted for.
 
-## Environment compatibility
+The CA manifest separately binds four OpenML tasks, 7,776 retained rows, and
+47,126 feature values. The CCP protocol uses the bundled Boston, Abalone, and
+Parkinson/UPDRS data. A fresh run must fail closed when OpenML is unavailable or
+when any content hash changes.
 
-The released requirements leave package versions unconstrained. Its Parkinson
-loader standardizes a slice of integer-backed Pandas columns in place. That
-assignment is accepted by Pandas 2 but raises a `TypeError` in Pandas 3, before
-any estimator is run. The reproduction therefore pins `pandas==2.3.3`; this
-restores the source's intended behavior without modifying author code. The
-CCP wrapper also enters the released `e-ccp/` working directory before loading
-the bundled relative-path datasets, while keeping all generated outputs outside
-the vendored source tree. Because the complete CCP protocol has 11,700 cells,
-the CCP wrapper atomically checkpoints after each complete 39-cell seed and the
-CA wrapper does the same after each complete 24-cell seed. Both fail closed on
-missing, duplicate, non-finite, or out-of-scope cells before resuming. This
-changes only orchestration and failure recovery; it does not alter the released
-estimators, data, folds, models, methods, or seeds. Final dataset JSON is also
-written atomically and structurally revalidated before reuse. The independent
-CA and CCP aggregators separately reject protocol drift, missing, duplicate,
-unexpected, and non-finite raw cells.
+## Protocol boundary
 
-A line-by-line audit of the CCP wrapper against `e-ccp/main.py` confirms the
-released split (`default_rng(seed)`, train sample without replacement, sorted
-complement test set), seeds 45–144, three model calls, 300-point grid, 13
-reported methods, and per-test aggregation. It also identifies a material
-source/paper drift. The paper defines F1/F2/F3 as
-log/square-root/linear, but `e-ccp/main.py` fills those three table positions
-from `int_cc_eval_sqrt`, `int_cc_eval_log`, and `int_cc_eval_pow`. The last
-released output computes `5(1-p)^4`, not the paper's `F3(p)=2(1-p)`. Treating
-those positions as the paper-defined formulas would be incorrect. The wrapper
-therefore leaves every author estimator and returned foldwise p-value
-untouched, preserves honest log and square-root labels, replays the identical
-local randomization stream, and reconstructs the paper-specified F3 intervals
-as `ECCP(linear)`. A hash-bound contract audit and dedicated numerical tests
-verify all three formula differences. The wrapper deliberately
-uses the same `numpy.nanmean` aggregation as the released driver; interval
-counts are checked before aggregation and any non-finite seed summary is
-rejected before checkpoint promotion. A fake-source execution test exercises
-this behavior.
+The reproduction preserves author estimators, data splits, seeds, folds,
+candidate grids, and foldwise p-values. The CCP runner uses the named
+`vectorized-exact-postprocessing-v1` adapter only for deterministic p/e
+aggregation; parity checks require the same source grids, foldwise outputs,
+randomization, and 13 method cells. This is orchestration, not a replacement
+model.
 
-## Exact vectorized CCP adapter
+The released CCP table driver has a material formula/column mismatch. The paper
+defines F1/F2/F3 as log/square-root/linear, while the released driver fills
+those positions with square-root/log/power. The last released function computes
+`5(1-p)^4`, not the paper’s `2(1-p)`. The audit binds the paper TeX and released
+source by hash, records numerical witnesses, keeps formula-faithful labels, and
+replays only the reversible log/square-root swap across 72 available scalars.
 
-The literal released functions perform deterministic p/e aggregation in a
-Python loop over every candidate-grid/test-point pair. A measured Parkinson-
-shaped microkernel (`K=20`, 300 grid points) took about `0.32 s` for ten test
-points versus `0.012 s` when vectorized, a roughly `27x` local speedup. Extrapolating only
-that loop (not model fitting) across 2,875 Parkinson test points, three models,
-and 100 seeds gives roughly `7.7` literal CPU-hours versus `0.28` vectorized
-CPU-hours. This is a calibrator-kernel projection, not an end-to-end runtime
-claim; model fitting and interval extraction are excluded.
+## Claim 2 endpoint qualification
 
-The full runner therefore uses the named
-`vectorized-exact-postprocessing-v1` adapter. It reproduces the source fold
-permutation, OLS/RF/Lasso fits, candidate grid, foldwise p-values, and RNG
-draws, then evaluates the same deterministic aggregation formulas with NumPy
-arrays. Parallel seeds were rejected because the released random forest
-already uses all local cores; that route would oversubscribe the host and raise
-RAM risk. The largest Parkinson p-value tensor is about 138 MB, and temporary
-calibrator arrays are evaluated one at a time.
+The paper’s uniqueness proof forces the AoN form on positive intervals but does
+not identify the value at zero. The endpoint verifier records the exact witness
+and the corrected statement. This qualification is part of the result, not an
+implementation failure.
 
-A dedicated parity test executes both literal and vectorized paths for OLS,
-RF, and Lasso. It requires bit-identical grids and foldwise p-values and exact
-interval equality for all 13 published method cells, including the separately
-audited paper-linear F3 reconstruction. The protocol records the adapter name,
-and the final publication gate rejects output missing that provenance.
+## Environment
+
+The checked-in `pyproject.toml` and `uv.lock` pin Python 3.12-compatible
+dependencies, including `pandas==2.3.3`, which is required by the released
+Parkinson loader’s in-place numeric assignment. No author source file is
+modified.

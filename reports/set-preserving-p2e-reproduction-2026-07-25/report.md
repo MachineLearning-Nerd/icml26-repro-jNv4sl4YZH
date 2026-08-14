@@ -159,16 +159,16 @@ set of unrelated branches.
 
 | Experiment | Purpose | Commit | HF run | Outcome |
 | --- | --- | --- | --- | --- |
-| [Judged baseline](https://github.com/MachineLearning-Nerd/icml26-repro-jNv4sl4YZH/tree/orx/judged-7-of-12-baseline) | Lock `uv` environment and historical evidence | `2171272` | `ae118f6b` | Environmental failure: missing protocol sidecars |
-| [Sidecar repair](https://github.com/MachineLearning-Nerd/icml26-repro-jNv4sl4YZH/tree/orx/baseline-protocol-sidecar-repair) | Deterministically reconstruct missing sidecars | `5931369` | `ea731275` | Packaging failure: ignored Trackio metadata |
-| [Passing baseline](https://github.com/MachineLearning-Nerd/icml26-repro-jNv4sl4YZH/tree/orx/baseline-metadata-reconstruction) | Reconstruct metadata and freeze cumulative baseline | `19c3b99` | `92323273` | 14/14 commands, 35/35 tests |
-| [Claim 2](https://github.com/MachineLearning-Nerd/icml26-repro-jNv4sl4YZH/tree/orx/claim-2-literal-endpoint-counterexample) | Exact endpoint counterexample | `d2437fd` | `e35c4772` | FALSIFIED literally; corrected positive-domain form verified |
-| [Claim 3](https://github.com/MachineLearning-Nerd/icml26-repro-jNv4sl4YZH/tree/orx/claim-3-analytic-and-full-scale-aon-verification) | Analytic properties and direct AoN comparison | `56ed828` | `ad831d30` | VERIFIED |
-| [Claim 4](https://github.com/MachineLearning-Nerd/icml26-repro-jNv4sl4YZH/tree/orx/claim-4-eccp-universal-mechanism-and-full-protoc) | Universal ECCP mechanism and full protocol | `3211d65` | `7aebe226` | VERIFIED |
-| [Claim 5](https://github.com/MachineLearning-Nerd/icml26-repro-jNv4sl4YZH/tree/orx/claim-5-data-dependent-weca-full-protocol) | Data-dependent weight audit and full protocol | `f218228` | `edbed16d` | VERIFIED |
-| [Cumulative release science](https://github.com/MachineLearning-Nerd/icml26-repro-jNv4sl4YZH/tree/orx/evaluator-visible-cumulative-release-candidate) | Six-claim regression and evaluator-visible artifacts | `23c37c4` | `1811c6e7` | 25/25 commands; 44/44 tests |
-| [Judge-first capsule](https://github.com/MachineLearning-Nerd/icml26-repro-jNv4sl4YZH/tree/orx/judge-first-compact-evidence) | Reproduce and repair the live judge's 120k truncation | `0c8d208` | `dae8938a` | Science reached; upstream OpenML 504 |
-| [Outage-safe winner](https://github.com/MachineLearning-Nerd/icml26-repro-jNv4sl4YZH/tree/orx/fail-closed-openml-outage-fallback) | Guarded OpenML 5xx fallback plus cumulative visibility gate | `e21845d` | `88a1580c` | 27/27 commands; 49/49 tests; visibility PASS |
+| [Judged baseline](https://github.com/MachineLearning-Nerd/icml26-set-preserving-p2e-calibration/tree/baseline/judged-7-of-12) | Lock `uv` environment and historical evidence | `2171272` | `ae118f6b` | Environmental failure: missing protocol sidecars |
+| [Sidecar repair](https://github.com/MachineLearning-Nerd/icml26-set-preserving-p2e-calibration/tree/baseline/protocol-sidecar-repair) | Deterministically reconstruct missing sidecars | `5931369` | `ea731275` | Packaging failure: ignored publication metadata |
+| [Passing baseline](https://github.com/MachineLearning-Nerd/icml26-set-preserving-p2e-calibration/tree/baseline/metadata-reconstruction) | Reconstruct metadata and freeze cumulative baseline | `19c3b99` | `92323273` | 14/14 commands, 35/35 tests |
+| [Claim 2](https://github.com/MachineLearning-Nerd/icml26-set-preserving-p2e-calibration/tree/audit/claim-2-endpoint-counterexample) | Exact endpoint counterexample | `d2437fd` | `e35c4772` | FALSIFIED literally; corrected positive-domain form verified |
+| [Claim 3](https://github.com/MachineLearning-Nerd/icml26-set-preserving-p2e-calibration/tree/audit/claim-3-sigmoid-aon) | Analytic properties and direct AoN comparison | `56ed828` | `ad831d30` | VERIFIED |
+| [Claim 4](https://github.com/MachineLearning-Nerd/icml26-set-preserving-p2e-calibration/tree/audit/claim-4-eccp-coverage) | Universal ECCP mechanism and full protocol | `3211d65` | `7aebe226` | VERIFIED |
+| [Claim 5](https://github.com/MachineLearning-Nerd/icml26-set-preserving-p2e-calibration/tree/audit/claim-5-weca-independence) | Data-dependent weight audit and full protocol | `f218228` | `edbed16d` | VERIFIED |
+| [Cumulative release science](https://github.com/MachineLearning-Nerd/icml26-set-preserving-p2e-calibration/tree/release/evaluator-visible-cumulative) | Six-claim regression and evaluator-visible artifacts | `23c37c4` | `1811c6e7` | 25/25 commands; 44/44 tests |
+| [Judge-first capsule](https://github.com/MachineLearning-Nerd/icml26-set-preserving-p2e-calibration/tree/audit/judge-first-visibility) | Reproduce and repair the live judge's 120k truncation | `0c8d208` | `dae8938a` | Science reached; upstream OpenML 504 |
+| [Outage-safe winner](https://github.com/MachineLearning-Nerd/icml26-set-preserving-p2e-calibration/tree/release/openml-outage-fallback) | Guarded OpenML 5xx fallback plus cumulative visibility gate | `e21845d` | `88a1580c` | 27/27 commands; 49/49 tests; visibility PASS |
 
 All formal runs used the exact command shown above on Hugging Face
 `cpu-upgrade`. The passing scientific stages each used the platform’s 64-vCPU

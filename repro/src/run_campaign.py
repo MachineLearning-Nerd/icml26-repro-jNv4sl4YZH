@@ -33,22 +33,6 @@ EVIDENCE_BUNDLE_SHA256 = (
     "1cd1115ee4fefc260c79512eb1a4bea61f342ebca5bb9acf3cc5b8ca91f90359"
 )
 EXPECTED_BUNDLE_RECORDS = 21
-TRACKIO_METADATA = {
-    "schema_version": 1,
-    "title": "Repro - Set-Preserving Calibration from Conformal P-Values to E-Values",
-    "space_id": "DineshAI/jNv4sl4YZH",
-    "openreview_id": "jNv4sl4YZH",
-    "arxiv_id": "2606.03600",
-    "paper": {
-        "arxiv_id": "2606.03600",
-        "openreview_id": "jNv4sl4YZH",
-    },
-    "tags": ["icml2026-repro", "paper-jNv4sl4YZH"],
-    "artifacts_bucket": "hf://buckets/DineshAI/jNv4sl4YZH-artifacts",
-    "local_path_artifacts": [],
-}
-
-
 def sha256_bytes(payload: bytes) -> str:
     return hashlib.sha256(payload).hexdigest()
 
@@ -226,16 +210,6 @@ def cpu_allocation() -> dict[str, object]:
     }
 
 
-def prepare_trackio_metadata() -> None:
-    """Restore ignored, non-secret publication metadata in every fresh clone."""
-    destination = ROOT / ".trackio/metadata.json"
-    destination.parent.mkdir(parents=True, exist_ok=True)
-    destination.write_text(
-        json.dumps(TRACKIO_METADATA, indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
-    )
-
-
 def main() -> None:
     started_wall = time.time()
     started = time.monotonic()
@@ -256,7 +230,6 @@ def main() -> None:
 
     source = prepare_source()
     evidence = restore_historical_evidence()
-    prepare_trackio_metadata()
     python = sys.executable
     commands = [
         [python, "repro/src/verify_p2e_identity.py", "--output", "outputs/claim1_independent.json"],
